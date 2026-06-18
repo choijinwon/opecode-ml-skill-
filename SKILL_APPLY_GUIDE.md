@@ -12,7 +12,7 @@
 
 - 사용자가 직접 가져온 ML/GenAI 모델 프로젝트
 - `requirements.txt`, `train.py`, `run_model.py`, `config.json`, `ai_studio.env`, `input_example.json` 중 일부 또는 전체를 가진 프로젝트
-- MLflow local file store 또는 원격 MLflow 등록 준비 상태를 확인하려는 프로젝트
+- 사용자 환경의 MLflow tracking URI 또는 원격 MLflow 등록 준비 상태를 확인하려는 프로젝트
 
 ## 3. 포함되는 Skill
 
@@ -180,5 +180,5 @@ skill 이름이 너무 길게 느껴지는 경우:
 
 원격 MLflow 설정이 없는 경우:
 
-- local file store fallback인 `file:./mlruns` 기준으로 준비 상태를 확인한다.
+- 사용자 환경에 맞는 `MLFLOW_TRACKING_URI` 또는 `MLFLOW_TRACKING_URL` 값을 먼저 확인한다.
 - 원격 등록 정보는 `ai_studio.env`에 준비한 뒤 다시 확인한다.

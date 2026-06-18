@@ -28,9 +28,9 @@ metadata:
 ## Runtime Responsibilities
 
 - Windows 경로와 공백이 있는 경로를 처리한다.
-- local file store fallback을 지원한다.
+- 사용자 환경의 tracking URI 설정을 지원한다.
 - `mlflow.pyfunc.log_model(...)`과 `registered_model_name` 사용 흐름을 갖는다.
-- 원격 설정이 비어 있으면 친절한 local mode 안내를 출력한다.
+- 원격 설정이 비어 있으면 친절한 tracking URI 설정 안내를 출력한다.
 
 ## Output
 

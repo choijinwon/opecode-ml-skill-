@@ -76,7 +76,7 @@
 
 장점:
 
-- local/remote 등록 준비를 분리한다.
+- local tracking URI/remote 등록 준비를 분리한다.
 - `MLFLOW_TRACKING_URI`, `MLFLOW_TRACKING_URL`, experiment, registered model name 확인 기준이 있다.
 - secret 값 숨김과 원격 서버 미연결 원칙이 명확하다.
 
@@ -102,7 +102,7 @@
 
 - `run_model.py`에 필요한 핵심 옵션이 단순하고 명확하다.
 - Windows 경로와 공백 경로를 고려한다.
-- local file store fallback과 `mlflow.pyfunc.log_model(...)` 흐름을 안내한다.
+- 사용자 환경의 tracking URI 설정과 `mlflow.pyfunc.log_model(...)` 흐름을 안내한다.
 
 주의점:
 
@@ -124,7 +124,7 @@
 
 장점:
 
-- local mode와 remote mode를 분리해 안내한다.
+- 사용자 설정 tracking URI와 remote mode를 분리해 안내한다.
 - 원격 등록은 명시적 승인 이후에만 안내하도록 되어 있다.
 - credential 저장/생성을 금지한다.
 

@@ -8,4 +8,4 @@
 | 4 | `agent-mlflow-skill-gap-guide` | 부족한 파일과 설정을 safe, review_required, blocked로 나눠 보완 방향을 안내합니다. |
 | 5 | `agent-mlflow-skill-run-model-guide` | `run_model.py`가 가져야 할 옵션과 동작 방식을 안내합니다. |
 | 6 | `agent-mlflow-skill-prepare-check` | `run_model.py --prepare-only`로 등록 전 확인할 항목을 안내합니다. |
-| 7 | `agent-mlflow-skill-register-guide` | local `file:./mlruns` 또는 remote MLflow 등록 실행 조건을 안내합니다. |
+| 7 | `agent-mlflow-skill-register-guide` | 사용자 설정 tracking URI 또는 remote MLflow 등록 실행 조건을 안내합니다. |

@@ -1,6 +1,6 @@
 ---
 name: agent-mlflow-skill-register-guide
-description: 로컬 file store 또는 원격 MLflow 등록 실행 조건과 주의사항을 안내한다.
+description: 사용자 환경의 MLflow tracking URI 또는 원격 MLflow 등록 실행 조건과 주의사항을 안내한다.
 license: MIT
 compatibility: opencode
 metadata:
@@ -14,13 +14,13 @@ metadata:
 ## When To Use
 
 - `run_model.py --register` 실행 조건을 안내할 때
-- 로컬 `MLFLOW_TRACKING_URI=file:./mlruns` 등록과 원격 MLflow 등록을 구분해야 할 때
+- 사용자 설정 `MLFLOW_TRACKING_URI` 등록과 원격 MLflow 등록을 구분해야 할 때
 - 등록 실행 조건과 다음 조치를 안내해야 할 때
 
-## Local Mode
+## Configured Tracking URI
 
-- `MLFLOW_TRACKING_URI` 또는 `MLFLOW_TRACKING_URL`이 비어 있으면 local file store를 기본값으로 안내한다.
-- local run, artifact, registered model name 후보를 표시한다.
+- `MLFLOW_TRACKING_URI` 또는 `MLFLOW_TRACKING_URL`이 비어 있으면 사용자에게 tracking URI 설정이 필요하다고 안내한다.
+- 사용자 설정 tracking URI, artifact, registered model name 후보를 표시한다.
 - 테스트 목적의 등록 성공 여부를 짧게 요약한다.
 
 ## Remote Mode
@@ -32,10 +32,10 @@ metadata:
 ## Output
 
 - registration command
-- local/remote mode
+- tracking URI/remote mode
 - experiment name
 - registered model name
-- run id 또는 local run path
+- run id 또는 tracking output path
 - next action
 
 ## Safety

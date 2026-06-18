@@ -29,7 +29,7 @@
 
 - 로컬에 모델 프로젝트를 가져온 사용자
 - OpenCode를 사용해 모델 등록 준비 상태를 확인하려는 사용자
-- MLflow local file store 또는 원격 MLflow 등록 전에 필요한 파일과 설정을 점검하려는 사용자
+- 사용자 환경의 MLflow tracking URI 또는 원격 MLflow 등록 전에 필요한 파일과 설정을 점검하려는 사용자
 
 ## 4. 네이밍 규칙
 
@@ -134,7 +134,7 @@ Skill: `agent-mlflow-skill-mlflow-check`
 
 목적:
 
-- MLflow local/remote 등록 준비 상태 확인 기준을 안내한다.
+- MLflow tracking URI/remote 등록 준비 상태 확인 기준을 안내한다.
 
 확인 항목:
 
@@ -142,7 +142,7 @@ Skill: `agent-mlflow-skill-mlflow-check`
 - `MLFLOW_TRACKING_URI` 또는 `MLFLOW_TRACKING_URL`
 - experiment name
 - registered model name
-- local file store fallback 가능 여부
+- 사용자 환경의 tracking URI 설정 여부
 - username/password 존재 여부
 
 안전 요구사항:
@@ -198,9 +198,9 @@ Skill: `agent-mlflow-skill-run-model-guide`
 동작 기준:
 
 - Windows 경로와 공백 포함 경로를 고려한다.
-- local file store fallback을 고려한다.
+- 사용자 환경의 tracking URI 설정을 우선 확인한다.
 - `mlflow.pyfunc.log_model(...)`과 `registered_model_name` 사용 흐름을 안내한다.
-- 원격 설정이 비어 있으면 local mode 안내를 제공한다.
+- 원격 설정이 비어 있으면 tracking URI 설정 안내를 제공한다.
 
 다음 단계:
 
@@ -238,12 +238,12 @@ Skill: `agent-mlflow-skill-register-guide`
 
 목적:
 
-- local file store 또는 원격 MLflow 등록 실행 조건과 주의사항을 안내한다.
+- 사용자 환경의 MLflow tracking URI 또는 원격 MLflow 등록 실행 조건과 주의사항을 안내한다.
 
-Local mode 요구사항:
+사용자 설정 tracking URI 요구사항:
 
-- `MLFLOW_TRACKING_URI` 또는 `MLFLOW_TRACKING_URL`이 비어 있으면 `file:./mlruns` fallback을 안내한다.
-- local run, artifact, registered model name 후보를 안내한다.
+- `MLFLOW_TRACKING_URI` 또는 `MLFLOW_TRACKING_URL`이 비어 있으면 사용자에게 tracking URI 설정이 필요하다고 안내한다.
+- 사용자 설정 tracking URI, artifact, registered model name 후보를 안내한다.
 
 Remote mode 요구사항:
 
@@ -254,10 +254,10 @@ Remote mode 요구사항:
 출력 요구사항:
 
 - registration command
-- local/remote mode
+- tracking URI/remote mode
 - experiment name
 - registered model name
-- run id 또는 local run path
+- run id 또는 tracking output path
 - next action
 
 ## 7. 안전 요구사항
