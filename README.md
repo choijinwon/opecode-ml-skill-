@@ -19,6 +19,7 @@
 ```
 
 상세 요구사항은 [SKILL_REQUIREMENTS.md](SKILL_REQUIREMENTS.md)를 확인하세요.
+구성 분석은 [SKILL_ANALYSIS_REPORT.md](SKILL_ANALYSIS_REPORT.md)를 확인하세요.
 
 ## 단계
 
