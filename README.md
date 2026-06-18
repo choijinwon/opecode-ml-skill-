@@ -1,87 +1,57 @@
-# OpenCode MLflow Skill Pack
+# OpenCode MLflow Local Model Skills
 
-OpenCode에서 사용자가 가져온 로컬 ML/GenAI 모델 프로젝트를 읽고, MLflow 등록 준비와 검증 순서를 단계별로 안내하기 위한 skill pack입니다.
+사용자가 이미 가져온 로컬 모델 프로젝트를 OpenCode에서 단계별로 점검하도록 돕는 단순 skill pack입니다.
 
-이 저장소는 `choijinwon/agent-onboarding-ml`의 MLflow 온보딩 POC 구조를 OpenCode skill 형식에 맞게 정리한 버전입니다.
+이 저장소는 앱, CLI, TUI, 샘플 생성기, 자동 스캐너를 배포하지 않습니다. 사용자에게 제공하는 것은 OpenCode가 읽는 `.opencode/skills/<name>/SKILL.md` 파일뿐입니다.
 
-## 구성
+## 포함된 Skill
 
 ```text
 .opencode/
-├── agents/
-│   └── mlflow.md
 └── skills/
-    ├── mlflow-onboarding/
-    ├── mlflow-experiment-tracking/
-    ├── mlflow-registration-check/
-    ├── mlflow-model-registry-deployment/
-    ├── instrumenting-with-mlflow-tracing/
-    ├── analyze-mlflow-trace/
-    ├── agent-evaluation/
-    └── ...
+    ├── local-model-intake-flow/
+    ├── model-project-scan-validation/
+    ├── mlflow-readiness-validation/
+    ├── registration-gap-fill-planning/
+    ├── run-model-template-planning/
+    ├── prepare-only-validation/
+    └── mlflow-registration-execution/
 ```
 
-OpenCode는 프로젝트 루트에서 `.opencode/skills/<name>/SKILL.md`를 자동 발견합니다. 각 skill의 `name`은 폴더명과 일치합니다.
+## 단계
+
+1. 로컬 모델 경로 선택
+2. 프로젝트 스캔 안내
+3. MLflow 준비 검증 안내
+4. 부족한 파일/설정 보완 안내
+5. `run_model.py` 동작 안내
+6. `--prepare-only` 검증 안내
+7. local/remote MLflow 등록 안내
 
 ## 사용 방법
 
-이 저장소를 ML 프로젝트 루트에 복사합니다.
+사용자의 ML 프로젝트 루트에 skill 폴더를 복사합니다.
 
 ```bash
-cp -R .opencode /path/to/your-ml-project/
+cp -R .opencode/skills /path/to/user-project/.opencode/
 ```
 
-그다음 해당 ML 프로젝트에서 OpenCode를 실행하고 다음처럼 요청합니다.
+그다음 사용자는 OpenCode에서 자연어로 요청합니다.
 
 ```text
-@mlflow 이 프로젝트 MLflow 등록 준비 상태 점검해줘
-@mlflow train.py에 experiment tracking 누락된 부분 찾아줘
-@mlflow LangChain agent에 MLflow tracing 붙이는 계획 만들어줘
-@mlflow 모델 registry 배포 체크리스트 만들어줘
-@mlflow work/my-model을 로컬에서 점검하고 MLflow 등록까지 단계별로 알려줘
+이 로컬 모델 프로젝트를 MLflow 등록 준비 관점에서 단계별로 봐줘
+./my-model 경로를 기준으로 필요한 파일이 뭔지 알려줘
+run_model.py가 어떤 옵션을 가져야 하는지 알려줘
+원격 MLflow 등록 전에 prepare-only로 뭘 확인해야 하는지 알려줘
 ```
 
-프로젝트에 이미 `.opencode`가 있다면 `skills/`와 `agents/mlflow.md`만 병합하세요.
+## 범위
 
-## 포함된 주요 skill
-
-### 로컬 모델 등록 안내 단계 skill
-
-- `model-scenario-orchestrator`: 전체 Step 1~9 흐름 조율
-- `local-model-intake-flow`: 사용자가 가져온 로컬 모델 프로젝트 탐지와 선택
-- `model-project-scan-validation`: requirements, entrypoint, artifact, config, input example 스캔
-- `mlflow-readiness-validation`: local/remote MLflow 등록 준비 상태 점검
-- `registration-gap-fill-planning`: Step 6 승인 전 누락 파일 보완 계획
-- `run-model-template-planning`: `run_model.py` 옵션과 책임 정의
-- `prepare-only-validation`: `run_model.py --prepare-only` 검증 흐름
-- `mlflow-registration-execution`: local file store 또는 원격 MLflow 등록 실행 안내
-- `wizard-cli-tui-step-flow`: Wizard, CLI, TUI 단계 연결
-
-### MLflow 범용 skill
-
-- `mlflow-onboarding`: Tracking, Evaluation, Registry, Tracing 중 시작 경로 선택
-- `mlflow-experiment-tracking`: params, metrics, artifacts, datasets 기록 점검
-- `mlflow-registration-check`: 모델 등록 전 필수 파일과 설정 확인
-- `mlflow-model-registry-deployment`: registry, serving, deployment readiness 점검
-- `instrumenting-with-mlflow-tracing`: GenAI 앱과 agent 코드에 tracing 추가
-- `analyze-mlflow-trace`: trace span, latency, error, metadata 분석
-- `retrieving-mlflow-traces`: MLflow trace 검색과 필터링 안내
-- `agent-evaluation`: agent 품질 평가와 regression 비교
-- `closed-network-validation`: 폐쇄망/내부망 환경 반입 전 점검
-- `ai-studio-runtime-template`: AI Studio 등록용 runtime scaffold 점검
-
-## 권장 작업 흐름
-
-1. `@mlflow`로 로컬 모델 등록 안내 흐름을 시작합니다.
-2. `local-model-intake-flow`로 현재 프로젝트, 사용자가 지정한 경로, 또는 `work/` 아래 모델을 선택합니다.
-3. `model-project-scan-validation`과 `mlflow-readiness-validation`으로 구조와 MLflow 준비 상태를 읽기 전용으로 점검합니다.
-4. `registration-gap-fill-planning`으로 보완이 필요한 파일과 설정을 safe/review_required/blocked로 분리합니다.
-5. `run-model-template-planning`과 `prepare-only-validation`으로 `run_model.py --prepare-only` 검증 흐름을 안내합니다.
-6. `mlflow-registration-execution`으로 local/remote 등록 실행 조건을 안내합니다.
-
-## OpenCode 참고
-
-이 저장소는 OpenCode의 project-local skill 경로인 `.opencode/skills/<name>/SKILL.md`를 사용합니다. OpenCode skill frontmatter에는 `name`, `description`, `license`, `compatibility`를 넣었습니다.
+- 파일을 자동 생성하지 않습니다.
+- 샘플 모델을 만들지 않습니다.
+- 별도 스캐너 프로그램을 실행하지 않습니다.
+- 리포트 파일을 만들지 않습니다.
+- OpenCode가 로컬 파일을 읽고 skill 지침에 따라 다음 조치를 안내하는 용도입니다.
 
 ## License
 

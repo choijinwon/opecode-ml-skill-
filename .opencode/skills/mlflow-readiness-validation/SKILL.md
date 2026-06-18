@@ -1,11 +1,11 @@
 ---
 name: mlflow-readiness-validation
-description: 선택된 프로젝트가 MLflow local/remote 등록 테스트를 수행할 준비가 되었는지 검증한다.
+description: 선택된 프로젝트가 MLflow local/remote 등록 테스트를 수행할 준비가 되었는지 확인하는 기준을 안내한다.
 license: MIT
 compatibility: opencode
 metadata:
   flow: local-model-registration
-  stage: 03-validation
+  stage: 03-mlflow-check
   step: 3
 ---
 
@@ -13,9 +13,9 @@ metadata:
 
 ## When To Use
 
-- Step 2~5에서 MLflow 의존성, tracking URI, experiment, registered model name을 점검할 때
+- Step 3에서 MLflow 의존성, tracking URI, experiment, registered model name을 점검할 때
 - 로컬 `file:./mlruns` 테스트와 원격 MLflow 등록 조건을 나눠 판단할 때
-- `run_model.py --register` 전에 readiness summary가 필요할 때
+- `run_model.py --register` 전에 준비 상태 요약이 필요할 때
 
 ## Checklist
 
@@ -36,4 +36,4 @@ metadata:
 ## Safety
 
 - 원격 서버 연결이나 등록 실행은 하지 않는다.
-- secret 값을 로그, trace, report에 포함하지 않는다.
+- secret 값을 로그, trace, 화면 출력에 포함하지 않는다.

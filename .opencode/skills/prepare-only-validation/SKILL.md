@@ -1,12 +1,12 @@
 ---
 name: prepare-only-validation
-description: Step 7~8에서 run_model.py --prepare-only로 모델 artifact 준비와 입력 예제를 검증한다.
+description: run_model.py --prepare-only로 모델 artifact 준비와 입력 예제를 확인하는 기준을 안내한다.
 license: MIT
 compatibility: opencode
 metadata:
   flow: local-model-registration
-  stage: 05-prepare
-  step: 7
+  stage: 06-prepare-only
+  step: 6
 ---
 
 # Prepare Only Validation
@@ -14,7 +14,7 @@ metadata:
 ## When To Use
 
 - MLflow 등록 실행 전 local preparation smoke test를 설계할 때
-- `run_model.py --prepare-only` 결과를 Wizard/TUI에 표시해야 할 때
+- `run_model.py --prepare-only` 결과에서 어떤 상태를 확인할지 정해야 할 때
 - artifact, config, input example이 실제로 함께 동작하는지 확인해야 할 때
 
 ## Checks

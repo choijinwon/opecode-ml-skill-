@@ -1,43 +1,15 @@
-# OpenCode MLflow Skills
+# OpenCode Skills
 
-OpenCode skills are stored here. Each skill lives in its own directory with a `SKILL.md` file.
-
-## Local Model Registration Flow
+이 폴더는 사용자가 가져온 로컬 모델 프로젝트를 MLflow 등록 준비 관점에서 안내하는 7개 skill만 포함합니다.
 
 ```text
-Step 0     model-scenario-orchestrator
-Step 1     local-model-intake-flow
-Step 2-4   model-project-scan-validation
-Step 2-4   mlflow-readiness-validation
-Step 5     registration-gap-fill-planning
-Step 5     run-model-template-planning
-Step 6     prepare-only-validation
-Step 7-8   mlflow-registration-execution
-Step 1-9   wizard-cli-tui-step-flow
+Step 1  local-model-intake-flow
+Step 2  model-project-scan-validation
+Step 3  mlflow-readiness-validation
+Step 4  registration-gap-fill-planning
+Step 5  run-model-template-planning
+Step 6  prepare-only-validation
+Step 7  mlflow-registration-execution
 ```
 
-These skills describe the feature behavior only. They do not create models, implement TUI screens, or run MLflow registration code by themselves.
-
-## Existing MLflow Skill Set
-
-```text
-├── agent-evaluation/
-├── analyze-mlflow-chat-session/
-├── analyze-mlflow-trace/
-├── closed-network-validation/
-├── error-log-repair/
-├── instrumenting-with-mlflow-tracing/
-├── job-template-draft/
-├── mlflow-ai-gateway/
-├── mlflow-experiment-tracking/
-├── mlflow-model-registry-deployment/
-├── mlflow-onboarding/
-├── mlflow-prompt-management/
-├── mlflow-prompt-optimization/
-├── mlflow-registration-check/
-├── querying-mlflow-metrics/
-├── retrieving-mlflow-traces/
-└── searching-mlflow-docs/
-```
-
-The MLflow-specific skills are adapted for this closed-network POC from `mlflow/skills` and `mlflow/mlflow`: tracing, trace analysis, chat session analysis, trace retrieval, agent evaluation, metrics querying, onboarding, documentation search, prompt management, prompt optimization, AI Gateway, experiment tracking, model registry, and deployment.
+이 skill들은 기능 안내용입니다. 샘플 모델 생성, 코드 자동 생성, CLI/TUI 실행, 리포트 파일 생성은 포함하지 않습니다.

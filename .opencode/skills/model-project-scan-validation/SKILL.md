@@ -1,11 +1,11 @@
 ---
 name: model-project-scan-validation
-description: 선택된 모델 프로젝트의 entrypoint, artifact, config, input example, requirements를 읽기 전용으로 스캔한다.
+description: 선택된 모델 프로젝트의 entrypoint, artifact, config, input example, requirements 확인 기준을 안내한다.
 license: MIT
 compatibility: opencode
 metadata:
   flow: local-model-registration
-  stage: 03-validation
+  stage: 02-project-check
   step: 2
 ---
 
@@ -13,9 +13,9 @@ metadata:
 
 ## When To Use
 
-- Step 2~5에서 선택된 프로젝트가 등록 가능한 구조인지 확인할 때
+- Step 2에서 선택된 프로젝트가 등록 가능한 구조인지 확인할 때
 - 학습 entrypoint, 모델 artifact, 환경 파일, 입력 예제를 찾을 때
-- 수정 전 read-only 상태 보고서를 만들어야 할 때
+- 수정 전 read-only 확인 기준이 필요할 때
 
 ## Checklist
 

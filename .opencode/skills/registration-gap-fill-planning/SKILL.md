@@ -5,8 +5,8 @@ license: MIT
 compatibility: opencode
 metadata:
   flow: local-model-registration
-  stage: 04-gap-fill
-  step: 6
+  stage: 04-gap-guidance
+  step: 4
 ---
 
 # Registration Gap Fill Planning
@@ -14,7 +14,7 @@ metadata:
 ## When To Use
 
 - 검증 결과 누락 파일이 발견되었고, 보완 안내 계획만 만들어야 할 때
-- 승인 화면에서 추가/수정 후보를 보여줘야 할 때
+- 사용자에게 추가/수정 후보를 보여줘야 할 때
 - 위험한 자동 수정과 안전한 scaffold 안내를 분리해야 할 때
 
 ## Classifications

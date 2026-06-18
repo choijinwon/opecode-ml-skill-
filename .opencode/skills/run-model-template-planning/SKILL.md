@@ -1,12 +1,12 @@
 ---
 name: run-model-template-planning
-description: MLflow 등록 테스트용 run_model.py 템플릿의 옵션, 책임, 검증 동작을 정의한다.
+description: MLflow 등록 테스트용 run_model.py가 가져야 할 옵션, 책임, 검증 동작을 안내한다.
 license: MIT
 compatibility: opencode
 metadata:
   flow: local-model-registration
-  stage: 04-gap-fill
-  step: 6
+  stage: 05-run-model-guidance
+  step: 5
 ---
 
 # Run Model Template Planning
@@ -17,7 +17,7 @@ metadata:
 - `--prepare-only`, `--register`, `--env-file`, `--config`, `--model` 옵션 의미를 정의할 때
 - 모델별 wrapper 차이는 숨기고 공통 등록 흐름을 제공해야 할 때
 
-## Required CLI Options
+## Required Options
 
 - `--prepare-only`: artifact와 config를 읽고 등록 전 준비만 검증한다.
 - `--register`: MLflow logging/register를 실행한다.

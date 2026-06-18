@@ -1,12 +1,12 @@
 ---
 name: mlflow-registration-execution
-description: Step 9~10에서 로컬 file store 또는 원격 MLflow 등록 실행 조건과 결과 처리를 정의한다.
+description: 로컬 file store 또는 원격 MLflow 등록 실행 조건과 주의사항을 안내한다.
 license: MIT
 compatibility: opencode
 metadata:
   flow: local-model-registration
-  stage: 06-registration
-  step: 9
+  stage: 07-registration
+  step: 7
 ---
 
 # MLflow Registration Execution
