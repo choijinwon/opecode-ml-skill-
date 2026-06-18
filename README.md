@@ -9,7 +9,7 @@
 ```text
 .opencode/
 └── skills/
-    ├── agent-mlflow-skill-local-model-intake-flow/
+    ├── agent-mlflow-skill-model-select/
     ├── agent-mlflow-skill-model-project-scan-validation/
     ├── agent-mlflow-skill-mlflow-readiness-validation/
     ├── agent-mlflow-skill-registration-gap-fill-planning/

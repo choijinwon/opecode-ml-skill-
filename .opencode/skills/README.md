@@ -3,7 +3,7 @@
 이 폴더는 사용자가 가져온 로컬 모델 프로젝트를 MLflow 등록 준비 관점에서 안내하는 7개 skill만 포함합니다.
 
 ```text
-Step 1  agent-mlflow-skill-local-model-intake-flow
+Step 1  agent-mlflow-skill-model-select
 Step 2  agent-mlflow-skill-model-project-scan-validation
 Step 3  agent-mlflow-skill-mlflow-readiness-validation
 Step 4  agent-mlflow-skill-registration-gap-fill-planning

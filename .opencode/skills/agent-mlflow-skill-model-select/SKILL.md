@@ -1,5 +1,5 @@
 ---
-name: agent-mlflow-skill-local-model-intake-flow
+name: agent-mlflow-skill-model-select
 description: 사용자가 가져온 로컬 모델 프로젝트를 찾고 MLflow 등록 검증 대상으로 선택하도록 안내한다.
 license: MIT
 compatibility: opencode
@@ -9,7 +9,7 @@ metadata:
   step: 1
 ---
 
-# Local Model Intake Flow
+# Model Select
 
 ## When To Use
 
