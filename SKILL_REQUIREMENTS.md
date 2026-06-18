@@ -205,7 +205,7 @@ Skill: `agent-mlflow-skill-run-model-guide`
 
 권장 기능:
 
-- prepare-only 또는 dry-run 기능 존재 여부
+- prepare-only 기능 존재 여부
 - register 기능
 - environment config 전달 기능
 - config path 전달 기능
@@ -230,7 +230,7 @@ Skill: `agent-mlflow-skill-prepare-check`
 
 목적:
 
-- 등록/실행 entrypoint에 prepare-only 또는 dry-run 기능이 있는지 확인하고, 등록 전 확인할 항목을 안내한다.
+- 등록/실행 entrypoint에 prepare-only 기능이 있는지 확인하고, 등록 전 확인할 항목을 안내한다.
 
 확인 항목:
 
@@ -244,7 +244,7 @@ Skill: `agent-mlflow-skill-prepare-check`
 안전 요구사항:
 
 - 원격 MLflow 등록을 수행하지 않는다.
-- dry-run은 직접 실행하지 않으며, 사용자가 명시적으로 실행을 요청하거나 승인한 경우에만 사용자 프로젝트의 명령 실행을 안내한다.
+- 사용자가 명시적으로 실행을 요청하거나 승인한 경우에만 사용자 프로젝트의 prepare-only 명령 실행 방법을 안내한다.
 - 사용자가 실행을 승인해 임시 파일이 생기는 경우에는 사용자 프로젝트가 허용한 안전한 경로를 사용하도록 안내한다.
 
 다음 단계:

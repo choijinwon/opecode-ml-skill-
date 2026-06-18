@@ -106,7 +106,7 @@ opencode
 
 ```text
 등록/실행 entrypoint가 제공하면 좋은 기능을 알려줘.
-prepare-only 또는 dry-run 전에 확인할 항목을 정리해줘.
+prepare-only 전에 확인할 항목을 정리해줘.
 원격 MLflow 등록 전에 환경 변수나 설정 파일에서 확인할 키를 알려줘.
 이 모델이 TensorFlow/PyTorch/sklearn/ONNX/HuggingFace 중 어떤 유형인지 근거와 함께 봐줘.
 ```
@@ -124,7 +124,7 @@ prepare-only 또는 dry-run 전에 확인할 항목을 정리해줘.
 5. `agent-mlflow-skill-run-model-guide`
    - 등록/실행 entrypoint 기능과 책임을 확인한다.
 6. `agent-mlflow-skill-prepare-check`
-   - prepare-only 또는 동등한 dry-run 기능 존재 여부와 실행 전 확인 기준을 확인한다.
+   - prepare-only 기능 존재 여부와 실행 전 확인 기준을 확인한다.
 7. `agent-mlflow-skill-register-guide`
    - local/remote MLflow 등록 실행 조건을 확인한다.
 
