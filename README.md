@@ -18,6 +18,8 @@
     └── agent-mlflow-skill-register-guide/
 ```
 
+상세 요구사항은 [SKILL_REQUIREMENTS.md](SKILL_REQUIREMENTS.md)를 확인하세요.
+
 ## 단계
 
 1. 로컬 모델 경로 선택
