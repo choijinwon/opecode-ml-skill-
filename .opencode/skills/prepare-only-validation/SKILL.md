@@ -4,7 +4,7 @@ description: Step 7~8에서 run_model.py --prepare-only로 모델 artifact 준�
 license: MIT
 compatibility: opencode
 metadata:
-  flow: model-test-scenario
+  flow: local-model-registration
   stage: 05-prepare
   step: 7
 ---

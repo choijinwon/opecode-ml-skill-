@@ -1,20 +1,19 @@
 # Skill Index
 
-## Model Test Scenario Flow
+## Local Model Registration Flow
 
 | Step | Skill | Purpose |
 | --- | --- | --- |
-| 0 | `model-scenario-orchestrator` | 샘플 생성, 선택, 검증, prepare-only, MLflow 등록, 리포트 전체 흐름을 조율합니다. |
-| 1 | `sample-model-matrix-generation` | TensorFlow, PyTorch, sklearn, ONNX, XGBoost, HuggingFace, Sora 오류, 대형 artifact 등 10개 샘플 matrix를 정의합니다. |
-| 1 | `model-sample-selection-flow` | `.aiu/sample_projects/` 샘플과 `work/` 사용자 모델을 탐지하고 선택 목록으로 정리합니다. |
-| 2-5 | `model-project-scan-validation` | requirements, entrypoint, artifact, config, env, input example을 읽기 전용으로 스캔합니다. |
-| 2-5 | `mlflow-readiness-validation` | MLflow dependency, tracking URI, experiment, registered model name, local fallback을 검증합니다. |
-| 6 | `registration-gap-fill-planning` | 부족한 파일과 설정을 safe, review_required, blocked로 나눠 보완 계획을 만듭니다. |
-| 6 | `run-model-template-planning` | `run_model.py`의 `--prepare-only`, `--register`, `--env-file`, `--config`, `--model` 기능을 정의합니다. |
-| 7-8 | `prepare-only-validation` | `run_model.py --prepare-only` 준비 검증 흐름과 실패 원인 분류를 정의합니다. |
-| 9-10 | `mlflow-registration-execution` | local `file:./mlruns` 또는 원격 MLflow 등록 실행 조건을 정의합니다. |
-| 1-10 | `wizard-cli-tui-step-flow` | Wizard, CLI, TUI가 같은 단계 상태를 쓰도록 명령과 화면 필드를 매핑합니다. |
-| 10 | `registration-result-reporting` | 최종 결과 표, pass/warn/block 요약, 다음 조치를 정리합니다. |
+| 0 | `model-scenario-orchestrator` | 사용자가 가져온 로컬 모델의 선택, 검증, prepare-only, MLflow 등록 안내, 리포트 전체 흐름을 조율합니다. |
+| 1 | `local-model-intake-flow` | 현재 프로젝트, 명시 경로, `work/` 아래 로컬 모델 후보를 탐지하고 선택하도록 안내합니다. |
+| 2-4 | `model-project-scan-validation` | requirements, entrypoint, artifact, config, env, input example을 읽기 전용으로 스캔합니다. |
+| 2-4 | `mlflow-readiness-validation` | MLflow dependency, tracking URI, experiment, registered model name, local fallback을 검증합니다. |
+| 5 | `registration-gap-fill-planning` | 부족한 파일과 설정을 safe, review_required, blocked로 나눠 보완 안내를 만듭니다. |
+| 5 | `run-model-template-planning` | `run_model.py`의 `--prepare-only`, `--register`, `--env-file`, `--config`, `--model` 동작을 정의합니다. |
+| 6 | `prepare-only-validation` | `run_model.py --prepare-only` 준비 검증 흐름과 실패 원인 분류를 정의합니다. |
+| 7-8 | `mlflow-registration-execution` | local `file:./mlruns` 또는 원격 MLflow 등록 실행 조건을 정의합니다. |
+| 1-9 | `wizard-cli-tui-step-flow` | Wizard, CLI, TUI가 같은 단계 상태를 쓰도록 명령과 화면 필드를 매핑합니다. |
+| 9 | `registration-result-reporting` | 최종 결과 표, pass/warn/block 요약, 다음 조치를 정리합니다. |
 
 ## Existing MLflow Skills
 

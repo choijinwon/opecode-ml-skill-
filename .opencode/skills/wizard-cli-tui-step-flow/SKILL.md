@@ -1,10 +1,10 @@
 ---
 name: wizard-cli-tui-step-flow
-description: 초급자 Wizard, CLI, TUI에서 모델 생성/선택/검증/등록 단계가 같은 상태 흐름을 쓰도록 정의한다.
+description: 초급자 Wizard, CLI, TUI에서 로컬 모델 선택/검증/등록 안내 단계가 같은 상태 흐름을 쓰도록 정의한다.
 license: MIT
 compatibility: opencode
 metadata:
-  flow: model-test-scenario
+  flow: local-model-registration
   stage: 07-interface
   step: 1
 ---
@@ -13,27 +13,25 @@ metadata:
 
 ## When To Use
 
-- 같은 기능을 Wizard, CLI, TUI에서 일관되게 보여줘야 할 때
-- Step 1 모델 선택 화면과 Step 10 결과 화면을 설계할 때
+- 같은 로컬 모델 안내 기능을 Wizard, CLI, TUI에서 일관되게 보여줘야 할 때
+- Step 1 모델 선택 화면과 최종 결과 화면을 설계할 때
 - CLI 명령과 Wizard 상태를 연결해야 할 때
 
 ## Interface Commands
 
-- `aiu sample list`
-- `aiu sample create --kind tensorflow`
-- `aiu sample create --kind large10`
+- `aiu analyze <project>`
 - `aiu validate <project>`
 - `aiu register <project> --dry-run`
 - `aiu register <project>`
 
 ## Wizard Steps
 
-- Step 1: sample/work 모델 목록 표시와 선택
-- Step 2~5: scan, dependency, config, artifact, input example 검증
-- Step 6: 보완 계획 승인
-- Step 7~8: `--prepare-only` 준비 검증
-- Step 9: MLflow 등록 실행 안내
-- Step 10: 결과 리포트 표시
+- Step 1: 현재 프로젝트, 명시 경로, `work/` 로컬 모델 후보 표시와 선택
+- Step 2~4: scan, dependency, config, artifact, input example 검증
+- Step 5: 보완 안내와 승인 필요 항목 표시
+- Step 6: `--prepare-only` 준비 검증 안내
+- Step 7~8: MLflow 등록 실행 조건 안내
+- Step 9: 결과 리포트 표시
 
 ## Output
 

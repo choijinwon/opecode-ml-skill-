@@ -4,7 +4,7 @@ description: 선택된 모델 프로젝트의 entrypoint, artifact, config, inpu
 license: MIT
 compatibility: opencode
 metadata:
-  flow: model-test-scenario
+  flow: local-model-registration
   stage: 03-validation
   step: 2
 ---

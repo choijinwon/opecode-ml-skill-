@@ -1,10 +1,10 @@
 ---
 name: registration-result-reporting
-description: Step 10에서 샘플 생성, 검증, prepare-only, MLflow 등록 결과를 표 형태로 요약한다.
+description: 최종 단계에서 로컬 모델 검증, prepare-only, MLflow 등록 안내 결과를 표 형태로 요약한다.
 license: MIT
 compatibility: opencode
 metadata:
-  flow: model-test-scenario
+  flow: local-model-registration
   stage: 08-reporting
   step: 10
 ---
@@ -13,13 +13,13 @@ metadata:
 
 ## When To Use
 
-- Step 10 최종 리포트를 만들어야 할 때
+- 최종 리포트를 만들어야 할 때
 - Wizard/TUI/CLI 출력에 같은 결과 요약을 써야 할 때
 - 성공, 경고, 차단 항목과 다음 조치를 분리해야 할 때
 
 ## Report Fields
 
-- selected project
+- selected local project
 - framework
 - artifact size
 - required files status

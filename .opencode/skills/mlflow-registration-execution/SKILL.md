@@ -4,7 +4,7 @@ description: Step 9~10에서 로컬 file store 또는 원격 MLflow 등록 실�
 license: MIT
 compatibility: opencode
 metadata:
-  flow: model-test-scenario
+  flow: local-model-registration
   stage: 06-registration
   step: 9
 ---

@@ -4,7 +4,7 @@ description: MLflow 등록 테스트용 run_model.py 템플릿의 옵션, 책임
 license: MIT
 compatibility: opencode
 metadata:
-  flow: model-test-scenario
+  flow: local-model-registration
   stage: 04-gap-fill
   step: 6
 ---
@@ -13,7 +13,7 @@ metadata:
 
 ## When To Use
 
-- `run_model.py` 생성 또는 보강 기능을 설계할 때
+- `run_model.py` 구성 또는 보강 안내를 설계할 때
 - `--prepare-only`, `--register`, `--env-file`, `--config`, `--model` 옵션 의미를 정의할 때
 - 모델별 wrapper 차이는 숨기고 공통 등록 흐름을 제공해야 할 때
 

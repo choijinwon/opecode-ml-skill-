@@ -13,7 +13,7 @@ metadata:
 ## When To Use
 
 - Windows 10/11 또는 폐쇄망 Mac/Linux 환경에서 설치와 실행을 점검할 때
-- 외부 다운로드 없이 로컬 샘플, 내부 Qwen, 로컬 MLflow file store로 검증해야 할 때
+- 외부 다운로드 없이 사용자가 가져온 로컬 모델, 내부 Qwen, 로컬 MLflow file store로 검증해야 할 때
 - 폴더 권한, 한글 인코딩, 절대 경로, 드래그앤드랍 경로 문제가 있을 때
 
 ## Checklist

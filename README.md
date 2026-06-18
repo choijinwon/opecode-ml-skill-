@@ -1,6 +1,6 @@
 # OpenCode MLflow Skill Pack
 
-OpenCode에서 MLflow 기반 ML/GenAI 프로젝트 온보딩, 실험 추적, 모델 등록, tracing, evaluation, 운영 점검을 빠르게 수행하기 위한 skill pack입니다.
+OpenCode에서 사용자가 가져온 로컬 ML/GenAI 모델 프로젝트를 읽고, MLflow 등록 준비와 검증 순서를 단계별로 안내하기 위한 skill pack입니다.
 
 이 저장소는 `choijinwon/agent-onboarding-ml`의 MLflow 온보딩 POC 구조를 OpenCode skill 형식에 맞게 정리한 버전입니다.
 
@@ -38,17 +38,17 @@ cp -R .opencode /path/to/your-ml-project/
 @mlflow train.py에 experiment tracking 누락된 부분 찾아줘
 @mlflow LangChain agent에 MLflow tracing 붙이는 계획 만들어줘
 @mlflow 모델 registry 배포 체크리스트 만들어줘
+@mlflow work/my-model을 로컬에서 점검하고 MLflow 등록까지 단계별로 알려줘
 ```
 
 프로젝트에 이미 `.opencode`가 있다면 `skills/`와 `agents/mlflow.md`만 병합하세요.
 
 ## 포함된 주요 skill
 
-### 모델 테스트 시나리오 단계 skill
+### 로컬 모델 등록 안내 단계 skill
 
-- `model-scenario-orchestrator`: 전체 Step 1~10 흐름 조율
-- `sample-model-matrix-generation`: 10개 폐쇄망 샘플 모델 matrix 정의
-- `model-sample-selection-flow`: `.aiu/sample_projects/`와 `work/` 모델 선택 흐름
+- `model-scenario-orchestrator`: 전체 Step 1~9 흐름 조율
+- `local-model-intake-flow`: 사용자가 가져온 로컬 모델 프로젝트 탐지와 선택
 - `model-project-scan-validation`: requirements, entrypoint, artifact, config, input example 스캔
 - `mlflow-readiness-validation`: local/remote MLflow 등록 준비 상태 점검
 - `registration-gap-fill-planning`: Step 6 승인 전 누락 파일 보완 계획
@@ -73,14 +73,13 @@ cp -R .opencode /path/to/your-ml-project/
 
 ## 권장 작업 흐름
 
-1. `@mlflow`로 모델 테스트 시나리오 전체를 시작합니다.
-2. `sample-model-matrix-generation`으로 샘플 모델 set을 정합니다.
-3. `model-sample-selection-flow`로 샘플 또는 `work/` 모델을 선택합니다.
-4. `model-project-scan-validation`과 `mlflow-readiness-validation`으로 Step 2~5 검증을 수행합니다.
-5. `registration-gap-fill-planning`으로 Step 6 보완 계획을 만들고 승인 항목을 분리합니다.
-6. `run-model-template-planning`과 `prepare-only-validation`으로 Step 7~8 준비 검증을 정의합니다.
-7. `mlflow-registration-execution`으로 Step 9 local/remote 등록 실행 조건을 안내합니다.
-8. `registration-result-reporting`으로 Step 10 리포트를 정리합니다.
+1. `@mlflow`로 로컬 모델 등록 안내 흐름을 시작합니다.
+2. `local-model-intake-flow`로 현재 프로젝트, 사용자가 지정한 경로, 또는 `work/` 아래 모델을 선택합니다.
+3. `model-project-scan-validation`과 `mlflow-readiness-validation`으로 구조와 MLflow 준비 상태를 읽기 전용으로 점검합니다.
+4. `registration-gap-fill-planning`으로 보완이 필요한 파일과 설정을 safe/review_required/blocked로 분리합니다.
+5. `run-model-template-planning`과 `prepare-only-validation`으로 `run_model.py --prepare-only` 검증 흐름을 안내합니다.
+6. `mlflow-registration-execution`으로 local/remote 등록 실행 조건을 안내합니다.
+7. `registration-result-reporting`으로 최종 리포트를 정리합니다.
 
 ## OpenCode 참고
 
