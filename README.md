@@ -9,13 +9,13 @@
 ```text
 .opencode/
 └── skills/
-    ├── local-model-intake-flow/
-    ├── model-project-scan-validation/
-    ├── mlflow-readiness-validation/
-    ├── registration-gap-fill-planning/
-    ├── run-model-template-planning/
-    ├── prepare-only-validation/
-    └── mlflow-registration-execution/
+    ├── agent-mlflow-skill-local-model-intake-flow/
+    ├── agent-mlflow-skill-model-project-scan-validation/
+    ├── agent-mlflow-skill-mlflow-readiness-validation/
+    ├── agent-mlflow-skill-registration-gap-fill-planning/
+    ├── agent-mlflow-skill-run-model-template-planning/
+    ├── agent-mlflow-skill-prepare-only-validation/
+    └── agent-mlflow-skill-mlflow-registration-execution/
 ```
 
 ## 단계
