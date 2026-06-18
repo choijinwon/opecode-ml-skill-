@@ -3,6 +3,9 @@ name: retrieving-mlflow-traces
 description: MLflow trace를 상태, 시간, session, user, metadata 기준으로 검색하는 방법을 안내한다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 05-evaluate
+  phase: trace-retrieval
 ---
 
 # Retrieving MLflow Traces

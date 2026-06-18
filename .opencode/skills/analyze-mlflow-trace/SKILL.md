@@ -3,6 +3,9 @@ name: analyze-mlflow-trace
 description: MLflow trace/span 정보를 바탕으로 실패 원인과 수정 후보를 분석한다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 05-evaluate
+  phase: trace-analysis
 ---
 
 # Analyze MLflow Trace

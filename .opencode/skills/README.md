@@ -1,21 +1,28 @@
-# Agent Skills
+# OpenCode MLflow Skills
 
-Deep Agent harness skills are stored here.
+OpenCode skills are stored here. Each skill lives in its own directory with a `SKILL.md` file.
 
-Each skill should live in its own directory with a `SKILL.md` file.
-
-Example:
+## Model Test Scenario Flow
 
 ```text
-deep_agent/skills/
-└── mlflow-registration-check/
-    └── SKILL.md
+Step 0     model-scenario-orchestrator
+Step 1     sample-model-matrix-generation
+Step 1     model-sample-selection-flow
+Step 2-5   model-project-scan-validation
+Step 2-5   mlflow-readiness-validation
+Step 6     registration-gap-fill-planning
+Step 6     run-model-template-planning
+Step 7-8   prepare-only-validation
+Step 9-10  mlflow-registration-execution
+Step 1-10  wizard-cli-tui-step-flow
+Step 10    registration-result-reporting
 ```
 
-Default skills:
+These skills describe the feature behavior only. They do not implement sample generation, TUI screens, or MLflow registration code by themselves.
+
+## Existing MLflow Skill Set
 
 ```text
-deep_agent/skills/
 ├── agent-evaluation/
 ├── analyze-mlflow-chat-session/
 ├── analyze-mlflow-trace/

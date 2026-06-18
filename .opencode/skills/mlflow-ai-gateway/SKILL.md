@@ -3,6 +3,9 @@ name: mlflow-ai-gateway
 description: MLflow AI Gateway 개념을 참고해 내부 LLM 라우팅, 비용, 접근 제어, fallback 설정을 점검한다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 03-instrument
+  phase: llm-gateway
 ---
 
 # MLflow AI Gateway

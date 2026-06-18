@@ -3,6 +3,9 @@ name: querying-mlflow-metrics
 description: MLflow metrics를 조회해 token usage, latency, error rate, 품질 추세를 분석한다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 05-evaluate
+  phase: metrics-analysis
 ---
 
 # Querying MLflow Metrics

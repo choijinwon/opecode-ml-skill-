@@ -3,6 +3,9 @@ name: local-serving-validation
 description: 등록 전 로컬 FastAPI 서빙, health/predict 호출, input_example 추론 테스트를 검증한다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 04-validate
+  phase: serving-smoke-test
 ---
 
 # Local Serving Validation

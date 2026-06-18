@@ -3,6 +3,9 @@ name: mlflow-prompt-management
 description: MLflow Prompt Management로 프롬프트 버전, lineage, 평가 연결 흐름을 점검한다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 03-instrument
+  phase: prompt-lineage
 ---
 
 # MLflow Prompt Management

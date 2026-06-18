@@ -3,6 +3,9 @@ name: closed-network-validation
 description: 폐쇄망 AI ML 온보딩 환경에서 내부 Qwen, 의존성, 파일 권한, 로그 마스킹, 산출물 경로를 검증한다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 02-standardize
+  phase: environment-policy
 ---
 
 # Closed Network Validation

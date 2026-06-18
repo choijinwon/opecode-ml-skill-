@@ -44,6 +44,22 @@ cp -R .opencode /path/to/your-ml-project/
 
 ## 포함된 주요 skill
 
+### 모델 테스트 시나리오 단계 skill
+
+- `model-scenario-orchestrator`: 전체 Step 1~10 흐름 조율
+- `sample-model-matrix-generation`: 10개 폐쇄망 샘플 모델 matrix 정의
+- `model-sample-selection-flow`: `.aiu/sample_projects/`와 `work/` 모델 선택 흐름
+- `model-project-scan-validation`: requirements, entrypoint, artifact, config, input example 스캔
+- `mlflow-readiness-validation`: local/remote MLflow 등록 준비 상태 점검
+- `registration-gap-fill-planning`: Step 6 승인 전 누락 파일 보완 계획
+- `run-model-template-planning`: `run_model.py` 옵션과 책임 정의
+- `prepare-only-validation`: `run_model.py --prepare-only` 검증 흐름
+- `mlflow-registration-execution`: local file store 또는 원격 MLflow 등록 실행 안내
+- `wizard-cli-tui-step-flow`: Wizard, CLI, TUI 단계 연결
+- `registration-result-reporting`: Step 10 결과 표와 다음 조치 정리
+
+### MLflow 범용 skill
+
 - `mlflow-onboarding`: Tracking, Evaluation, Registry, Tracing 중 시작 경로 선택
 - `mlflow-experiment-tracking`: params, metrics, artifacts, datasets 기록 점검
 - `mlflow-registration-check`: 모델 등록 전 필수 파일과 설정 확인
@@ -57,11 +73,14 @@ cp -R .opencode /path/to/your-ml-project/
 
 ## 권장 작업 흐름
 
-1. `@mlflow`로 프로젝트 목적을 분류합니다.
-2. `mlflow-onboarding`으로 Tracking, Registry, Tracing, Evaluation 중 우선순위를 정합니다.
-3. `mlflow-registration-check` 또는 `mlflow-experiment-tracking`으로 현재 코드 상태를 읽기 전용으로 점검합니다.
-4. 수정이 필요하면 preview를 먼저 만들고, 승인 후 적용합니다.
-5. `analysis-reporting`으로 등록 준비 리포트를 남깁니다.
+1. `@mlflow`로 모델 테스트 시나리오 전체를 시작합니다.
+2. `sample-model-matrix-generation`으로 샘플 모델 set을 정합니다.
+3. `model-sample-selection-flow`로 샘플 또는 `work/` 모델을 선택합니다.
+4. `model-project-scan-validation`과 `mlflow-readiness-validation`으로 Step 2~5 검증을 수행합니다.
+5. `registration-gap-fill-planning`으로 Step 6 보완 계획을 만들고 승인 항목을 분리합니다.
+6. `run-model-template-planning`과 `prepare-only-validation`으로 Step 7~8 준비 검증을 정의합니다.
+7. `mlflow-registration-execution`으로 Step 9 local/remote 등록 실행 조건을 안내합니다.
+8. `registration-result-reporting`으로 Step 10 리포트를 정리합니다.
 
 ## OpenCode 참고
 

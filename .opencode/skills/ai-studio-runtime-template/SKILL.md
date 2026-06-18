@@ -3,6 +3,9 @@ name: ai-studio-runtime-template
 description: AI Studio 환경변수, run_model.py, ModelWrapper, MLflow logging 코드를 표준 템플릿으로 구성한다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 02-standardize
+  phase: runtime-template
 ---
 
 # AI Studio Runtime Template

@@ -3,6 +3,9 @@ name: model-project-standardization
 description: 사용자가 가져온 TensorFlow, PyTorch, sklearn, ONNX, HuggingFace 스타일 모델을 AI Studio 표준 폴더 구조로 정리한다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 02-standardize
+  phase: project-layout
 ---
 
 # Model Project Standardization

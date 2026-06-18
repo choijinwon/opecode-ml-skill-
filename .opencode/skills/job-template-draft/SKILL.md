@@ -3,6 +3,9 @@ name: job-template-draft
 description: 학습 entrypoint, MLflow 등록 명령, 로컬 서빙 호출 결과를 기반으로 Job Template YAML 초안을 만든다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 04-validate
+  phase: job-template
 ---
 
 # Job Template Draft

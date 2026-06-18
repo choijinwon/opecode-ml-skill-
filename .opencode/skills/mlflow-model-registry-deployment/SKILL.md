@@ -3,6 +3,9 @@ name: mlflow-model-registry-deployment
 description: MLflow Model Registry와 Deployment 흐름을 기준으로 모델 등록, 버전, 배포 준비 상태를 점검한다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 07-release
+  phase: registry-deployment
 ---
 
 # MLflow Model Registry And Deployment

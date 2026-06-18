@@ -3,6 +3,9 @@ name: instrumenting-with-mlflow-tracing
 description: Python/TypeScript GenAI 앱에 MLflow Tracing을 추가하기 위한 점검과 수정안을 만든다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 03-instrument
+  phase: genai-tracing
 ---
 
 # Instrumenting With MLflow Tracing

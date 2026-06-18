@@ -3,6 +3,9 @@ name: analyze-mlflow-chat-session
 description: MLflow에 남은 multi-turn chat session을 재구성하고 대화 실패 지점을 찾는다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 05-evaluate
+  phase: session-analysis
 ---
 
 # Analyze MLflow Chat Session

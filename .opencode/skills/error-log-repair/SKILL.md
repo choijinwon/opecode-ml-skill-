@@ -3,6 +3,9 @@ name: error-log-repair
 description: 저장된 에러 로그와 실패한 실행 결과를 기반으로 원인 후보를 찾고 승인 기반 재수정안을 만든다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 06-repair
+  phase: failure-repair
 ---
 
 # Error Log Repair

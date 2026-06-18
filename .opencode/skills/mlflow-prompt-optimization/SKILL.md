@@ -3,6 +3,9 @@ name: mlflow-prompt-optimization
 description: MLflow Prompt Optimization 흐름을 참고해 프롬프트 개선 실험과 평가 루프를 설계한다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 05-evaluate
+  phase: prompt-optimization
 ---
 
 # MLflow Prompt Optimization

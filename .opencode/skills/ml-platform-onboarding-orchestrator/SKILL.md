@@ -3,6 +3,9 @@ name: ml-platform-onboarding-orchestrator
 description: 모델 프로젝트를 ML Platform 표준 등록 흐름으로 끝까지 안내하는 최상위 오케스트레이션 skill이다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 01-discovery
+  phase: workflow-routing
 ---
 
 # ML Platform Onboarding Orchestrator

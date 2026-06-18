@@ -3,6 +3,9 @@ name: mlflow-experiment-tracking
 description: MLflow Experiment Tracking으로 params, metrics, artifacts, datasets 기록 상태를 점검한다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 03-instrument
+  phase: experiment-logging
 ---
 
 # MLflow Experiment Tracking

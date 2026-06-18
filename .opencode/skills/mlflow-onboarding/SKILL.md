@@ -3,6 +3,9 @@ name: mlflow-onboarding
 description: 신규 사용자가 MLflow Tracking, Evaluation, Registry, Tracing 중 필요한 경로를 선택하도록 안내한다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 01-discovery
+  phase: goal-selection
 ---
 
 # MLflow Onboarding

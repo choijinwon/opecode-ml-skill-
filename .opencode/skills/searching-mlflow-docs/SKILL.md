@@ -3,6 +3,9 @@ name: searching-mlflow-docs
 description: MLflow 공식 문서 또는 반입된 문서 인덱스를 기준으로 필요한 내용을 찾는 절차를 안내한다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 01-discovery
+  phase: reference-lookup
 ---
 
 # Searching MLflow Docs

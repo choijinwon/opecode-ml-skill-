@@ -3,6 +3,9 @@ name: agent-evaluation
 description: MLflow Evaluation으로 agent 품질 평가 데이터셋, scorer, 실행, 결과 분석 흐름을 만든다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 05-evaluate
+  phase: agent-quality
 ---
 
 # Agent Evaluation

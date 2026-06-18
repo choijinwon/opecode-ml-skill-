@@ -3,6 +3,9 @@ name: mlflow-registration-check
 description: MLflow 등록 준비 상태를 점검하고 누락된 logging, artifact, registry 조건을 설명한다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 04-validate
+  phase: registry-readiness
 ---
 
 # MLflow Registration Check

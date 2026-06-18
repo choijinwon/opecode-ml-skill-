@@ -3,6 +3,9 @@ name: analysis-reporting
 description: 프로젝트 분석, 수정, 재검증, MLflow 등록, 로컬 서빙 결과를 사용자용 리포트로 정리한다.
 license: MIT
 compatibility: opencode
+metadata:
+  stage: 07-release
+  phase: final-report
 ---
 
 # Analysis Reporting
