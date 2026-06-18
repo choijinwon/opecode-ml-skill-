@@ -11,7 +11,7 @@
 적용 대상은 다음과 같은 로컬 모델 프로젝트다.
 
 - 사용자가 직접 가져온 ML/GenAI 모델 프로젝트
-- `requirements.txt`, `train.py`, `run_model.py`, `config.json`, `ai_studio.env`, `input_example.json` 중 일부 또는 전체를 가진 프로젝트
+- `requirements.txt`, `train.py`, `config.json`, `ai_studio.env`, `input_example.json` 중 일부 또는 전체를 가진 프로젝트
 - 사용자 환경의 MLflow tracking URI 또는 원격 MLflow 등록 준비 상태를 확인하려는 프로젝트
 
 ## 3. 포함되는 Skill
@@ -36,7 +36,7 @@ user-project/
 ├── model artifact 또는 saved_model/
 ├── requirements.txt
 ├── train.py 또는 inference entrypoint
-├── run_model.py
+├── 등록/실행 entrypoint
 ├── config.json
 ├── ai_studio.env
 └── input_example.json
@@ -105,8 +105,8 @@ opencode
 특정 단계만 요청할 수도 있다.
 
 ```text
-run_model.py가 가져야 할 옵션을 알려줘.
---prepare-only 전에 확인할 항목을 정리해줘.
+등록/실행 entrypoint가 제공하면 좋은 기능을 알려줘.
+prepare-only 또는 dry-run 전에 확인할 항목을 정리해줘.
 원격 MLflow 등록 전에 ai_studio.env에서 확인할 키를 알려줘.
 이 모델이 TensorFlow/PyTorch/sklearn/ONNX/HuggingFace 중 어떤 유형인지 근거와 함께 봐줘.
 ```
@@ -122,9 +122,9 @@ run_model.py가 가져야 할 옵션을 알려줘.
 4. `agent-mlflow-skill-gap-guide`
    - 부족한 파일과 설정을 보완 방향별로 분류한다.
 5. `agent-mlflow-skill-run-model-guide`
-   - `run_model.py` 옵션과 책임을 확인한다.
+   - 등록/실행 entrypoint 기능과 책임을 확인한다.
 6. `agent-mlflow-skill-prepare-check`
-   - `--prepare-only` 검증 기준을 확인한다.
+   - prepare-only 또는 동등한 dry-run 기능 검증 기준을 확인한다.
 7. `agent-mlflow-skill-register-guide`
    - local/remote MLflow 등록 실행 조건을 확인한다.
 

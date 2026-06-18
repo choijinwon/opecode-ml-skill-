@@ -29,8 +29,8 @@
 2. 프로젝트 스캔 안내
 3. MLflow 준비 검증 안내
 4. 부족한 파일/설정 보완 안내
-5. `run_model.py` 동작 안내
-6. `--prepare-only` 검증 안내
+5. 등록/실행 entrypoint 기능 안내
+6. prepare-only 또는 동등한 dry-run 기능 검증 안내
 7. local/remote MLflow 등록 안내
 
 ## 사용 방법
@@ -46,7 +46,7 @@ cp -R .opencode/skills /path/to/user-project/.opencode/
 ```text
 이 로컬 모델 프로젝트를 MLflow 등록 준비 관점에서 단계별로 봐줘
 ./my-model 경로를 기준으로 필요한 파일이 뭔지 알려줘
-run_model.py가 어떤 옵션을 가져야 하는지 알려줘
+등록/실행 entrypoint가 어떤 기능을 제공하면 좋은지 알려줘
 원격 MLflow 등록 전에 prepare-only로 뭘 확인해야 하는지 알려줘
 ```
 

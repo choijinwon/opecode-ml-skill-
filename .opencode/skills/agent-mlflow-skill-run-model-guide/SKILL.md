@@ -1,6 +1,6 @@
 ---
 name: agent-mlflow-skill-run-model-guide
-description: MLflow 등록 테스트용 run_model.py가 가져야 할 옵션, 책임, 검증 동작을 안내한다.
+description: MLflow 등록 테스트용 등록/실행 entrypoint가 제공하면 좋은 기능과 동작 기준을 안내한다.
 license: MIT
 compatibility: opencode
 metadata:
@@ -13,17 +13,19 @@ metadata:
 
 ## When To Use
 
-- `run_model.py` 구성 또는 보강 안내를 설계할 때
-- `--prepare-only`, `--register`, `--env-file`, `--config`, `--model` 옵션 의미를 정의할 때
+- 등록/실행 entrypoint 구성 또는 보강 안내를 설계할 때
+- prepare-only, register, env/config/model path 전달 등 사용자 entrypoint가 제공하면 좋은 기능을 정의할 때
 - 모델별 wrapper 차이는 숨기고 공통 등록 흐름을 제공해야 할 때
 
-## Required Options
+## Recommended Capabilities
 
-- `--prepare-only`: artifact와 config를 읽고 등록 전 준비만 검증한다.
-- `--register`: MLflow logging/register를 실행한다.
-- `--env-file`: `ai_studio.env` 같은 환경 파일을 읽는다.
-- `--config`: `config.json` 경로를 받는다.
-- `--model`: model artifact 경로를 명시한다.
+- prepare-only 또는 dry-run 기능: artifact와 config를 읽고 등록 전 준비만 검증한다.
+- register 기능: MLflow logging/register 실행 조건을 분리한다.
+- env file 전달 기능: `ai_studio.env` 같은 환경 파일을 읽을 수 있게 한다.
+- config path 전달 기능: `config.json` 경로를 받을 수 있게 한다.
+- model path 전달 기능: model artifact 경로를 명시할 수 있게 한다.
+
+옵션 이름은 사용자 프로젝트마다 달라도 된다. 중요한 것은 같은 책임을 수행하는 기능이 있는지 확인하는 것이다.
 
 ## Runtime Responsibilities
 

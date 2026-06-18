@@ -110,7 +110,7 @@ Skill: `agent-mlflow-skill-project-check`
 
 - `requirements.txt`
 - `train.py` 또는 추론 entrypoint
-- `run_model.py`
+- 등록/실행 entrypoint 또는 등록 절차 문서
 - `config.json`
 - `ai_studio.env`
 - `input_example.json`
@@ -201,15 +201,17 @@ Skill: `agent-mlflow-skill-run-model-guide`
 
 목적:
 
-- `run_model.py`가 제공해야 할 옵션과 동작 기준을 안내한다.
+- 등록/실행 entrypoint가 제공하면 좋은 기능과 동작 기준을 안내한다.
 
-필수 옵션:
+권장 기능:
 
-- `--prepare-only`
-- `--register`
-- `--env-file`
-- `--config`
-- `--model`
+- prepare-only 또는 dry-run 기능
+- register 기능
+- env file 전달 기능
+- config path 전달 기능
+- model path 전달 기능
+
+옵션 이름은 사용자 프로젝트마다 달라도 된다. 중요한 것은 같은 책임을 수행하는 기능이 있는지 확인하는 것이다.
 
 동작 기준:
 
@@ -228,7 +230,7 @@ Skill: `agent-mlflow-skill-prepare-check`
 
 목적:
 
-- `run_model.py --prepare-only`로 등록 전 확인할 항목을 안내한다.
+- 등록/실행 entrypoint의 prepare-only 또는 dry-run 기능으로 등록 전 확인할 항목을 안내한다.
 
 확인 항목:
 

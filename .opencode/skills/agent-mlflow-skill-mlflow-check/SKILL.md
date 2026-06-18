@@ -15,7 +15,7 @@ metadata:
 
 - Step 3에서 MLflow 의존성, tracking URI, experiment, registered model name을 점검할 때
 - 사용자 설정 tracking URI와 원격 MLflow 등록 조건을 나눠 판단할 때
-- `run_model.py --register` 전에 준비 상태 요약이 필요할 때
+- 등록/실행 entrypoint의 register 기능을 사용하기 전에 준비 상태 요약이 필요할 때
 
 ## Checklist
 

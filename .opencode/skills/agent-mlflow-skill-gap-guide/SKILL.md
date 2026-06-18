@@ -20,7 +20,7 @@ metadata:
 ## Classifications
 
 - safe: `config.json`, `ai_studio.env.example`, `input_example.json`, wrapper scaffold 추가 안내
-- review_required: `requirements.txt`, `run_model.py`, serving wrapper 수정
+- review_required: `requirements.txt`, serving wrapper 수정
 - blocked: credential 직접 삽입, 기존 artifact 삭제, 프로젝트 외부 수정
 
 ## Output

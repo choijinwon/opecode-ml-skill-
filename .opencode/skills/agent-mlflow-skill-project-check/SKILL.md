@@ -21,7 +21,7 @@ metadata:
 
 - `requirements.txt` 존재 여부
 - `train.py` 또는 추론 entrypoint 존재 여부
-- `run_model.py` 존재 여부
+- 등록/실행 entrypoint 또는 등록 절차 문서 존재 여부
 - `config.json` 존재 여부
 - `ai_studio.env` 존재 여부
 - `input_example.json` 존재 여부

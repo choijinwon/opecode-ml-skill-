@@ -13,7 +13,7 @@ metadata:
 
 ## When To Use
 
-- `run_model.py --register` 실행 조건을 안내할 때
+- 등록/실행 entrypoint의 register 기능 실행 조건을 안내할 때
 - 사용자 설정 `MLFLOW_TRACKING_URI` 등록과 원격 MLflow 등록을 구분해야 할 때
 - 등록 실행 조건과 다음 조치를 안내해야 할 때
 

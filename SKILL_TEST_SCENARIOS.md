@@ -79,7 +79,7 @@ my-model/
 기대 결과:
 
 - 발견된 파일과 누락된 파일을 구분한다.
-- `run_model.py`, `ai_studio.env` 등이 없으면 보완 필요로 안내한다.
+- `ai_studio.env` 등이 없으면 보완 필요로 안내한다.
 - 상태를 pass, warn, block 수준으로 구분한다.
 - 파일을 자동 생성하지 않는다.
 
@@ -128,21 +128,21 @@ MLflow 등록에 필요한 tracking URI와 experiment 설정이 준비됐는지 
 - blocked: credential 직접 삽입, artifact 삭제, 프로젝트 외부 수정
 - 자동 수정이나 덮어쓰기를 수행하지 않는다.
 
-## 9. run_model.py 동작 안내
+## 9. 등록/실행 entrypoint 기능 안내
 
 요청:
 
 ```text
-run_model.py가 어떤 옵션을 가져야 하는지 알려줘.
+등록/실행 entrypoint가 어떤 기능을 제공하면 좋은지 알려줘.
 ```
 
 기대 결과:
 
-- `--prepare-only`
-- `--register`
-- `--env-file`
-- `--config`
-- `--model`
+- prepare-only 또는 동등한 dry-run 기능
+- register 또는 동등한 등록 기능
+- env file 전달 기능
+- config path 전달 기능
+- model path 전달 기능
 - Windows 경로와 공백 포함 경로를 고려하라고 안내한다.
 - 사용자 환경의 tracking URI 설정을 우선 확인하라고 안내한다.
 
@@ -151,7 +151,7 @@ run_model.py가 어떤 옵션을 가져야 하는지 알려줘.
 요청:
 
 ```text
-run_model.py --prepare-only 전에 어떤 항목을 확인해야 해?
+등록/실행 entrypoint의 prepare-only 또는 dry-run 기능 전에 어떤 항목을 확인해야 해?
 ```
 
 기대 결과:
