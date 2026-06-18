@@ -1,5 +1,5 @@
 ---
-name: agent-mlflow-skill-mlflow-readiness-validation
+name: agent-mlflow-skill-mlflow-check
 description: 선택된 프로젝트가 MLflow local/remote 등록 테스트를 수행할 준비가 되었는지 확인하는 기준을 안내한다.
 license: MIT
 compatibility: opencode
@@ -31,7 +31,7 @@ metadata:
 - remote registration readiness
 - missing dependency/config list
 - recommended fallback mode
-- 다음 단계: `agent-mlflow-skill-registration-gap-fill-planning`
+- 다음 단계: `agent-mlflow-skill-gap-guide`
 
 ## Safety
 

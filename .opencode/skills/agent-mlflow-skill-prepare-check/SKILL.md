@@ -1,5 +1,5 @@
 ---
-name: agent-mlflow-skill-prepare-only-validation
+name: agent-mlflow-skill-prepare-check
 description: run_model.py --prepare-only로 모델 artifact 준비와 입력 예제를 확인하는 기준을 안내한다.
 license: MIT
 compatibility: opencode
@@ -32,7 +32,7 @@ metadata:
 - success/failure status
 - error category
 - user-friendly repair hint
-- 다음 단계: `agent-mlflow-skill-mlflow-registration-execution`
+- 다음 단계: `agent-mlflow-skill-register-guide`
 
 ## Safety
 

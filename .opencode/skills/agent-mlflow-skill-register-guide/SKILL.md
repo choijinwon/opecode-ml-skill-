@@ -1,5 +1,5 @@
 ---
-name: agent-mlflow-skill-mlflow-registration-execution
+name: agent-mlflow-skill-register-guide
 description: 로컬 file store 또는 원격 MLflow 등록 실행 조건과 주의사항을 안내한다.
 license: MIT
 compatibility: opencode

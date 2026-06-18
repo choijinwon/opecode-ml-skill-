@@ -1,5 +1,5 @@
 ---
-name: agent-mlflow-skill-model-project-scan-validation
+name: agent-mlflow-skill-project-check
 description: 선택된 모델 프로젝트의 entrypoint, artifact, config, input example, requirements 확인 기준을 안내한다.
 license: MIT
 compatibility: opencode
@@ -34,7 +34,7 @@ metadata:
 - 발견된 파일 목록
 - 누락 파일 목록
 - framework와 artifact 요약
-- 다음 단계: `agent-mlflow-skill-mlflow-readiness-validation`
+- 다음 단계: `agent-mlflow-skill-mlflow-check`
 
 ## Safety
 

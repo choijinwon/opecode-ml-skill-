@@ -10,12 +10,12 @@
 .opencode/
 └── skills/
     ├── agent-mlflow-skill-model-select/
-    ├── agent-mlflow-skill-model-project-scan-validation/
-    ├── agent-mlflow-skill-mlflow-readiness-validation/
-    ├── agent-mlflow-skill-registration-gap-fill-planning/
-    ├── agent-mlflow-skill-run-model-template-planning/
-    ├── agent-mlflow-skill-prepare-only-validation/
-    └── agent-mlflow-skill-mlflow-registration-execution/
+    ├── agent-mlflow-skill-project-check/
+    ├── agent-mlflow-skill-mlflow-check/
+    ├── agent-mlflow-skill-gap-guide/
+    ├── agent-mlflow-skill-run-model-guide/
+    ├── agent-mlflow-skill-prepare-check/
+    └── agent-mlflow-skill-register-guide/
 ```
 
 ## 단계

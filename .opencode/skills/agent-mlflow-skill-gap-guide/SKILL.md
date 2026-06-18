@@ -1,5 +1,5 @@
 ---
-name: agent-mlflow-skill-registration-gap-fill-planning
+name: agent-mlflow-skill-gap-guide
 description: MLflow 등록에 부족한 파일과 설정을 보완 안내 대상으로 분류한다.
 license: MIT
 compatibility: opencode
@@ -29,7 +29,7 @@ metadata:
 - 수정할 파일 목록
 - 사용자의 승인이 필요한 항목
 - 차단된 항목과 이유
-- 다음 단계: `agent-mlflow-skill-run-model-template-planning`
+- 다음 단계: `agent-mlflow-skill-run-model-guide`
 
 ## Safety
 

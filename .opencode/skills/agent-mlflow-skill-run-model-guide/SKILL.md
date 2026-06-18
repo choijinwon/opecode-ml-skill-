@@ -1,5 +1,5 @@
 ---
-name: agent-mlflow-skill-run-model-template-planning
+name: agent-mlflow-skill-run-model-guide
 description: MLflow 등록 테스트용 run_model.py가 가져야 할 옵션, 책임, 검증 동작을 안내한다.
 license: MIT
 compatibility: opencode
@@ -37,4 +37,4 @@ metadata:
 - 템플릿 기능 목록
 - 옵션별 expected behavior
 - framework별 wrapper 필요 여부
-- 다음 단계: `agent-mlflow-skill-prepare-only-validation`
+- 다음 단계: `agent-mlflow-skill-prepare-check`

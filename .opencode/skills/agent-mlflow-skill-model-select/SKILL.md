@@ -30,7 +30,7 @@ metadata:
 - 경로가 없으면 현재 프로젝트 루트와 `work/` 아래 모델 후보를 찾는다.
 - 후보별 framework, artifact 위치, 주요 파일 존재 여부를 요약한다.
 - 여러 후보가 있으면 하나를 선택하도록 안내한다.
-- 선택이 끝나면 `agent-mlflow-skill-model-project-scan-validation`으로 넘긴다.
+- 선택이 끝나면 `agent-mlflow-skill-project-check`으로 넘긴다.
 
 ## Output
 
@@ -39,7 +39,7 @@ metadata:
 - detected artifact candidates
 - existing registration files
 - missing critical files summary
-- next skill: `agent-mlflow-skill-model-project-scan-validation`
+- next skill: `agent-mlflow-skill-project-check`
 
 ## Safety
 
