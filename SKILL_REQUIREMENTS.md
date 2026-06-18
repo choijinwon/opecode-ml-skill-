@@ -112,7 +112,7 @@ Skill: `agent-mlflow-skill-project-check`
 - `train.py` 또는 추론 entrypoint
 - 등록/실행 entrypoint 또는 등록 절차 문서
 - `config.json`
-- `ai_studio.env`
+- 환경 변수/설정 방식. 전용 env 파일은 필수가 아니며 OS 환경 변수, `.env`, YAML/JSON config, 배포 환경 변수 등을 인정한다.
 - `input_example.json`
 - model artifact 경로와 크기
 - framework 후보
@@ -159,7 +159,7 @@ Skill: `agent-mlflow-skill-mlflow-check`
 - experiment name
 - registered model name
 - 사용자 환경의 tracking URI 설정 여부
-- username/password 존재 여부
+- 인증 정보 존재 여부
 
 안전 요구사항:
 
@@ -207,7 +207,7 @@ Skill: `agent-mlflow-skill-run-model-guide`
 
 - prepare-only 또는 dry-run 기능
 - register 기능
-- env file 전달 기능
+- environment config 전달 기능
 - config path 전달 기능
 - model path 전달 기능
 
@@ -265,7 +265,7 @@ Skill: `agent-mlflow-skill-register-guide`
 
 Remote mode 요구사항:
 
-- `ai_studio.env`에 tracking URL, username/password, experiment, registered model name이 있는지 확인하도록 안내한다.
+- 사용자 프로젝트의 환경 변수/설정 방식에서 tracking URI 또는 URL, 인증 정보 존재 여부, experiment, registered model name을 확인하도록 안내한다. 특정 env 파일명은 요구하지 않는다.
 - secret 값은 표시하지 않는다.
 - 원격 등록은 사용자의 명시적 승인 이후에만 안내한다.
 

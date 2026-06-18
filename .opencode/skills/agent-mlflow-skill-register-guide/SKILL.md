@@ -25,7 +25,7 @@ metadata:
 
 ## Remote Mode
 
-- `ai_studio.env`에 tracking URL, username/password, experiment, registered model name이 있는지 확인한다.
+- 사용자 프로젝트의 환경 변수/설정 방식에서 tracking URI 또는 URL, 인증 정보 존재 여부, experiment, registered model name을 확인한다. 특정 env 파일명을 요구하지 않는다.
 - secret 값은 표시하지 않는다.
 - 원격 등록 실행은 사용자의 명시적 승인 이후에만 안내한다.
 

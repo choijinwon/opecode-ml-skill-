@@ -21,7 +21,7 @@ metadata:
 
 - current repository root
 - explicit project path from the user
-- known files: `requirements.txt`, `train.py`, `config.json`, `ai_studio.env`, `input_example.json`
+- known files: `requirements.txt`, `train.py`, `config.json`, optional environment/config files, `input_example.json`
 
 ## Selection Rules
 

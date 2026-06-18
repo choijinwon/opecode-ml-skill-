@@ -79,7 +79,7 @@ my-model/
 기대 결과:
 
 - 발견된 파일과 누락된 파일을 구분한다.
-- `ai_studio.env` 등이 없으면 보완 필요로 안내한다.
+- tracking URI와 인증 정보 주입 방식이 없으면 사용자 환경에 맞는 설정 방식이 필요하다고 안내한다. 특정 env 파일 생성을 요구하지 않는다.
 - 상태를 pass, warn, block 수준으로 구분한다.
 - 파일을 자동 생성하지 않는다.
 
@@ -140,7 +140,7 @@ MLflow 등록에 필요한 tracking URI와 experiment 설정이 준비됐는지 
 
 - prepare-only 또는 동등한 dry-run 기능
 - register 또는 동등한 등록 기능
-- env file 전달 기능
+- environment config 전달 기능
 - config path 전달 기능
 - model path 전달 기능
 - Windows 경로와 공백 포함 경로를 고려하라고 안내한다.
@@ -169,13 +169,13 @@ MLflow 등록에 필요한 tracking URI와 experiment 설정이 준비됐는지 
 요청:
 
 ```text
-원격 MLflow 등록 전에 ai_studio.env에서 확인할 키를 알려줘.
+원격 MLflow 등록 전에 환경 변수나 설정 파일에서 확인할 키를 알려줘.
 ```
 
 기대 결과:
 
 - tracking URL 또는 tracking URI 설정 여부
-- username/password 존재 여부
+- 인증 정보 존재 여부
 - experiment name
 - registered model name
 - secret 값은 표시하지 않는다.

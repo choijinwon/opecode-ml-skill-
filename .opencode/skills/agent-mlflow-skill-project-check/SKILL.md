@@ -14,7 +14,7 @@ metadata:
 ## When To Use
 
 - Step 2에서 선택된 프로젝트가 등록 가능한 구조인지 확인할 때
-- 학습 entrypoint, 모델 artifact, 환경 파일, 입력 예제를 찾을 때
+- 학습 entrypoint, 모델 artifact, 환경 변수/설정 방식, 입력 예제를 확인할 때
 - 수정 전 read-only 확인 기준이 필요할 때
 
 ## Checklist
@@ -23,7 +23,7 @@ metadata:
 - `train.py` 또는 추론 entrypoint 존재 여부
 - 등록/실행 entrypoint 또는 등록 절차 문서 존재 여부
 - `config.json` 존재 여부
-- `ai_studio.env` 존재 여부
+- 환경 변수/설정 방식 확인. 전용 파일이 없어도 OS 환경 변수, `.env`, YAML/JSON config, 배포 환경 변수 등 사용자 프로젝트 방식을 인정한다.
 - `input_example.json` 존재 여부
 - model artifact 경로와 크기
 - framework 추정 결과

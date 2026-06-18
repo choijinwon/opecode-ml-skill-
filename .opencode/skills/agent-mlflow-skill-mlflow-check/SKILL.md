@@ -23,7 +23,7 @@ metadata:
 - `MLFLOW_TRACKING_URI` 또는 `MLFLOW_TRACKING_URL` 설정 여부를 확인한다.
 - experiment name과 registered model name 후보를 확인한다.
 - 사용자 환경의 tracking URI 설정 여부를 확인한다.
-- username/password는 존재 여부만 표시하고 값은 숨긴다.
+- 인증 정보는 존재 여부만 표시하고 값은 숨긴다.
 
 ## Output
 

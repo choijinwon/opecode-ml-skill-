@@ -21,7 +21,7 @@ metadata:
 
 - prepare-only 또는 dry-run 기능: artifact와 config를 읽고 등록 전 준비만 검증한다.
 - register 기능: MLflow logging/register 실행 조건을 분리한다.
-- env file 전달 기능: `ai_studio.env` 같은 환경 파일을 읽을 수 있게 한다.
+- environment config 전달 기능: 사용자 프로젝트의 환경 변수/설정 방식을 읽을 수 있게 한다.
 - config path 전달 기능: `config.json` 경로를 받을 수 있게 한다.
 - model path 전달 기능: model artifact 경로를 명시할 수 있게 한다.
 
