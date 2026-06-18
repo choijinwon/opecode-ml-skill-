@@ -14,7 +14,7 @@ metadata:
 
 - 학습 코드가 실험 재현에 필요한 정보를 충분히 남기는지 확인할 때
 - params, metrics, artifacts, datasets, tags 누락을 점검할 때
-- 등록 전 학습 실행 이력을 리포트로 정리해야 할 때
+- 등록 전 학습 실행 이력을 요약해야 할 때
 
 ## Checklist
 

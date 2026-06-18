@@ -14,7 +14,7 @@ metadata:
 ## When To Use
 
 - 같은 로컬 모델 안내 기능을 Wizard, CLI, TUI에서 일관되게 보여줘야 할 때
-- Step 1 모델 선택 화면과 최종 결과 화면을 설계할 때
+- Step 1 모델 선택 화면과 단계 상태 표시를 설계할 때
 - CLI 명령과 Wizard 상태를 연결해야 할 때
 
 ## Interface Commands
@@ -31,7 +31,7 @@ metadata:
 - Step 5: 보완 안내와 승인 필요 항목 표시
 - Step 6: `--prepare-only` 준비 검증 안내
 - Step 7~8: MLflow 등록 실행 조건 안내
-- Step 9: 결과 리포트 표시
+- Step 9: 다음 실행 명령 또는 보완 필요 항목 표시
 
 ## Output
 

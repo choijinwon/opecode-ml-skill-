@@ -15,13 +15,13 @@ metadata:
 
 - `run_model.py --register` 실행 조건을 안내할 때
 - 로컬 `MLFLOW_TRACKING_URI=file:./mlruns` 등록과 원격 MLflow 등록을 구분해야 할 때
-- 등록 결과를 Step 10 리포트로 넘겨야 할 때
+- 등록 실행 조건과 다음 조치를 안내해야 할 때
 
 ## Local Mode
 
 - `MLFLOW_TRACKING_URI` 또는 `MLFLOW_TRACKING_URL`이 비어 있으면 local file store를 기본값으로 안내한다.
 - local run, artifact, registered model name 후보를 표시한다.
-- 테스트 목적의 등록 성공 여부를 리포트한다.
+- 테스트 목적의 등록 성공 여부를 짧게 요약한다.
 
 ## Remote Mode
 
@@ -36,7 +36,7 @@ metadata:
 - experiment name
 - registered model name
 - run id 또는 local run path
-- 다음 단계: `registration-result-reporting`
+- next action
 
 ## Safety
 

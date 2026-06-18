@@ -14,7 +14,6 @@ Step 5     run-model-template-planning
 Step 6     prepare-only-validation
 Step 7-8   mlflow-registration-execution
 Step 1-9   wizard-cli-tui-step-flow
-Step 9     registration-result-reporting
 ```
 
 These skills describe the feature behavior only. They do not create models, implement TUI screens, or run MLflow registration code by themselves.

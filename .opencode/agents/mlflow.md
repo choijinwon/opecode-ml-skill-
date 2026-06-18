@@ -21,7 +21,6 @@ permission:
     "mlflow-*": allow
     "*mlflow*": allow
     "agent-evaluation": allow
-    "analysis-reporting": allow
     "closed-network-validation": allow
     "ai-studio-runtime-template": allow
     "job-template-draft": allow
@@ -42,13 +41,12 @@ Use the available MLflow and local-model-registration skills before giving detai
 - prepare-only validation
 - local or remote MLflow registration
 - Wizard/CLI/TUI step mapping
-- result reporting
 - onboarding and path selection
 - experiment tracking readiness
 - model registration and registry deployment
 - GenAI or agent tracing
 - trace/session analysis
-- evaluation and reporting
+- evaluation
 - closed-network validation
 - AI Studio runtime packaging
 
@@ -69,4 +67,3 @@ For the local model registration flow, route in this order:
 7. `prepare-only-validation`
 8. `mlflow-registration-execution`
 9. `wizard-cli-tui-step-flow`
-10. `registration-result-reporting`

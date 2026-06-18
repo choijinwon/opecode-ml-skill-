@@ -4,7 +4,7 @@
 
 | Step | Skill | Purpose |
 | --- | --- | --- |
-| 0 | `model-scenario-orchestrator` | 사용자가 가져온 로컬 모델의 선택, 검증, prepare-only, MLflow 등록 안내, 리포트 전체 흐름을 조율합니다. |
+| 0 | `model-scenario-orchestrator` | 사용자가 가져온 로컬 모델의 선택, 검증, prepare-only, MLflow 등록 안내 흐름을 조율합니다. |
 | 1 | `local-model-intake-flow` | 현재 프로젝트, 명시 경로, `work/` 아래 로컬 모델 후보를 탐지하고 선택하도록 안내합니다. |
 | 2-4 | `model-project-scan-validation` | requirements, entrypoint, artifact, config, env, input example을 읽기 전용으로 스캔합니다. |
 | 2-4 | `mlflow-readiness-validation` | MLflow dependency, tracking URI, experiment, registered model name, local fallback을 검증합니다. |
@@ -13,7 +13,6 @@
 | 6 | `prepare-only-validation` | `run_model.py --prepare-only` 준비 검증 흐름과 실패 원인 분류를 정의합니다. |
 | 7-8 | `mlflow-registration-execution` | local `file:./mlruns` 또는 원격 MLflow 등록 실행 조건을 정의합니다. |
 | 1-9 | `wizard-cli-tui-step-flow` | Wizard, CLI, TUI가 같은 단계 상태를 쓰도록 명령과 화면 필드를 매핑합니다. |
-| 9 | `registration-result-reporting` | 최종 결과 표, pass/warn/block 요약, 다음 조치를 정리합니다. |
 
 ## Existing MLflow Skills
 
@@ -21,7 +20,6 @@
 | --- | --- |
 | `agent-evaluation` | Agent 품질 평가와 regression 비교를 설계합니다. |
 | `ai-studio-runtime-template` | AI Studio 등록용 runtime scaffold를 점검합니다. |
-| `analysis-reporting` | 분석 결과와 등록 준비 상태를 리포트로 정리합니다. |
 | `analyze-mlflow-chat-session` | MLflow에 남은 chat session 기록을 분석합니다. |
 | `analyze-mlflow-trace` | MLflow trace span, latency, error, metadata를 분석합니다. |
 | `closed-network-validation` | 폐쇄망 반입과 내부망 실행 전 제약을 점검합니다. |

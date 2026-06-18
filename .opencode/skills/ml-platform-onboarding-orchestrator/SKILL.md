@@ -22,7 +22,7 @@ metadata:
 2. read-only scan으로 framework, entrypoint, artifact, requirements, config, input example을 확인한다.
 3. 필요한 하위 skill을 순서대로 적용한다: standardization, experiment tracking, registry, serving, job template, error repair.
 4. 수정은 정책에 따라 safe, review_required, blocked로 분류한다.
-5. 승인된 항목만 적용하고 재검증 결과와 다음 조치를 리포트한다.
+5. 승인된 항목만 적용하고 재검증 상태와 다음 조치를 요약한다.
 
 ## Output
 

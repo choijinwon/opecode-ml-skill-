@@ -1,6 +1,6 @@
 ---
 name: model-scenario-orchestrator
-description: 사용자가 가져온 로컬 모델 프로젝트의 선택, 검증, MLflow 등록 준비를 Step 1~9 흐름으로 조율한다.
+description: 사용자가 가져온 로컬 모델 프로젝트의 선택, 검증, MLflow 등록 준비를 Step 1~8 흐름으로 조율한다.
 license: MIT
 compatibility: opencode
 metadata:
@@ -19,8 +19,8 @@ metadata:
 
 ## Responsibilities
 
-- Step 1~9 전체 진행 상태를 추적한다.
-- 사용자의 목적을 intake, validation, preparation, registration, reporting 중 하나로 분류한다.
+- Step 1~8 전체 진행 상태를 추적한다.
+- 사용자의 목적을 intake, validation, preparation, registration 중 하나로 분류한다.
 - 필요한 하위 skill을 순서대로 호출한다.
 - 각 단계의 입력, 산출물, 차단 조건을 짧게 요약한다.
 
@@ -34,7 +34,6 @@ metadata:
 6. prepare-only 검증: `prepare-only-validation`
 7. MLflow 등록 실행 안내: `mlflow-registration-execution`
 8. Wizard/CLI/TUI 연결: `wizard-cli-tui-step-flow`
-9. 결과 리포트: `registration-result-reporting`
 
 ## Output
 

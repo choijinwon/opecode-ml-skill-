@@ -56,7 +56,6 @@ cp -R .opencode /path/to/your-ml-project/
 - `prepare-only-validation`: `run_model.py --prepare-only` 검증 흐름
 - `mlflow-registration-execution`: local file store 또는 원격 MLflow 등록 실행 안내
 - `wizard-cli-tui-step-flow`: Wizard, CLI, TUI 단계 연결
-- `registration-result-reporting`: Step 10 결과 표와 다음 조치 정리
 
 ### MLflow 범용 skill
 
@@ -79,7 +78,6 @@ cp -R .opencode /path/to/your-ml-project/
 4. `registration-gap-fill-planning`으로 보완이 필요한 파일과 설정을 safe/review_required/blocked로 분리합니다.
 5. `run-model-template-planning`과 `prepare-only-validation`으로 `run_model.py --prepare-only` 검증 흐름을 안내합니다.
 6. `mlflow-registration-execution`으로 local/remote 등록 실행 조건을 안내합니다.
-7. `registration-result-reporting`으로 최종 리포트를 정리합니다.
 
 ## OpenCode 참고
 

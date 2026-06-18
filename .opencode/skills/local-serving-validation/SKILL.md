@@ -21,7 +21,7 @@ metadata:
 - `serving_app.py` 존재 여부와 FastAPI/uvicorn 의존성을 확인한다.
 - `input_example.json`을 요청 payload로 사용한다.
 - `/health`와 `/predict` 응답 코드와 body를 기록한다.
-- 성공/실패 결과를 Step 리포트와 Job Template YAML에 반영한다.
+- 성공/실패 상태를 다음 조치와 Job Template YAML에 반영한다.
 
 ## Output
 

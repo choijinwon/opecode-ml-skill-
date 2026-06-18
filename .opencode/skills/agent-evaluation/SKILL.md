@@ -21,7 +21,7 @@ metadata:
 - 평가 목적과 입력/정답/참조 데이터 형태를 정한다.
 - dataset 후보를 만들거나 기존 evaluation set을 찾는다.
 - scorer와 threshold를 선택한다.
-- evaluation 실행 계획과 결과 리포트 위치를 정한다.
+- evaluation 실행 계획과 결과 확인 방법을 정한다.
 - 실패 케이스를 수정 후보로 연결한다.
 
 ## Safety

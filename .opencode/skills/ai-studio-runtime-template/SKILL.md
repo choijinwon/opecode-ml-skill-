@@ -33,5 +33,5 @@ metadata:
 
 ## Safety
 
-- password/API key는 로그와 리포트에 원문 출력하지 않는다.
+- password/API key는 로그나 화면 출력에 원문으로 남기지 않는다.
 - 기존 `run_model.py` 덮어쓰기는 review_required로 분류한다.
