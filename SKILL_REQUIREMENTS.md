@@ -116,12 +116,28 @@ Skill: `agent-mlflow-skill-project-check`
 - `input_example.json`
 - model artifact 경로와 크기
 - framework 후보
+- 모델 타입별 artifact와 dependency 확인 기준
+
+모델 타입별 확인 기준:
+
+| Model type | 확인 기준 |
+| --- | --- |
+| TensorFlow / Keras | `saved_model.pb`, `variables/`, `.h5`, `.keras`, `tensorflow`/`keras` dependency |
+| PyTorch | `.pt`, `.pth`, TorchScript, `state_dict`, model class source, `torch` dependency |
+| scikit-learn | `.pkl`, `.joblib`, pipeline/preprocessor, `sklearn` dependency |
+| ONNX | `.onnx`, input/output names, opset/runtime dependency |
+| HuggingFace | `config.json`, tokenizer files, `pytorch_model.bin`, `model.safetensors`, `transformers` dependency |
+| XGBoost | `.bst`, `.json`, `.ubj`, feature names, native booster/sklearn wrapper 구분 |
+| LightGBM | `.txt`, `.pkl`, `.joblib`, booster/sklearn wrapper 구분 |
+| Custom pyfunc | `PythonModel`, wrapper source, `load_context`, `predict` 계약 |
 
 출력 요구사항:
 
 - 발견된 파일
 - 누락된 파일
 - framework와 artifact 요약
+- 모델 타입 후보와 근거
+- 추천 MLflow flavor 또는 pyfunc wrapper 방향
 - pass/warn/block 수준의 상태 구분
 
 다음 단계:

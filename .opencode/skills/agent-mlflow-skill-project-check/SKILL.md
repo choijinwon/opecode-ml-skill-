@@ -28,6 +28,35 @@ metadata:
 - model artifact 경로와 크기
 - framework 추정 결과
 
+## Model Type Matrix
+
+| Model type | Detection hints | Artifact checks | MLflow registration notes |
+| --- | --- | --- | --- |
+| TensorFlow / Keras | `tensorflow`, `keras`, `saved_model.pb`, `.h5`, `.keras` | SavedModel directory, `variables/`, `.h5` or `.keras` file | `mlflow.tensorflow` or pyfunc wrapper path를 확인한다. |
+| PyTorch | `torch`, `.pt`, `.pth`, TorchScript, `state_dict` | weight file, model class source, tokenizer/preprocess code if needed | model class와 weights를 함께 재현할 수 있는지 확인한다. |
+| scikit-learn | `sklearn`, `scikit-learn`, `.pkl`, `.joblib` | pickle/joblib artifact, feature order, preprocessing pipeline | `predict`/`predict_proba` 가능 객체인지 확인한다. |
+| ONNX | `onnx`, `.onnx`, `onnxruntime` | `.onnx` file, input/output names, opset compatibility | input schema와 runtime dependency를 확인한다. |
+| HuggingFace | `transformers`, `config.json`, tokenizer files, `pytorch_model.bin`, `model.safetensors` | model weights, tokenizer, config, generation/inference task | task type과 tokenizer dependency를 함께 확인한다. |
+| XGBoost | `xgboost`, `.bst`, `.json`, `.ubj`, `.pkl` | booster/model file, feature names, objective | native booster인지 sklearn wrapper인지 구분한다. |
+| LightGBM | `lightgbm`, `.txt`, `.pkl`, `.joblib` | booster text file or wrapper artifact, feature names | native booster와 sklearn wrapper 등록 방식을 구분한다. |
+| Custom pyfunc | `PythonModel`, `mlflow.pyfunc`, custom wrapper files | wrapper source, artifact directory, dependency files | `load_context`와 `predict` 계약을 확인한다. |
+
+## Framework Detection Rules
+
+- `requirements.txt`, `pyproject.toml`, `environment.yml`에서 framework dependency를 먼저 확인한다.
+- artifact 확장자와 디렉터리 구조로 후보 framework를 보강한다.
+- training/inference entrypoint import 문에서 실제 사용 framework를 확인한다.
+- 여러 후보가 있으면 primary model framework와 preprocessing framework를 분리해 표시한다.
+- framework를 확정할 수 없으면 `unknown/custom`으로 두고 wrapper 요구사항을 먼저 안내한다.
+
+## Model-Specific Output
+
+- detected model type candidates
+- artifact evidence by model type
+- required runtime dependencies
+- missing model-specific files
+- recommended MLflow flavor or pyfunc wrapper direction
+
 ## Output
 
 - pass/warn/block 판정

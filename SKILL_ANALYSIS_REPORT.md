@@ -70,7 +70,8 @@
 
 주의점:
 
-- framework 추정 기준이 아직 구체적이지 않다. 예를 들어 TensorFlow, PyTorch, sklearn, ONNX, HuggingFace를 어떤 파일/의존성으로 판단할지 보강하면 더 안정적이다.
+- framework 추정 기준은 TensorFlow/Keras, PyTorch, scikit-learn, ONNX, HuggingFace, XGBoost, LightGBM, custom pyfunc 기준으로 보강되어 있다.
+- 다만 실제 프로젝트가 여러 framework를 혼합할 수 있으므로 primary model과 preprocessing dependency를 분리해서 해석해야 한다.
 
 ### 4.3 MLflow Check
 
@@ -188,14 +189,13 @@
 | 사용자가 skill을 자동 스캐너로 오해 | 기대치 불일치 | README와 요구사항 문서에 "안내용 skill"임을 유지한다. |
 | secret 값 노출 | 보안 문제 | 모든 단계에서 값 대신 존재 여부만 표시하도록 유지한다. |
 | `safe` 항목을 자동 생성으로 오해 | 파일 변경 혼동 | `safe`를 "추가 안내 가능"으로 계속 표현한다. |
-| framework 추정 기준 모호 | 안내 품질 저하 | project-check에 framework 판단 힌트를 추가할 수 있다. |
+| framework 혼합 프로젝트 해석 오류 | 안내 품질 저하 | primary model framework와 preprocessing framework를 분리해 표시한다. |
 | 원격 등록 실행으로 오해 | 의도치 않은 외부 연결 | register-guide에서 "명시적 승인 전 실행 없음"을 유지한다. |
 
 ## 9. 개선 제안
 
 우선순위 높은 개선:
 
-- `agent-mlflow-skill-project-check`에 framework 추정 힌트를 추가한다.
 - `agent-mlflow-skill-mlflow-check`에 local/remote 설정 우선순위를 추가한다.
 - `agent-mlflow-skill-register-guide`에 "명령 예시와 실제 실행은 분리"한다는 문구를 강화한다.
 
@@ -216,4 +216,4 @@
 - 네이밍은 짧고 직관적으로 개선되었다.
 - 안전 요구사항도 전반적으로 적절하다.
 
-배포 가능 상태로 판단한다. 다만 framework 추정 기준과 local/remote 설정 우선순위를 조금 더 보강하면 실제 사용 품질이 더 좋아질 것이다.
+배포 가능 상태로 판단한다. 다만 local/remote 설정 우선순위와 framework 혼합 프로젝트 해석 기준을 조금 더 보강하면 실제 사용 품질이 더 좋아질 것이다.

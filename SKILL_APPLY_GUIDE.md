@@ -108,6 +108,7 @@ opencode
 run_model.py가 가져야 할 옵션을 알려줘.
 --prepare-only 전에 확인할 항목을 정리해줘.
 원격 MLflow 등록 전에 ai_studio.env에서 확인할 키를 알려줘.
+이 모델이 TensorFlow/PyTorch/sklearn/ONNX/HuggingFace 중 어떤 유형인지 근거와 함께 봐줘.
 ```
 
 ## 7. 권장 사용 흐름
@@ -115,7 +116,7 @@ run_model.py가 가져야 할 옵션을 알려줘.
 1. `agent-mlflow-skill-model-select`
    - 로컬 모델 경로를 선택한다.
 2. `agent-mlflow-skill-project-check`
-   - 프로젝트 파일과 artifact 상태를 확인한다.
+   - 프로젝트 파일, artifact 상태, 모델 타입별 체크 기준을 확인한다.
 3. `agent-mlflow-skill-mlflow-check`
    - MLflow dependency와 tracking 설정을 확인한다.
 4. `agent-mlflow-skill-gap-guide`
