@@ -138,7 +138,7 @@ MLflow 등록에 필요한 tracking URI와 experiment 설정이 준비됐는지 
 
 기대 결과:
 
-- prepare-only 또는 동등한 dry-run 기능
+- prepare-only 또는 동등한 dry-run 기능 존재 여부
 - register 또는 동등한 등록 기능
 - environment config 전달 기능
 - config path 전달 기능
@@ -151,7 +151,7 @@ MLflow 등록에 필요한 tracking URI와 experiment 설정이 준비됐는지 
 요청:
 
 ```text
-등록/실행 entrypoint의 prepare-only 또는 dry-run 기능 전에 어떤 항목을 확인해야 해?
+등록/실행 entrypoint에 prepare-only 또는 dry-run 기능이 있는지, 있다면 실행 전에 어떤 항목을 확인해야 해?
 ```
 
 기대 결과:

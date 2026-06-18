@@ -31,7 +31,7 @@
 | 3 | `agent-mlflow-skill-mlflow-check` | MLflow 등록 준비 상태 확인 기준 안내 |
 | 4 | `agent-mlflow-skill-gap-guide` | 부족한 파일과 설정의 보완 방향 분류 |
 | 5 | `agent-mlflow-skill-run-model-guide` | 등록/실행 entrypoint 기능과 동작 기준 안내 |
-| 6 | `agent-mlflow-skill-prepare-check` | prepare-only 또는 동등한 dry-run 기능 검증 기준 안내 |
+| 6 | `agent-mlflow-skill-prepare-check` | prepare-only 또는 동등한 dry-run 기능 확인 기준 안내 |
 | 7 | `agent-mlflow-skill-register-guide` | local/remote MLflow 등록 조건 안내 |
 
 ## 3. 요구사항 적합성 평가
@@ -168,7 +168,7 @@
 1. 사용자가 로컬 모델 경로를 제시한다.
 2. OpenCode가 skill 지침에 따라 필요한 파일을 확인한다.
 3. 부족한 항목을 안전하게 분류해 알려준다.
-4. 등록/실행 entrypoint와 prepare-only 또는 동등한 dry-run 기능 기준을 안내한다.
+4. 등록/실행 entrypoint와 prepare-only 또는 동등한 dry-run 기능 존재 여부 및 확인 기준을 안내한다.
 5. local/remote MLflow 등록 조건을 안내한다.
 
 좋은 점:
