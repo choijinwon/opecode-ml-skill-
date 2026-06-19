@@ -11,8 +11,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLES_DIR = ROOT / "samples"
+
+# When no project path is provided, sample projects are selected in this order.
+# sklearn stays first because it is the lightest sample for a quick local check.
 SAMPLE_PRIORITY = ["sklearn_sample", "pytorch_sample", "tensorflow_sample"]
 
+# The skill pack does not require a fixed file name. These common names are
+# used only as hints when detecting a registration or inference entrypoint.
 ENTRYPOINT_NAMES = [
     "register_model.py",
     "run_model.py",
@@ -93,6 +98,9 @@ def safe_relative(path: Path, base: Path) -> str:
 
 
 def has_project_markers(path: Path) -> bool:
+    # Treat the current directory as a model project only when it has clear
+    # ML project markers. This prevents the repository root from being selected
+    # just because it contains the skill pack itself.
     marker_names = {
         "requirements.txt",
         "pyproject.toml",
@@ -113,6 +121,8 @@ def has_project_markers(path: Path) -> bool:
 
 
 def score_project(path: Path) -> int:
+    # The score is intentionally simple and transparent. It is a candidate
+    # ranking aid, not a pass/fail quality score.
     score = 0
     if (path / "requirements.txt").exists():
         score += 5
@@ -128,6 +138,10 @@ def score_project(path: Path) -> int:
 
 
 def select_project(explicit: str | None) -> tuple[Path, str]:
+    # Priority:
+    # 1. explicit user path
+    # 2. current directory when it looks like a model project
+    # 3. bundled samples, using SAMPLE_PRIORITY as a tie breaker
     if explicit:
         project = Path(explicit).expanduser().resolve()
         return project, "explicit path"
@@ -147,6 +161,8 @@ def select_project(explicit: str | None) -> tuple[Path, str]:
 
 
 def iter_files(path: Path, max_depth: int = 4):
+    # Limit traversal depth and skip heavy/generated directories so this script
+    # remains safe to run in large Windows workspaces.
     base_depth = len(path.parts)
     for root, dirs, files in os.walk(path):
         root_path = Path(root)
@@ -169,6 +185,9 @@ def find_artifacts(path: Path, max_depth: int = 4) -> list[Path]:
 
 
 def detect_framework(project: Path, requirements_text: str, artifacts: list[Path]) -> tuple[str, list[str]]:
+    # Framework detection is evidence-based and conservative. Unknown/custom is
+    # valid when the project does not expose recognizable dependency or artifact
+    # hints.
     evidence: list[str] = []
     lowered = requirements_text.lower()
     artifact_names = " ".join(path.name.lower() for path in artifacts)
@@ -270,6 +289,8 @@ def windows_path_check(project: Path) -> Check:
 
 def has_prepare_only(entrypoints: list[Path]) -> tuple[bool, list[str]]:
     evidence = []
+    # --prepare-only is only one possible implementation. "preflight" or a
+    # prepare() function can provide the same registration-before-execution check.
     patterns = ["--prepare-only", "prepare_only", "preflight", "prepare("]
     for path in entrypoints:
         text = read_text(path)
@@ -291,6 +312,9 @@ def has_register_flow(entrypoints: list[Path]) -> tuple[bool, list[str]]:
 
 
 def build_report(project: Path, reason: str, write_check: bool) -> ValidationReport:
+    # Build the report in the same order as the 7 OpenCode skills:
+    # model select -> project check -> mlflow check -> gap guide ->
+    # run-model guide -> preflight check -> register guide.
     checks: list[Check] = []
     project = project.resolve()
 
@@ -345,6 +369,9 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
         )
     )
 
+    # A dedicated env file such as ai_studio.env is not required. Config files,
+    # OS environment variables, or deployment-provided variables can all satisfy
+    # the registration settings check.
     config_ok = False
     if config_file:
         config_ok, config_message = check_json_file(config_file) if config_file.suffix == ".json" else (True, "config file exists")
@@ -392,6 +419,8 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
     )
 
     local_remote_evidence = []
+    # Do not assume a fixed local tracking URI. Each user's local/remote MLflow
+    # target should come from their config or environment.
     if config_file and config_file.suffix == ".json":
         try:
             payload = json.loads(config_file.read_text(encoding="utf-8"))

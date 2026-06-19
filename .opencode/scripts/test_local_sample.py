@@ -13,6 +13,9 @@ DEFAULT_SAMPLES = ["pytorch_sample", "sklearn_sample", "tensorflow_sample"]
 
 
 def python_in_venv(venv_dir: Path) -> Path:
+    # Windows and POSIX virtual environments place the Python executable in
+    # different folders. Keep the path logic here so the rest of the script is
+    # platform-neutral.
     if os.name == "nt":
         return venv_dir / "Scripts" / "python.exe"
     return venv_dir / "bin" / "python"
@@ -36,6 +39,8 @@ def interpreter_version(python_bin: Path) -> tuple[int, int]:
 
 def ensure_venv(sample_dir: Path, rebuild: bool, base_python: Path) -> Path:
     venv_dir = sample_dir / ".venv"
+    # Rebuild is useful when validating a clean Windows 10/11 setup or after
+    # changing sample requirements.
     if rebuild and venv_dir.exists():
         shutil.rmtree(venv_dir)
     if not venv_dir.exists():
@@ -58,9 +63,13 @@ def test_sample(sample_name: str, rebuild: bool, do_install: bool, do_register: 
     if do_install:
         install_requirements(python_bin, sample_dir)
 
+    # Each sample must be able to create its local artifact and then verify the
+    # registration prerequisites without contacting a remote MLflow server.
     run([str(python_bin), "train.py"], cwd=sample_dir)
     run([str(python_bin), "register_model.py", "--prepare-only"], cwd=sample_dir)
 
+    # Full registration is optional because each user may have different local
+    # or remote MLflow tracking settings.
     if do_register:
         run([str(python_bin), "register_model.py"], cwd=sample_dir)
 
@@ -100,6 +109,8 @@ def main():
         raise FileNotFoundError(f"python interpreter not found: {base_python}")
 
     major, minor = interpreter_version(base_python)
+    # kserve==0.15.0 does not currently support Python 3.13+. Fail early with a
+    # clear message instead of producing a long pip resolver error.
     if (major, minor) >= (3, 13):
         raise RuntimeError(
             f"python {major}.{minor} is not supported for this sample set. "
