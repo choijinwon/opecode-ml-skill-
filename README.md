@@ -1,6 +1,6 @@
 # OpenCode MLflow Local Model Skills
 
-사용자가 이미 가져온 로컬 모델 프로젝트를 OpenCode에서 단계별로 점검하도록 돕는 skill pack이며, 정적 샘플 프로젝트도 함께 제공합니다.
+처음 모델을 개발하는 사용자와 이미 가져온 로컬 모델 프로젝트를 OpenCode에서 단계별로 점검하려는 사용자를 돕는 skill pack이며, 정적 샘플 프로젝트도 함께 제공합니다.
 
 이 저장소는 앱, CLI, TUI, 샘플 생성기, 자동 스캐너를 배포하지 않습니다. 사용자에게 제공하는 것은 OpenCode가 읽는 `.opencode/skills/<name>/SKILL.md` 파일, 정적 샘플 프로젝트, 로컬 검증 스크립트입니다.
 
@@ -10,6 +10,7 @@
 .opencode/
 └── skills/
     ├── agent-mlflow-skill-model-select/
+    ├── agent-mlflow-skill-model-create-guide/
     ├── agent-mlflow-skill-project-check/
     ├── agent-mlflow-skill-mlflow-check/
     ├── agent-mlflow-skill-gap-guide/
@@ -30,10 +31,12 @@
 상세 요구사항은 [SKILL_REQUIREMENTS.md](SKILL_REQUIREMENTS.md)를 확인하세요.
 구성 분석은 [SKILL_ANALYSIS_REPORT.md](SKILL_ANALYSIS_REPORT.md)를 확인하세요.
 적용 방법은 [SKILL_APPLY_GUIDE.md](SKILL_APPLY_GUIDE.md)를 확인하세요.
+폐쇄망 등록 가이드 프롬프트도 [SKILL_APPLY_GUIDE.md](SKILL_APPLY_GUIDE.md)의 "폐쇄망 등록 가이드 프롬프트" 섹션에 포함되어 있습니다.
 테스트 시나리오는 [SKILL_TEST_SCENARIOS.md](SKILL_TEST_SCENARIOS.md)를 확인하세요.
 
 ## 단계
 
+0. 처음 개발자용 모델 프로젝트 생성 안내
 1. 로컬 모델 경로 선택
 2. 프로젝트 스캔 안내
 3. MLflow 준비 검증 안내
@@ -53,10 +56,18 @@ cp -R .opencode /path/to/user-project/
 그다음 사용자는 OpenCode에서 자연어로 요청합니다.
 
 ```text
+나는 처음 모델을 개발하는 개발자야. sklearn 기준으로 MLflow 등록 가능한 모델 프로젝트 구조를 잡아줘
 이 로컬 모델 프로젝트를 MLflow 등록 준비 관점에서 단계별로 봐줘
 ./my-model 경로를 기준으로 필요한 파일이 뭔지 알려줘
 등록/실행 entrypoint가 어떤 기능을 제공하면 좋은지 알려줘
 원격 MLflow 등록 전에 사전 준비 검증 단계가 있으면 무엇을 확인해야 하는지 알려줘
+```
+
+AI Studio pyfunc 방식까지 확인하려면 아래처럼 요청합니다.
+
+```text
+이 프로젝트가 AI Studio pyfunc 방식으로 MLflow 등록 가능한지 봐줘.
+aiu_custom 폴더, run_model.py, ModelWrapper, input_example, config, requirements를 확인해줘.
 ```
 
 샘플 구조를 먼저 확인하려면 `.opencode/samples/` 아래 프로젝트를 참고합니다. `.opencode` 전체를 복사하면 스킬, 샘플, 검증 스크립트가 함께 적용됩니다.
@@ -97,11 +108,12 @@ python .opencode/scripts/validate_mlflow_project.py
 6. 등록 전 사전 준비 검증 기준 안내
 7. local/remote MLflow 등록 안내
 
+검증 스크립트 출력은 7단계 흐름에 더해 `aiu_custom` wrapper, Windows 경로, 쓰기 권한 같은 세부 항목을 함께 표시할 수 있습니다.
 Windows 기준으로는 경로 길이, 공백 포함 경로, 쓰기 권한도 함께 확인합니다.
 
 ## 범위
 
-- 파일을 자동 생성하지 않습니다.
+- 사용자가 명확히 요청하면 OpenCode가 모델 프로젝트 구조 생성을 도울 수 있습니다.
 - 정적 샘플 프로젝트를 제공합니다.
 - 실행 중 샘플 생성기를 돌리지 않습니다.
 - 별도 스캐너 프로그램을 실행하지 않습니다.

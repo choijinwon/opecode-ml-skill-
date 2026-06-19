@@ -25,9 +25,9 @@ metadata:
 
 ## Registration Checks
 
-- 사용자 프로젝트의 환경 변수, 설정 파일, 배포 환경 변수 중 어디에 MLflow 설정이 있는지 확인한다.
+- 사용자 프로젝트의 코드 내부 상수 또는 config 중 어디에 MLflow 설정이 있는지 확인한다.
 - tracking target, artifact 위치, 모델 이름 규칙, experiment 규칙이 정해져 있는지 확인한다.
-- remote MLflow를 쓰는 경우 인증 방식과 secret 주입 위치를 확인한다. 특정 env 파일명을 요구하지 않는다.
+- remote MLflow를 쓰는 경우 인증 방식과 secret 설정 위치를 확인한다.
 - 등록에 사용하는 entrypoint가 실제로 모델 로드, signature/input example, artifact 참조를 포함하는지 확인한다.
 - local과 remote 중 어느 경로로 등록할지 사용자가 명확히 선택했는지 확인한다.
 

@@ -4,7 +4,7 @@
 
 이 문서는 OpenCode MLflow Local Model Skills의 요구 사항을 정의한다.
 
-이 skill pack은 사용자가 이미 보유한 로컬 모델 프로젝트 또는 저장소가 제공하는 정적 샘플 프로젝트를 OpenCode에서 단계별로 확인하고, MLflow 등록 준비에 필요한 다음 조치를 안내하기 위한 것이다.
+이 skill pack은 처음 모델을 개발하는 사용자, 이미 보유한 로컬 모델 프로젝트, 또는 저장소가 제공하는 정적 샘플 프로젝트를 OpenCode에서 단계별로 확인하고, MLflow 등록 준비에 필요한 다음 조치를 안내하기 위한 것이다.
 
 ## 2. 배포 범위
 
@@ -23,13 +23,14 @@
 - 앱, CLI, TUI, Wizard 구현
 - 샘플 생성기
 - 자동 스캐너 프로그램
-- 파일 자동 생성 또는 자동 수정
+- 사용자 요청 없는 파일 자동 생성 또는 자동 수정
 - 리포트 파일 생성
 - 원격 MLflow 서버 직접 연결 또는 등록 실행
 
 ## 3. 대상 사용자
 
 - 로컬에 모델 프로젝트를 가져온 사용자
+- 처음 모델을 개발하며 MLflow 등록 가능한 프로젝트 구조를 만들고 싶은 사용자
 - 샘플 프로젝트 구조를 먼저 확인하려는 사용자
 - OpenCode를 사용해 모델 등록 준비 상태를 확인하려는 사용자
 - 사용자 환경의 MLflow tracking URI 또는 원격 MLflow 등록 전에 필요한 파일과 설정을 점검하려는 사용자
@@ -47,6 +48,7 @@
 
 | Step | Skill |
 | --- | --- |
+| 0 | `agent-mlflow-skill-model-create-guide` |
 | 1 | `agent-mlflow-skill-model-select` |
 | 2 | `agent-mlflow-skill-project-check` |
 | 3 | `agent-mlflow-skill-mlflow-check` |
@@ -80,6 +82,30 @@ metadata:
 - `Safety`
 
 ## 6. 단계별 기능 요구사항
+
+### 6.0 Model Create Guide
+
+Skill: `agent-mlflow-skill-model-create-guide`
+
+목적:
+
+- 처음 모델을 개발하는 사용자가 OpenCode 챗봇으로 MLflow 등록 가능한 모델 프로젝트 구조를 만들 수 있도록 안내한다.
+
+요구사항:
+
+- 사용자가 모델 생성 또는 프로젝트 구조 생성을 명확히 요청할 때만 파일 생성을 지원한다.
+- 사용자가 점검만 요청하면 파일을 생성하지 않고 부족한 항목만 안내한다.
+- 모델 유형은 `sklearn`, `pytorch`, `tensorflow` 중 하나를 기본 후보로 안내한다.
+- 폴더명은 판단 기준으로 쓰지 않고 현재 OpenCode root 또는 사용자가 지정한 경로를 모델 root로 본다.
+- 기본 구조는 `requirements.txt`, `train.py`, `config.json`, `input_example.json`, `run_model.py`, `aiu_custom/`, `artifacts/`를 포함한다.
+- AI Studio pyfunc 방식이면 `aiu_custom/predict.py`의 `ModelWrapper`, `load_context`, `predict`, `code_paths=["aiu_custom"]` 구성을 필수로 본다.
+- MLflow 설정값은 코드 내부 상수 또는 프로젝트 config에서 확인한다.
+- 폐쇄망 환경을 전제로 외부 다운로드, pip 설치, 원격 문서 조회를 요구하지 않는다.
+- OpenCode 챗봇 응답에서는 직접 실행 명령 대신 파일/기능/설정 기준을 안내한다.
+
+다음 단계:
+
+- `agent-mlflow-skill-model-select`
 
 ### 6.1 Model Select
 
@@ -118,10 +144,11 @@ Skill: `agent-mlflow-skill-project-check`
 - `train.py` 또는 추론 entrypoint
 - 등록/실행 entrypoint 또는 등록 절차 문서
 - `config.json`
-- 환경 변수/설정 방식. 전용 env 파일은 필수가 아니며 OS 환경 변수, `.env`, YAML/JSON config, 배포 환경 변수 등을 인정한다.
+- MLflow 설정 방식. 코드 내부 상수 또는 프로젝트 config를 기준으로 확인한다.
 - `input_example.json`
 - model artifact 경로와 크기
 - framework 후보
+- AI Studio pyfunc 방식의 `aiu_custom/`, `aiu_custom/predict.py`, `ModelWrapper`
 - 모델 타입별 artifact와 dependency 확인 기준
 
 모델 타입별 확인 기준:
@@ -135,7 +162,7 @@ Skill: `agent-mlflow-skill-project-check`
 | HuggingFace | `config.json`, tokenizer files, `pytorch_model.bin`, `model.safetensors`, `transformers` dependency |
 | XGBoost | `.bst`, `.json`, `.ubj`, feature names, native booster/sklearn wrapper 구분 |
 | LightGBM | `.txt`, `.pkl`, `.joblib`, booster/sklearn wrapper 구분 |
-| Custom pyfunc | `PythonModel`, wrapper source, `load_context`, `predict` 계약 |
+| Custom pyfunc | `PythonModel`, wrapper source, `load_context`, `predict` 계약, AI Studio pyfunc 방식의 `aiu_custom/` 필수 구성 |
 
 출력 요구사항:
 
@@ -156,15 +183,15 @@ Skill: `agent-mlflow-skill-mlflow-check`
 
 목적:
 
-- MLflow tracking URI/remote 등록 준비 상태 확인 기준을 안내한다.
+- MLflow tracking URL/remote 등록 준비 상태 확인 기준을 안내한다.
 
 확인 항목:
 
 - `mlflow` dependency 포함 여부
-- `MLFLOW_TRACKING_URI` 또는 `MLFLOW_TRACKING_URL`
+- `mlflow_tracking_url`
 - experiment name
 - registered model name
-- 사용자 환경의 tracking URI 설정 여부
+- 사용자 환경의 tracking URL 설정 여부
 - 인증 정보 존재 여부
 
 안전 요구사항:
@@ -272,7 +299,7 @@ Skill: `agent-mlflow-skill-register-guide`
 
 Remote mode 요구사항:
 
-- 사용자 프로젝트의 환경 변수/설정 방식에서 tracking URI 또는 URL, 인증 정보 존재 여부, experiment, registered model name을 확인하도록 안내한다. 특정 env 파일명은 요구하지 않는다.
+- 사용자 프로젝트의 코드 내부 상수 또는 config에서 tracking URL, 인증 정보 존재 여부, experiment, registered model name을 확인하도록 안내한다.
 - secret 값은 표시하지 않는다.
 - 원격 등록은 사용자의 명시적 승인 이후에만 안내한다.
 
@@ -299,7 +326,7 @@ Remote mode 요구사항:
 
 배포 전 다음 조건을 만족해야 한다.
 
-- skill은 7개만 존재한다.
+- skill은 Step 0 생성 안내와 기존 7단계 점검 흐름을 합쳐 8개 존재한다.
 - 모든 skill 폴더명은 `agent-mlflow-skill-`로 시작한다.
 - 모든 `SKILL.md` frontmatter의 `name`은 폴더명과 동일하다.
 - 모든 skill 이름은 lowercase kebab-case이다.

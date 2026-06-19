@@ -46,6 +46,8 @@ metadata:
 ## Safety
 
 - 이 skill은 사전 준비 검증 단계를 직접 실행하지 않는다.
+- OpenCode 챗봇 응답에서는 `python run_model.py --prepare-only` 같은 직접 실행 명령을 사용자에게 지시하지 않는다.
+- 대신 entrypoint에 등록 전 사전 준비 검증 기능이 있는지, 그 기능이 artifact/config/input example/wrapper를 확인하는지 설명한다.
 - 특정 옵션 이름을 전제하지 않고, 사용자가 확인해야 할 조건과 질문만 안내한다.
 - 이 단계는 MLflow 원격 등록을 수행하도록 지시하지 않는다.
 - 실제 실행 여부는 사용자와 프로젝트 운영 절차에 맡기고, 스킬은 안전한 경로 사용 필요성만 안내한다.

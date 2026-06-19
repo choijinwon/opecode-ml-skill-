@@ -6,9 +6,9 @@
 
 중요 원칙:
 
-- 사용자마다 MLflow tracking URI가 다르므로 특정 로컬 tracking 경로를 기본값으로 제안하지 않는다.
-- `MLFLOW_TRACKING_URI` 또는 `MLFLOW_TRACKING_URL`은 사용자 환경에 맞게 확인하도록 안내한다.
-- skill pack은 안내용이며 파일 생성, 파일 수정, 원격 등록 실행을 수행하지 않는다.
+- 사용자마다 MLflow tracking URL이 다르므로 특정 로컬 tracking 경로를 기본값으로 제안하지 않는다.
+- `mlflow_tracking_url`은 사용자 환경에 맞게 코드 내부 상수 또는 config에서 확인하도록 안내한다.
+- 사용자가 명확히 생성 요청을 하지 않으면 파일 생성, 파일 수정, 원격 등록 실행을 수행하지 않는다.
 
 ## 2. 사전 조건
 
@@ -19,6 +19,7 @@ user-project/
 └── .opencode/
     └── skills/
         ├── agent-mlflow-skill-model-select/
+        ├── agent-mlflow-skill-model-create-guide/
         ├── agent-mlflow-skill-project-check/
         ├── agent-mlflow-skill-mlflow-check/
         ├── agent-mlflow-skill-gap-guide/
@@ -39,9 +40,27 @@ OpenCode는 사용자 프로젝트 루트에서 실행한다.
 
 기대 결과:
 
-- 7단계 흐름을 안내한다.
-- 순서는 model select, project check, MLflow check, gap guide, run model guide, preflight check, register guide이다.
-- 파일 생성, 자동 스캔 프로그램 실행, 원격 등록 실행을 제안하지 않는다.
+- 처음 개발자용 Step 0과 기존 7단계 흐름을 안내한다.
+- 순서는 model create guide, model select, project check, MLflow check, gap guide, run model guide, preflight check, register guide이다.
+- 사용자가 생성 요청을 하지 않았으면 파일 생성, 자동 스캔 프로그램 실행, 원격 등록 실행을 제안하지 않는다.
+
+## 3.1 처음 개발자 모델 생성 안내
+
+요청:
+
+```text
+나는 처음 모델을 개발하는 개발자야.
+sklearn 기준으로 MLflow 등록 가능한 모델 프로젝트 구조를 잡아줘.
+폐쇄망 환경이고 직접 실행 명령은 안내하지 마.
+```
+
+기대 결과:
+
+- 모델 유형을 `sklearn`으로 보고 기본 구조를 안내한다.
+- `requirements.txt`, `train.py`, `config.json`, `input_example.json`, `run_model.py`, `aiu_custom/`, `artifacts/` 역할을 설명한다.
+- AI Studio pyfunc 방식에서 `aiu_custom`이 필수임을 설명한다.
+- 코드 내부 상수 또는 프로젝트 config 기준으로 확인한다.
+- 외부 다운로드나 pip 설치 명령을 요구하지 않는다.
 
 ## 4. 로컬 모델 경로 선택
 
@@ -109,9 +128,9 @@ my-model/
 기대 결과:
 
 - 발견된 파일과 누락된 파일을 구분한다.
-- tracking URI와 인증 정보 주입 방식이 없으면 사용자 환경에 맞는 설정 방식이 필요하다고 안내한다. 특정 env 파일 생성을 요구하지 않는다.
+- tracking URL과 인증 정보 설정 위치가 없으면 코드 내부 상수 또는 프로젝트 config에 설정 위치가 필요하다고 안내한다.
 - 상태를 pass, warn, block 수준으로 구분한다.
-- 파일을 자동 생성하지 않는다.
+- 사용자가 생성 요청을 하지 않았으므로 파일을 자동 생성하지 않는다.
 
 ## 6. 모델 타입별 확인
 
@@ -137,7 +156,7 @@ MLflow 등록에 필요한 tracking URI와 experiment 설정이 준비됐는지 
 
 기대 결과:
 
-- `MLFLOW_TRACKING_URI` 또는 `MLFLOW_TRACKING_URL` 설정 여부를 확인하도록 안내한다.
+- `mlflow_tracking_url` 설정 여부를 확인하도록 안내한다.
 - experiment name과 registered model name 후보를 확인한다.
 - tracking URI가 없으면 사용자 환경에 맞게 설정이 필요하다고 안내한다.
 - 특정 로컬 tracking 경로를 기본값으로 제안하지 않는다.
@@ -235,10 +254,10 @@ my-model/
 
 ## 13. 최종 통과 기준
 
-- OpenCode가 7개 skill 흐름을 자연스럽게 안내한다.
+- OpenCode가 Step 0 생성 안내와 기존 7단계 점검 흐름을 자연스럽게 안내한다.
 - 사용자 환경의 tracking URI 확인을 우선한다.
 - 특정 로컬 tracking 경로를 기본값으로 제안하지 않는다.
-- 파일을 자동 생성하거나 수정하지 않는다.
+- 사용자가 생성 요청을 하지 않았으면 파일을 자동 생성하거나 수정하지 않는다.
 - 실행 중 샘플 생성기를 언급하지 않는다.
 - 저장소의 정적 샘플 프로젝트는 허용한다.
 - secret 값을 출력하지 않는다.
@@ -255,7 +274,7 @@ python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/
 
 기대 결과:
 
-- 7단계 기준으로 선택, 스캔, MLflow 준비, gap, entrypoint, prepare-only, local/remote 등록 조건을 점검한다.
+- 기존 7단계 기준으로 선택, 스캔, MLflow 준비, gap, entrypoint, prepare-only, local/remote 등록 조건을 점검한다.
 - Windows 10/11 기준 경로 공백, 경로 길이, 쓰기 권한을 확인한다.
 - secret 값을 출력하지 않는다.
 - `block` 항목이 있으면 exit code `2`, `warn`만 있으면 exit code `1`, 모두 통과하면 exit code `0`을 반환한다.

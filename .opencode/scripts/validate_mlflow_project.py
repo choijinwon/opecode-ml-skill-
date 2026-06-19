@@ -250,6 +250,60 @@ def find_entrypoints(project: Path) -> list[Path]:
     return [path for path in iter_files(project, max_depth=2) if path.suffix == ".py"]
 
 
+def check_aiu_custom(project: Path, entrypoints: list[Path]) -> Check:
+    # AI Studio style pyfunc registration depends on aiu_custom being shipped
+    # with the model project because mlflow.pyfunc.log_model uses it through
+    # code_paths and ModelWrapper.
+    entrypoint_text = "\n".join(read_text(path) for path in entrypoints)
+    required = any(
+        marker in entrypoint_text
+        for marker in ["aiu_custom", "ModelWrapper", "code_paths", "PythonModel"]
+    )
+    aiu_dir = project / "aiu_custom"
+    predict_file = aiu_dir / "predict.py"
+
+    if not required and not aiu_dir.exists():
+        return Check(
+            "AI Studio custom wrapper",
+            "pass",
+            "aiu_custom is not required by detected entrypoints",
+            [],
+        )
+
+    evidence = []
+    if aiu_dir.exists():
+        evidence.append("aiu_custom/")
+    if predict_file.exists():
+        evidence.append("aiu_custom/predict.py")
+    predict_text = read_text(predict_file)
+    if "ModelWrapper" in predict_text:
+        evidence.append("ModelWrapper")
+    if "mlflow.pyfunc.PythonModel" in predict_text or "PythonModel" in predict_text:
+        evidence.append("PythonModel")
+
+    missing = []
+    if not aiu_dir.exists():
+        missing.append("aiu_custom/")
+    if not predict_file.exists():
+        missing.append("aiu_custom/predict.py")
+    if predict_file.exists() and "ModelWrapper" not in predict_text:
+        missing.append("ModelWrapper class")
+
+    if missing:
+        return Check(
+            "AI Studio custom wrapper",
+            "block",
+            "aiu_custom wrapper is required but incomplete",
+            evidence + [f"missing: {item}" for item in missing],
+        )
+    return Check(
+        "AI Studio custom wrapper",
+        "pass",
+        "aiu_custom wrapper is available",
+        evidence,
+    )
+
+
 def write_permission_check(project: Path) -> Check:
     try:
         with tempfile.NamedTemporaryFile(prefix=".mlflow_skill_check_", dir=project, delete=True) as handle:
@@ -311,6 +365,23 @@ def has_register_flow(entrypoints: list[Path]) -> tuple[bool, list[str]]:
     return bool(evidence), evidence
 
 
+def find_mlflow_code_settings(entrypoints: list[Path]) -> list[str]:
+    evidence = []
+    setting_names = [
+        "mlflow_tracking_url",
+        "mlflow_tracking_username",
+        "mlflow_tracking_password",
+        "mlflow_experiment_name",
+        "mlflow_register_model_name",
+    ]
+    for path in entrypoints:
+        text = read_text(path)
+        matched = [name for name in setting_names if name in text]
+        if matched:
+            evidence.append(f"{path.name}: {', '.join(matched)}")
+    return evidence
+
+
 def build_report(project: Path, reason: str, write_check: bool) -> ValidationReport:
     # Build the report in the same order as the 7 OpenCode skills:
     # model select -> project check -> mlflow check -> gap guide ->
@@ -344,22 +415,14 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
             project_evidence + framework_evidence,
         )
     )
+    checks.append(check_aiu_custom(project, entrypoints))
 
     mlflow_evidence = []
     has_mlflow_dep = any(re.match(r"(?i)^mlflow([=<>!~ ]|$)", pkg) for pkg in packages)
     if requirements_path:
         mlflow_evidence.append(f"requirements: {safe_relative(requirements_path, project)}")
-    env_keys = [
-        key
-        for key in [
-            "MLFLOW_TRACKING_URI",
-            "MLFLOW_TRACKING_URL",
-            "MLFLOW_EXPERIMENT_NAME",
-            "MLFLOW_EXPERIMENT_ID",
-        ]
-        if os.environ.get(key)
-    ]
-    mlflow_evidence.extend(env_keys)
+    code_settings = find_mlflow_code_settings(entrypoints)
+    mlflow_evidence.extend(code_settings)
     checks.append(
         Check(
             "MLflow readiness",
@@ -369,9 +432,8 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
         )
     )
 
-    # A dedicated env file such as ai_studio.env is not required. Config files,
-    # OS environment variables, or deployment-provided variables can all satisfy
-    # the registration settings check.
+    # Code constants and project config files are the expected places to
+    # confirm MLflow settings.
     config_ok = False
     if config_file:
         config_ok, config_message = check_json_file(config_file) if config_file.suffix == ".json" else (True, "config file exists")
@@ -429,7 +491,7 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
                     local_remote_evidence.append(f"{key}: present")
         except json.JSONDecodeError:
             pass
-    local_remote_evidence.extend(env_keys)
+    local_remote_evidence.extend(code_settings)
     checks.append(
         Check(
             "local/remote MLflow registration readiness",

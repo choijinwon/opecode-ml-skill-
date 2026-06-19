@@ -2,6 +2,7 @@
 
 | Step | Skill | Purpose |
 | --- | --- | --- |
+| 0 | `agent-mlflow-skill-model-create-guide` | 처음 모델을 개발하는 사용자가 MLflow 등록 가능한 프로젝트 구조를 만들 수 있도록 안내합니다. |
 | 1 | `agent-mlflow-skill-model-select` | 로컬 모델 프로젝트 또는 제공 샘플을 자동 후보 선정 규칙에 따라 검증 대상으로 정하도록 안내합니다. |
 | 2 | `agent-mlflow-skill-project-check` | 프로젝트 구조, artifact, framework, 설정 파일 확인 기준을 안내합니다. |
 | 3 | `agent-mlflow-skill-mlflow-check` | MLflow 의존성, tracking 설정 위치, 등록 준비 상태 확인 기준을 안내합니다. |

@@ -32,6 +32,7 @@ metadata:
 - Windows 경로와 공백이 있는 경로를 처리한다.
 - 사용자 환경의 tracking URI 설정을 지원한다.
 - `mlflow.pyfunc.log_model(...)`과 `registered_model_name` 사용 흐름을 갖는다.
+- AI Studio pyfunc 방식이면 `aiu_custom/` 폴더를 함께 배포하고 `code_paths=["aiu_custom"]`, `ModelWrapper`, `load_context`, `predict` 계약을 유지한다.
 - 원격 설정이 비어 있으면 친절한 tracking URI 설정 안내를 출력한다.
 
 ## Output
@@ -39,10 +40,12 @@ metadata:
 - entrypoint가 제공하면 좋은 기능 목록
 - 기능별 기대 동작
 - framework별 wrapper 필요 여부
+- AI Studio pyfunc 방식의 `aiu_custom` 필수 여부
 - 다음 단계: `agent-mlflow-skill-preflight-check`
 
 ## Safety
 
 - 이 skill은 특정 파일명이나 옵션명을 강제하지 않는다.
 - entrypoint 구현 방식을 하나로 표준화했다고 가정하지 않는다.
-- 실제 실행 명령이나 등록 수행을 기본 동작으로 전제하지 않는다.
+- OpenCode 챗봇 응답에서는 실제 실행 명령이나 등록 수행을 기본 동작으로 전제하지 않는다.
+- `run_model.py`는 직접 실행하라고 안내하는 대상이 아니라, 등록 전 검증/등록 책임이 분리되어 있는지 확인하는 대상이다.

@@ -2,7 +2,7 @@
 
 ## 1. 분석 개요
 
-분석 대상은 OpenCode MLflow Local Model Skills의 7개 skill이다.
+분석 대상은 OpenCode MLflow Local Model Skills의 8개 skill이다.
 
 분석 목적:
 
@@ -20,12 +20,13 @@
 
 ## 2. 현재 구성 요약
 
-현재 저장소는 앱, CLI, TUI, 샘플 생성기, 자동 스캐너를 포함하지 않고 OpenCode skill 파일과 정적 샘플 프로젝트를 제공한다.
+현재 저장소는 앱, CLI, TUI, 샘플 생성기, 자동 스캐너를 포함하지 않고 OpenCode skill 파일과 정적 샘플 프로젝트를 제공한다. 처음 개발자용 모델 프로젝트 생성 안내와 기존 모델 점검 흐름을 함께 제공한다.
 
 현재 skill 목록:
 
 | Step | Skill | 역할 |
 | --- | --- | --- |
+| 0 | `agent-mlflow-skill-model-create-guide` | 처음 개발자의 모델 프로젝트 구조 생성 안내 |
 | 1 | `agent-mlflow-skill-model-select` | 사용자가 가져온 로컬 모델 경로 선택 |
 | 2 | `agent-mlflow-skill-project-check` | 프로젝트 구조와 필수 파일 확인 기준 안내 |
 | 3 | `agent-mlflow-skill-mlflow-check` | MLflow 등록 준비 상태 확인 기준 안내 |
@@ -38,12 +39,12 @@
 
 | 항목 | 평가 | 근거 |
 | --- | --- | --- |
-| skill pack 배포 | 적합 | `.opencode/skills` 아래 7개 `SKILL.md`와 `.opencode/samples/` 아래 정적 샘플 프로젝트를 함께 제공한다. |
+| skill pack 배포 | 적합 | `.opencode/skills` 아래 8개 `SKILL.md`와 `.opencode/samples/` 아래 정적 샘플 프로젝트를 함께 제공한다. |
 | 샘플 생성기 제외 | 적합 | 실행 중 샘플 생성 기능은 없고, 정적 샘플 프로젝트만 제공한다. |
 | 자동 실행 제외 | 적합 | CLI, TUI, 자동 스캐너, 원격 등록 실행 기능을 포함하지 않는다. |
 | 네이밍 규칙 | 적합 | 모든 skill이 `agent-mlflow-skill-` prefix와 lowercase kebab-case를 사용한다. |
 | 폴더명/name 일치 | 적합 | 각 skill의 폴더명과 frontmatter `name`이 동일하다. |
-| 단계 흐름 | 적합 | model select에서 register guide까지 1~7 단계가 연결된다. |
+| 단계 흐름 | 적합 | model create guide에서 register guide까지 Step 0~7 단계가 연결된다. |
 | 안전 기준 | 대체로 적합 | credential 출력 금지, 파일 수정 금지, 원격 등록 실행 제한이 명시되어 있다. |
 
 ## 4. 단계 흐름 분석
@@ -77,13 +78,13 @@
 
 장점:
 
-- local tracking URI/remote 등록 준비를 분리한다.
-- `MLFLOW_TRACKING_URI`, `MLFLOW_TRACKING_URL`, experiment, registered model name 확인 기준이 있다.
+- local tracking URL/remote 등록 준비를 분리한다.
+- `mlflow_tracking_url`, `mlflow_experiment_name`, `mlflow_register_model_name` 확인 기준이 있다.
 - secret 값 숨김과 원격 서버 미연결 원칙이 명확하다.
 
 주의점:
 
-- `MLFLOW_TRACKING_URI`와 `MLFLOW_TRACKING_URL`의 우선순위 또는 매핑 규칙은 더 자세히 정의할 수 있다.
+- 코드 내부 상수와 config 중 어떤 값을 우선할지 매핑 규칙은 더 자세히 정의할 수 있다.
 
 ### 4.4 Gap Guide
 
@@ -152,29 +153,30 @@
 
 현재 skill pack은 다음 안전 원칙을 유지한다.
 
-- 파일 자동 생성 없음
-- 기존 파일 자동 수정 없음
+- 사용자가 명확히 요청하지 않은 파일 자동 생성 없음
+- 사용자가 명확히 요청하지 않은 기존 파일 자동 수정 없음
 - 모델 artifact 이동/삭제/복사 없음
 - secret 값 출력 금지
 - 원격 MLflow 직접 연결 또는 등록 실행 없음
 - 샘플 모델 다운로드 또는 실행 중 생성 없음
 - 저장소 내 정적 샘플 프로젝트 제공 가능
 
-이 방향은 "사용자에게 단순 skill만 제공"한다는 배포 목적에 잘 맞는다.
+이 방향은 "처음 개발자는 생성 안내를 받고, 기존 모델 사용자는 점검 안내를 받는다"는 배포 목적에 맞는다.
 
 ## 7. 사용자 경험 분석
 
 사용자 흐름은 단순하다.
 
-1. 사용자가 로컬 모델 경로를 제시한다.
-2. OpenCode가 skill 지침에 따라 필요한 파일을 확인한다.
-3. 부족한 항목을 안전하게 분류해 알려준다.
-4. 등록/실행 entrypoint와 등록 전 사전 준비 검증 단계 존재 여부 및 확인 기준을 안내한다.
-5. local/remote MLflow 등록 조건을 안내한다.
+1. 처음 개발자는 모델 유형과 프로젝트 구조를 정한다.
+2. 기존 모델 사용자는 로컬 모델 경로를 제시하거나 현재 root를 사용한다.
+3. OpenCode가 skill 지침에 따라 필요한 파일을 확인한다.
+4. 부족한 항목을 안전하게 분류해 알려준다.
+5. 등록/실행 entrypoint와 등록 전 사전 준비 검증 단계 존재 여부 및 확인 기준을 안내한다.
+6. local/remote MLflow 등록 조건을 안내한다.
 
 좋은 점:
 
-- 단계가 7개로 짧고 이해하기 쉽다.
+- Step 0 생성 안내와 기존 7단계 점검 흐름이 분리되어 이해하기 쉽다.
 - 구현이 아니라 안내 중심이라 배포 부담이 낮다.
 - 로컬 모델 프로젝트에 바로 복사해 사용할 수 있다.
 
@@ -189,7 +191,7 @@
 | --- | --- | --- |
 | 사용자가 skill을 자동 스캐너로 오해 | 기대치 불일치 | README와 요구사항 문서에 "안내용 skill"임을 유지한다. |
 | secret 값 노출 | 보안 문제 | 모든 단계에서 값 대신 존재 여부만 표시하도록 유지한다. |
-| `safe` 항목을 자동 생성으로 오해 | 파일 변경 혼동 | `safe`를 "추가 안내 가능"으로 계속 표현한다. |
+| 생성 안내를 자동 생성으로 오해 | 파일 변경 혼동 | 사용자가 명확히 "만들어줘"라고 요청한 경우에만 파일 생성을 지원한다고 명시한다. |
 | framework 혼합 프로젝트 해석 오류 | 안내 품질 저하 | primary model framework와 preprocessing framework를 분리해 표시한다. |
 | 원격 등록 실행으로 오해 | 의도치 않은 외부 연결 | register-guide에서 "명시적 승인 전 실행 없음"을 유지한다. |
 
@@ -204,7 +206,7 @@
 
 - 각 skill 제목을 새 짧은 이름에 맞춰 `Project Check`, `MLflow Check`, `Gap Guide`처럼 정리한다.
 - 출력 형식을 더 일관되게 `Status`, `Evidence`, `Next`로 통일한다.
-- README에 "추천 사용자 질문 예시"를 7단계에 맞춰 한 줄씩 추가한다.
+- README에 "추천 사용자 질문 예시"를 Step 0과 기존 7단계에 맞춰 한 줄씩 추가한다.
 
 ## 10. 결론
 

@@ -10,14 +10,16 @@
 
 적용 대상은 다음과 같은 로컬 모델 프로젝트다.
 
+- 처음 개발하는 ML/GenAI 모델 프로젝트
 - 사용자가 직접 가져온 ML/GenAI 모델 프로젝트
-- `requirements.txt`, `train.py`, `config.json`, 환경 변수/설정 방식, `input_example.json` 중 일부 또는 전체를 가진 프로젝트. 전용 env 파일은 필수가 아니다.
+- `requirements.txt`, `train.py`, `config.json`, MLflow 코드 내부 설정, `input_example.json` 중 일부 또는 전체를 가진 프로젝트.
 - 사용자 환경의 MLflow tracking URI 또는 원격 MLflow 등록 준비 상태를 확인하려는 프로젝트
 
 ## 3. 포함되는 Skill
 
 ```text
 .opencode/skills/
+├── agent-mlflow-skill-model-create-guide/
 ├── agent-mlflow-skill-model-select/
 ├── agent-mlflow-skill-project-check/
 ├── agent-mlflow-skill-mlflow-check/
@@ -46,12 +48,14 @@ user-project/
 ├── requirements.txt
 ├── train.py 또는 inference entrypoint
 ├── 등록/실행 entrypoint
+├── aiu_custom/ (AI Studio pyfunc 방식이면 필수)
 ├── config.json
-├── 환경 변수/설정 파일 또는 배포 환경 변수 (선택)
+├── MLflow 코드 내부 설정 또는 config
 └── input_example.json
 ```
 
 모든 파일이 없어도 된다. 부족한 파일은 skill이 "무엇이 필요한지" 안내한다.
+처음 개발하는 프로젝트라면 `agent-mlflow-skill-model-create-guide`가 위 구조를 만들기 위한 파일 역할과 작성 기준을 먼저 안내한다.
 
 ## 5. 적용 방법
 
@@ -121,7 +125,7 @@ opencode
 ```text
 등록/실행 entrypoint가 제공하면 좋은 기능을 알려줘.
 등록 전 사전 준비 검증 단계에서 확인할 항목을 정리해줘.
-원격 MLflow 등록 전에 환경 변수나 설정 파일에서 확인할 키를 알려줘.
+원격 MLflow 등록 전에 코드 내부 설정에서 확인할 값을 알려줘.
 이 모델이 TensorFlow/PyTorch/sklearn/ONNX/HuggingFace 중 어떤 유형인지 근거와 함께 봐줘.
 ```
 
@@ -129,6 +133,8 @@ opencode
 
 ## 7. 권장 사용 흐름
 
+0. `agent-mlflow-skill-model-create-guide`
+   - 처음 모델을 개발하는 경우 MLflow 등록 가능한 프로젝트 구조와 파일 역할을 정한다.
 1. `agent-mlflow-skill-model-select`
    - 로컬 모델 경로 또는 제공 샘플을 자동 후보 선정 규칙으로 정한다.
 2. `agent-mlflow-skill-project-check`
@@ -144,7 +150,68 @@ opencode
 7. `agent-mlflow-skill-register-guide`
    - local/remote MLflow 등록 방식과 사전 확인 항목을 확인한다.
 
-## 8. 적용 확인 방법
+## 8. 폐쇄망 등록 가이드 프롬프트
+
+OpenCode 챗봇에서 폐쇄망 환경을 기준으로 점검하려면 아래 프롬프트를 그대로 사용할 수 있다.
+
+```text
+나는 폐쇄망 환경에서 처음 모델을 개발하는 개발자야.
+
+현재 열려 있는 폴더를 모델 프로젝트 root로 보고,
+MLflow 등록 가능한 구조인지 단계별로 점검해줘.
+
+중요 조건:
+- 폴더 이름은 사용자마다 다르니 폴더명으로 판단하지 마.
+- 외부 다운로드, pip 설치, 원격 문서 조회를 전제로 하지 마.
+- 직접 실행 명령은 안내하지 마.
+- 내가 명확히 만들라고 요청하지 않으면 파일을 자동 생성하거나 수정하지 마.
+- MLflow 설정값은 코드 내부 상수 또는 프로젝트 config 기준으로 확인해줘.
+- secret 값은 절대 출력하지 마.
+
+확인할 항목:
+1. requirements.txt 존재 여부
+2. train.py 또는 학습 entrypoint 존재 여부
+3. 모델 artifact 저장 위치
+4. config.json 존재 여부
+5. input_example.json 존재 여부
+6. run_model.py 존재 여부
+7. aiu_custom/ 폴더 존재 여부
+8. aiu_custom/predict.py 존재 여부
+9. ModelWrapper 클래스 존재 여부
+10. ModelWrapper가 load_context와 predict를 제공하는지 여부
+11. run_model.py가 mlflow.pyfunc.log_model을 사용하는지 여부
+12. code_paths=["aiu_custom"] 구조인지 여부
+13. MLflow 코드 내부 설정값 위치 확인
+
+MLflow 코드 내부 설정값:
+- mlflow_tracking_url
+- mlflow_tracking_username
+- mlflow_tracking_password
+- mlflow_experiment_name
+- mlflow_register_model_name
+
+출력 형식:
+- 현재 판단한 모델 root
+- 발견된 파일
+- 부족한 파일
+- AI Studio pyfunc 등록 가능 여부
+- MLflow 설정값 준비 상태
+- local/remote MLflow 등록 전 확인할 점
+- 내가 다음에 보완해야 할 항목
+
+다시 강조:
+실행 명령은 쓰지 말고,
+파일 구조와 설정 기준만 보고 안내해줘.
+```
+
+샘플로 먼저 테스트할 때는 첫 문단만 아래처럼 바꾼다.
+
+```text
+.opencode/samples/sklearn_sample 샘플을 모델 프로젝트 root로 보고,
+MLflow 등록 가능한 구조인지 단계별로 점검해줘.
+```
+
+## 9. 적용 확인 방법
 
 사용자 프로젝트에서 다음 파일들이 존재하면 적용된 것이다.
 
@@ -152,9 +219,10 @@ opencode
 ls .opencode/skills/agent-mlflow-skill-*/SKILL.md
 ```
 
-예상되는 skill 수는 7개다.
+예상되는 skill 수는 8개다.
 
 ```text
+agent-mlflow-skill-model-create-guide
 agent-mlflow-skill-model-select
 agent-mlflow-skill-project-check
 agent-mlflow-skill-mlflow-check
@@ -164,7 +232,7 @@ agent-mlflow-skill-preflight-check
 agent-mlflow-skill-register-guide
 ```
 
-## 9. 업데이트 방법
+## 10. 업데이트 방법
 
 이 저장소의 skill을 최신 버전으로 다시 복사한다.
 
@@ -174,7 +242,7 @@ cp -R .opencode/skills/agent-mlflow-skill-* /path/to/user-project/.opencode/skil
 
 사용자 프로젝트에서 skill을 직접 수정했다면, 덮어쓰기 전에 diff를 확인한다.
 
-## 10. 주의사항
+## 11. 주의사항
 
 - 이 skill pack은 모델 파일을 생성하지 않는다.
 - 이 skill pack은 프로젝트 파일을 자동 수정하지 않는다.
@@ -182,7 +250,7 @@ cp -R .opencode/skills/agent-mlflow-skill-* /path/to/user-project/.opencode/skil
 - secret 값은 출력하지 않는 방향으로 사용해야 한다.
 - 원격 등록은 사용자가 명시적으로 실행하기 전까지 안내 수준에 머문다.
 
-## 11. 문제 해결
+## 12. 문제 해결
 
 OpenCode가 skill을 못 찾는 경우:
 
@@ -197,5 +265,5 @@ skill 이름이 너무 길게 느껴지는 경우:
 
 원격 MLflow 설정이 없는 경우:
 
-- 사용자 환경에 맞는 `MLFLOW_TRACKING_URI` 또는 `MLFLOW_TRACKING_URL` 값을 먼저 확인한다.
-- 원격 등록 정보는 사용자 프로젝트의 환경 변수/설정 방식에 맞게 준비한 뒤 다시 확인한다. 특정 env 파일명은 요구하지 않는다.
+- 사용자 환경에 맞는 `mlflow_tracking_url` 값을 먼저 확인한다.
+- 원격 등록 정보는 사용자 프로젝트의 코드 내부 상수 또는 config 기준으로 준비한 뒤 다시 확인한다.

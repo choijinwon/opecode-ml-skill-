@@ -14,7 +14,7 @@ metadata:
 ## When To Use
 
 - Step 2에서 선택된 프로젝트가 등록 가능한 구조인지 확인할 때
-- 학습 entrypoint, 모델 artifact, 환경 변수/설정 방식, 입력 예제를 확인할 때
+- 학습 entrypoint, 모델 artifact, MLflow 코드 내부 설정, 입력 예제를 확인할 때
 - 수정 전 read-only 확인 기준이 필요할 때
 
 ## Guidance Checks
@@ -23,10 +23,11 @@ metadata:
 - `train.py` 또는 추론 entrypoint 존재 여부
 - 등록/실행 entrypoint 또는 등록 절차 문서 존재 여부
 - `config.json` 존재 여부
-- 환경 변수/설정 방식 확인. 전용 파일이 없어도 OS 환경 변수, `.env`, YAML/JSON config, 배포 환경 변수 등 사용자 프로젝트 방식을 인정한다.
+- MLflow 설정 방식 확인. 코드 내부 상수 또는 프로젝트 config를 기준으로 확인한다.
 - `input_example.json` 존재 여부
 - model artifact 경로와 크기
 - framework 추정 결과
+- AI Studio pyfunc 방식이면 `aiu_custom/`, `aiu_custom/predict.py`, `ModelWrapper` 존재 여부. `code_paths=["aiu_custom"]` 또는 `from aiu_custom...` import가 있으면 필수로 본다.
 
 ## Model Type Matrix
 
@@ -39,13 +40,14 @@ metadata:
 | HuggingFace | `transformers`, `config.json`, tokenizer files, `pytorch_model.bin`, `model.safetensors` | model weights, tokenizer, config, generation/inference task | task type과 tokenizer dependency를 함께 확인한다. |
 | XGBoost | `xgboost`, `.bst`, `.json`, `.ubj`, `.pkl` | booster/model file, feature names, objective | native booster인지 sklearn wrapper인지 구분한다. |
 | LightGBM | `lightgbm`, `.txt`, `.pkl`, `.joblib` | booster text file or wrapper artifact, feature names | native booster와 sklearn wrapper 등록 방식을 구분한다. |
-| Custom pyfunc | `PythonModel`, `mlflow.pyfunc`, custom wrapper files | wrapper source, artifact directory, dependency files | `load_context`와 `predict` 계약을 확인한다. |
+| Custom pyfunc | `PythonModel`, `mlflow.pyfunc`, custom wrapper files, `aiu_custom` import | `aiu_custom/`, `aiu_custom/predict.py`, `ModelWrapper`, artifact directory, dependency files | `load_context`와 `predict` 계약을 확인한다. AI Studio pyfunc 방식에서는 `aiu_custom`을 필수 구성으로 본다. |
 
 ## Framework Detection Rules
 
 - `requirements.txt`, `pyproject.toml`, `environment.yml`에서 framework dependency를 먼저 확인한다.
 - artifact 확장자와 디렉터리 구조로 후보 framework를 보강한다.
 - training/inference entrypoint import 문에서 실제 사용 framework를 확인한다.
+- `run_model.py` 또는 등록 entrypoint가 `aiu_custom`을 참조하면 `aiu_custom/` 폴더 누락은 block으로 분류한다.
 - 여러 후보가 있으면 primary model framework와 preprocessing framework를 분리해 표시한다.
 - framework를 확정할 수 없으면 `unknown/custom`으로 두고 wrapper 요구사항을 먼저 안내한다.
 
