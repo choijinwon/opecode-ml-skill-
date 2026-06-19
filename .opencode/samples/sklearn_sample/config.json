@@ -1,0 +1,6 @@
+{
+  "framework": "sklearn",
+  "task": "binary_classification",
+  "artifact_path": "artifacts/model.joblib",
+  "registered_model_name": "sklearn-sample-model"
+}

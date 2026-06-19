@@ -23,7 +23,7 @@ user-project/
         ├── agent-mlflow-skill-mlflow-check/
         ├── agent-mlflow-skill-gap-guide/
         ├── agent-mlflow-skill-run-model-guide/
-        ├── agent-mlflow-skill-prepare-check/
+        ├── agent-mlflow-skill-preflight-check/
         └── agent-mlflow-skill-register-guide/
 ```
 
@@ -40,7 +40,7 @@ OpenCode는 사용자 프로젝트 루트에서 실행한다.
 기대 결과:
 
 - 7단계 흐름을 안내한다.
-- 순서는 model select, project check, MLflow check, gap guide, run model guide, prepare check, register guide이다.
+- 순서는 model select, project check, MLflow check, gap guide, run model guide, preflight check, register guide이다.
 - 파일 생성, 자동 스캔 프로그램 실행, 원격 등록 실행을 제안하지 않는다.
 
 ## 4. 로컬 모델 경로 선택
@@ -55,6 +55,36 @@ OpenCode는 사용자 프로젝트 루트에서 실행한다.
 
 - 사용자가 지정한 경로를 우선 대상으로 삼는다.
 - 모델 artifact를 이동하거나 복사하지 않는다.
+- 다음 단계로 project check를 안내한다.
+
+## 4.1 자동 후보 선택
+
+요청:
+
+```text
+이 저장소에서 MLflow 등록 준비 대상을 자동으로 골라 점검해줘.
+```
+
+기대 결과:
+
+- 사용자가 직접 샘플을 고르라고 되묻지 않는다.
+- 현재 루트가 모델 프로젝트이면 현재 루트를 우선한다.
+- 현재 루트가 모델 프로젝트가 아니고 `.opencode/samples/`만 명확하면 `sklearn_sample`, `pytorch_sample`, `tensorflow_sample` 순서로 하나를 자동 선택한다.
+- 자동 선택 근거와 대체 후보를 함께 표시한다.
+- 후보가 동점이거나 위험하게 모호한 경우에만 사용자 확인을 요청한다.
+
+## 4.2 샘플 프로젝트 경로 선택
+
+요청:
+
+```text
+./.opencode/samples/pytorch_sample 경로를 MLflow 등록 준비 대상으로 봐줘.
+```
+
+기대 결과:
+
+- 저장소가 제공한 샘플 프로젝트도 일반 로컬 프로젝트와 같은 기준으로 본다.
+- `requirements.txt`, `train.py`, `register_model.py`, `config.json`, `input_example.json` 존재 여부를 확인한다.
 - 다음 단계로 project check를 안내한다.
 
 ## 5. 프로젝트 구조 확인
@@ -138,7 +168,7 @@ MLflow 등록에 필요한 tracking URI와 experiment 설정이 준비됐는지 
 
 기대 결과:
 
-- prepare-only 기능 존재 여부
+- 등록 전 사전 준비 검증 단계 존재 여부
 - register 또는 동등한 등록 기능
 - environment config 전달 기능
 - config path 전달 기능
@@ -146,12 +176,12 @@ MLflow 등록에 필요한 tracking URI와 experiment 설정이 준비됐는지 
 - Windows 경로와 공백 포함 경로를 고려하라고 안내한다.
 - 사용자 환경의 tracking URI 설정을 우선 확인하라고 안내한다.
 
-## 10. prepare-only 확인
+## 10. 등록 전 사전 준비 검증 확인
 
 요청:
 
 ```text
-등록/실행 entrypoint에 prepare-only 기능이 있는지, 있다면 실행 전에 어떤 항목을 확인해야 해?
+등록/실행 entrypoint에 등록 전 사전 준비 검증 단계가 있는지, 있다면 등록 전에 어떤 항목을 확인해야 해?
 ```
 
 기대 결과:
@@ -209,7 +239,23 @@ my-model/
 - 사용자 환경의 tracking URI 확인을 우선한다.
 - 특정 로컬 tracking 경로를 기본값으로 제안하지 않는다.
 - 파일을 자동 생성하거나 수정하지 않는다.
-- 샘플 모델 생성을 언급하지 않는다.
+- 실행 중 샘플 생성기를 언급하지 않는다.
+- 저장소의 정적 샘플 프로젝트는 허용한다.
 - secret 값을 출력하지 않는다.
 - 모델 타입별 후보를 근거와 함께 안내한다.
 - 등록은 실행이 아니라 조건과 주의사항 안내로 유지한다.
+
+## 14. Windows 로컬 검증 스크립트
+
+요청:
+
+```bash
+python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/sklearn_sample
+```
+
+기대 결과:
+
+- 7단계 기준으로 선택, 스캔, MLflow 준비, gap, entrypoint, prepare-only, local/remote 등록 조건을 점검한다.
+- Windows 10/11 기준 경로 공백, 경로 길이, 쓰기 권한을 확인한다.
+- secret 값을 출력하지 않는다.
+- `block` 항목이 있으면 exit code `2`, `warn`만 있으면 exit code `1`, 모두 통과하면 exit code `0`을 반환한다.

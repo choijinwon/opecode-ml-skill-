@@ -8,7 +8,7 @@ Step 2  agent-mlflow-skill-project-check
 Step 3  agent-mlflow-skill-mlflow-check
 Step 4  agent-mlflow-skill-gap-guide
 Step 5  agent-mlflow-skill-run-model-guide
-Step 6  agent-mlflow-skill-prepare-check
+Step 6  agent-mlflow-skill-preflight-check
 Step 7  agent-mlflow-skill-register-guide
 ```
 

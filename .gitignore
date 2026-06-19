@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.opencode/scripts/__pycache__/
+.opencode/samples/*/.venv/
+.opencode/samples/*/__pycache__/
+.opencode/samples/*/artifacts/*
+!.opencode/samples/*/artifacts/.gitkeep
+mlruns/

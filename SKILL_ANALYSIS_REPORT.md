@@ -7,7 +7,7 @@
 분석 목적:
 
 - 현재 skill 구성이 요구사항에 맞는지 확인한다.
-- skill-only 배포 원칙이 지켜지는지 확인한다.
+- skill pack과 정적 샘플 배포 원칙이 지켜지는지 확인한다.
 - 단계 흐름, 네이밍, 안전 기준, 사용자 경험 측면의 적합성을 평가한다.
 - 배포 전 보완하면 좋은 개선 항목을 정리한다.
 
@@ -20,7 +20,7 @@
 
 ## 2. 현재 구성 요약
 
-현재 저장소는 앱, CLI, TUI, 샘플 생성기, 자동 스캐너를 포함하지 않고 OpenCode skill 파일만 제공한다.
+현재 저장소는 앱, CLI, TUI, 샘플 생성기, 자동 스캐너를 포함하지 않고 OpenCode skill 파일과 정적 샘플 프로젝트를 제공한다.
 
 현재 skill 목록:
 
@@ -31,15 +31,15 @@
 | 3 | `agent-mlflow-skill-mlflow-check` | MLflow 등록 준비 상태 확인 기준 안내 |
 | 4 | `agent-mlflow-skill-gap-guide` | 부족한 파일과 설정의 보완 방향 분류 |
 | 5 | `agent-mlflow-skill-run-model-guide` | 등록/실행 entrypoint 기능과 동작 기준 안내 |
-| 6 | `agent-mlflow-skill-prepare-check` | prepare-only 기능 확인 기준 안내 |
+| 6 | `agent-mlflow-skill-preflight-check` | 등록 전 사전 준비 검증 기준 안내 |
 | 7 | `agent-mlflow-skill-register-guide` | local/remote MLflow 등록 조건 안내 |
 
 ## 3. 요구사항 적합성 평가
 
 | 항목 | 평가 | 근거 |
 | --- | --- | --- |
-| skill-only 배포 | 적합 | `.opencode/skills` 아래 7개 `SKILL.md`만 기능 자산으로 유지된다. |
-| 샘플 생성 제외 | 적합 | 샘플 모델 생성 skill과 관련 문구가 제거되어 있다. |
+| skill pack 배포 | 적합 | `.opencode/skills` 아래 7개 `SKILL.md`와 `.opencode/samples/` 아래 정적 샘플 프로젝트를 함께 제공한다. |
+| 샘플 생성기 제외 | 적합 | 실행 중 샘플 생성 기능은 없고, 정적 샘플 프로젝트만 제공한다. |
 | 자동 실행 제외 | 적합 | CLI, TUI, 자동 스캐너, 원격 등록 실행 기능을 포함하지 않는다. |
 | 네이밍 규칙 | 적합 | 모든 skill이 `agent-mlflow-skill-` prefix와 lowercase kebab-case를 사용한다. |
 | 폴더명/name 일치 | 적합 | 각 skill의 폴더명과 frontmatter `name`이 동일하다. |
@@ -110,7 +110,7 @@
 - 이 skill은 템플릿 구현이 아니라 안내용이라는 범위가 중요하다.
 - framework별 wrapper 차이를 숨기되, 사용자가 어떤 wrapper가 필요한지 판단할 최소 기준이 필요할 수 있다.
 
-### 4.6 Prepare Check
+### 4.6 Preflight Check
 
 장점:
 
@@ -139,7 +139,7 @@
 
 좋은 점:
 
-- `model-select`, `project-check`, `mlflow-check`, `gap-guide`, `run-model-guide`, `prepare-check`, `register-guide`는 단계별 목적이 바로 보인다.
+- `model-select`, `project-check`, `mlflow-check`, `gap-guide`, `run-model-guide`, `preflight-check`, `register-guide`는 단계별 목적이 바로 보인다.
 - `agent-mlflow-skill-` prefix가 있어 배포 대상과 도메인이 분명하다.
 - 모든 이름이 OpenCode skill 규칙에 맞는 lowercase kebab-case다.
 
@@ -157,7 +157,8 @@
 - 모델 artifact 이동/삭제/복사 없음
 - secret 값 출력 금지
 - 원격 MLflow 직접 연결 또는 등록 실행 없음
-- 샘플 모델 다운로드 또는 생성 없음
+- 샘플 모델 다운로드 또는 실행 중 생성 없음
+- 저장소 내 정적 샘플 프로젝트 제공 가능
 
 이 방향은 "사용자에게 단순 skill만 제공"한다는 배포 목적에 잘 맞는다.
 
@@ -168,7 +169,7 @@
 1. 사용자가 로컬 모델 경로를 제시한다.
 2. OpenCode가 skill 지침에 따라 필요한 파일을 확인한다.
 3. 부족한 항목을 안전하게 분류해 알려준다.
-4. 등록/실행 entrypoint와 prepare-only 기능 존재 여부 및 확인 기준을 안내한다.
+4. 등록/실행 entrypoint와 등록 전 사전 준비 검증 단계 존재 여부 및 확인 기준을 안내한다.
 5. local/remote MLflow 등록 조건을 안내한다.
 
 좋은 점:
@@ -207,11 +208,11 @@
 
 ## 10. 결론
 
-현재 skill pack은 사용자가 요청한 "단순 skill 제공" 목적에 부합한다.
+현재 skill pack은 사용자가 요청한 "단순 skill pack과 정적 샘플 제공" 목적에 부합한다.
 
 핵심 판단:
 
-- skill-only 배포 원칙은 지켜지고 있다.
+- skill pack과 정적 샘플 배포 원칙은 지켜지고 있다.
 - 단계는 로컬 모델 선택부터 MLflow 등록 안내까지 자연스럽게 이어진다.
 - 네이밍은 짧고 직관적으로 개선되었다.
 - 안전 요구사항도 전반적으로 적절하다.

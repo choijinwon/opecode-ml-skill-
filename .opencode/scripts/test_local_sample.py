@@ -1,0 +1,130 @@
+import argparse
+import os
+import shutil
+import subprocess
+import sys
+import venv
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+SAMPLES_DIR = ROOT / "samples"
+DEFAULT_SAMPLES = ["pytorch_sample", "sklearn_sample", "tensorflow_sample"]
+
+
+def python_in_venv(venv_dir: Path) -> Path:
+    if os.name == "nt":
+        return venv_dir / "Scripts" / "python.exe"
+    return venv_dir / "bin" / "python"
+
+
+def run(cmd, cwd: Path):
+    print(f"[run] cwd={cwd} cmd={' '.join(str(c) for c in cmd)}")
+    subprocess.run(cmd, cwd=cwd, check=True)
+
+
+def interpreter_version(python_bin: Path) -> tuple[int, int]:
+    result = subprocess.run(
+        [str(python_bin), "-c", "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    major, minor = result.stdout.strip().split(".")
+    return int(major), int(minor)
+
+
+def ensure_venv(sample_dir: Path, rebuild: bool, base_python: Path) -> Path:
+    venv_dir = sample_dir / ".venv"
+    if rebuild and venv_dir.exists():
+        shutil.rmtree(venv_dir)
+    if not venv_dir.exists():
+        print(f"[info] create venv: {venv_dir}")
+        run([str(base_python), "-m", "venv", str(venv_dir)], cwd=sample_dir)
+    return python_in_venv(venv_dir)
+
+
+def install_requirements(python_bin: Path, sample_dir: Path):
+    run([str(python_bin), "-m", "pip", "install", "--upgrade", "pip"], cwd=sample_dir)
+    run([str(python_bin), "-m", "pip", "install", "-r", "requirements.txt"], cwd=sample_dir)
+
+
+def test_sample(sample_name: str, rebuild: bool, do_install: bool, do_register: bool, base_python: Path):
+    sample_dir = SAMPLES_DIR / sample_name
+    if not sample_dir.exists():
+        raise FileNotFoundError(f"unknown sample: {sample_name}")
+
+    python_bin = ensure_venv(sample_dir, rebuild=rebuild, base_python=base_python)
+    if do_install:
+        install_requirements(python_bin, sample_dir)
+
+    run([str(python_bin), "train.py"], cwd=sample_dir)
+    run([str(python_bin), "register_model.py", "--prepare-only"], cwd=sample_dir)
+
+    if do_register:
+        run([str(python_bin), "register_model.py"], cwd=sample_dir)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Run local sample checks")
+    parser.add_argument(
+        "--sample",
+        choices=DEFAULT_SAMPLES + ["all"],
+        default="all",
+        help="sample project to test",
+    )
+    parser.add_argument(
+        "--skip-install",
+        action="store_true",
+        help="skip pip install and reuse the existing venv",
+    )
+    parser.add_argument(
+        "--rebuild-venv",
+        action="store_true",
+        help="recreate .venv before testing",
+    )
+    parser.add_argument(
+        "--register",
+        action="store_true",
+        help="run the MLflow registration example after prepare-only",
+    )
+    parser.add_argument(
+        "--python",
+        default=sys.executable,
+        help="base Python interpreter used to create the sample virtual environment",
+    )
+    args = parser.parse_args()
+
+    base_python = Path(args.python).resolve()
+    if not base_python.exists():
+        raise FileNotFoundError(f"python interpreter not found: {base_python}")
+
+    major, minor = interpreter_version(base_python)
+    if (major, minor) >= (3, 13):
+        raise RuntimeError(
+            f"python {major}.{minor} is not supported for this sample set. "
+            "Use Python 3.9 to 3.12 with --python."
+        )
+
+    targets = DEFAULT_SAMPLES if args.sample == "all" else [args.sample]
+    for sample_name in targets:
+        print(f"[info] test sample: {sample_name}")
+        test_sample(
+            sample_name=sample_name,
+            rebuild=args.rebuild_venv,
+            do_install=not args.skip_install,
+            do_register=args.register,
+            base_python=base_python,
+        )
+    print("[done] local sample checks completed")
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except subprocess.CalledProcessError as exc:
+        print(f"[error] command failed with exit code {exc.returncode}", file=sys.stderr)
+        sys.exit(exc.returncode)
+    except Exception as exc:
+        print(f"[error] {exc}", file=sys.stderr)
+        sys.exit(1)

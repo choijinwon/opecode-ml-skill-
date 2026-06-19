@@ -4,7 +4,7 @@
 
 이 문서는 OpenCode MLflow Local Model Skills를 사용자 로컬 모델 프로젝트에 적용하는 방법을 안내한다.
 
-이 저장소는 실행 프로그램이 아니라 OpenCode skill 파일만 제공한다. 사용자는 `.opencode/skills` 폴더를 자신의 모델 프로젝트에 복사한 뒤, OpenCode에서 자연어로 점검을 요청한다.
+이 저장소는 실행 프로그램이 아니라 OpenCode skill 파일, 정적 샘플 프로젝트, 로컬 검증 스크립트를 제공한다. 사용자는 `.opencode` 폴더를 자신의 모델 프로젝트에 복사하거나, `.opencode/samples/` 아래 샘플을 참고 프로젝트로 사용할 수 있다.
 
 ## 2. 적용 대상
 
@@ -23,8 +23,17 @@
 ├── agent-mlflow-skill-mlflow-check/
 ├── agent-mlflow-skill-gap-guide/
 ├── agent-mlflow-skill-run-model-guide/
-├── agent-mlflow-skill-prepare-check/
+├── agent-mlflow-skill-preflight-check/
 └── agent-mlflow-skill-register-guide/
+```
+
+## 3.1 포함되는 Sample
+
+```text
+.opencode/samples/
+├── pytorch_sample/
+├── sklearn_sample/
+└── tensorflow_sample/
 ```
 
 ## 4. 적용 전 확인
@@ -48,11 +57,10 @@ user-project/
 
 ### 5.1 새 프로젝트에 적용
 
-사용자 모델 프로젝트에 `.opencode` 폴더가 없다면 다음처럼 복사한다.
+사용자 모델 프로젝트에 `.opencode` 폴더가 없다면 다음처럼 전체 폴더를 복사한다.
 
 ```bash
-mkdir -p /path/to/user-project/.opencode
-cp -R .opencode/skills /path/to/user-project/.opencode/
+cp -R .opencode /path/to/user-project/
 ```
 
 적용 후 구조:
@@ -60,26 +68,32 @@ cp -R .opencode/skills /path/to/user-project/.opencode/
 ```text
 /path/to/user-project/
 └── .opencode/
-    └── skills/
-        ├── agent-mlflow-skill-model-select/
-        ├── agent-mlflow-skill-project-check/
-        ├── agent-mlflow-skill-mlflow-check/
-        ├── agent-mlflow-skill-gap-guide/
-        ├── agent-mlflow-skill-run-model-guide/
-        ├── agent-mlflow-skill-prepare-check/
-        └── agent-mlflow-skill-register-guide/
+    ├── skills/
+    ├── samples/
+    └── scripts/
 ```
 
 ### 5.2 이미 `.opencode`가 있는 프로젝트에 적용
 
-기존 `.opencode/skills`가 있다면 이 저장소의 skill 폴더만 병합한다.
+기존 `.opencode`가 있다면 이 저장소의 `skills`, `samples`, `scripts`를 필요한 범위만 병합한다.
 
 ```bash
 mkdir -p /path/to/user-project/.opencode/skills
 cp -R .opencode/skills/agent-mlflow-skill-* /path/to/user-project/.opencode/skills/
+cp -R .opencode/samples /path/to/user-project/.opencode/
+cp -R .opencode/scripts /path/to/user-project/.opencode/
 ```
 
 기존 skill과 이름이 겹치면 덮어쓰기 전에 내용을 비교한다.
+
+### 5.3 샘플 프로젝트 사용
+
+샘플 구조를 먼저 확인하려면 `.opencode/samples/` 아래 프로젝트를 참고한다. 샘플을 별도 작업 디렉터리로 복사해 테스트할 때도 `.opencode` 전체를 함께 두면 된다.
+
+```bash
+cp -R .opencode/samples/pytorch_sample /path/to/workspace/
+cp -R .opencode /path/to/workspace/pytorch_sample/
+```
 
 ## 6. OpenCode에서 사용하는 방법
 
@@ -106,15 +120,17 @@ opencode
 
 ```text
 등록/실행 entrypoint가 제공하면 좋은 기능을 알려줘.
-prepare-only 전에 확인할 항목을 정리해줘.
+등록 전 사전 준비 검증 단계에서 확인할 항목을 정리해줘.
 원격 MLflow 등록 전에 환경 변수나 설정 파일에서 확인할 키를 알려줘.
 이 모델이 TensorFlow/PyTorch/sklearn/ONNX/HuggingFace 중 어떤 유형인지 근거와 함께 봐줘.
 ```
 
+샘플 프로젝트를 사용할 때도 같은 방식으로 요청하면 된다.
+
 ## 7. 권장 사용 흐름
 
 1. `agent-mlflow-skill-model-select`
-   - 로컬 모델 경로를 선택한다.
+   - 로컬 모델 경로 또는 제공 샘플을 자동 후보 선정 규칙으로 정한다.
 2. `agent-mlflow-skill-project-check`
    - 프로젝트 파일, artifact 상태, 모델 타입별 체크 기준을 확인한다.
 3. `agent-mlflow-skill-mlflow-check`
@@ -123,10 +139,10 @@ prepare-only 전에 확인할 항목을 정리해줘.
    - 부족한 파일과 설정을 보완 방향별로 분류한다.
 5. `agent-mlflow-skill-run-model-guide`
    - 등록/실행 entrypoint 기능과 책임을 확인한다.
-6. `agent-mlflow-skill-prepare-check`
-   - prepare-only 기능 존재 여부와 실행 전 확인 기준을 확인한다.
+6. `agent-mlflow-skill-preflight-check`
+   - 등록 전 사전 준비 검증 단계 존재 여부와 실행 전 확인 기준을 확인한다.
 7. `agent-mlflow-skill-register-guide`
-   - local/remote MLflow 등록 실행 조건을 확인한다.
+   - local/remote MLflow 등록 방식과 사전 확인 항목을 확인한다.
 
 ## 8. 적용 확인 방법
 
@@ -144,7 +160,7 @@ agent-mlflow-skill-project-check
 agent-mlflow-skill-mlflow-check
 agent-mlflow-skill-gap-guide
 agent-mlflow-skill-run-model-guide
-agent-mlflow-skill-prepare-check
+agent-mlflow-skill-preflight-check
 agent-mlflow-skill-register-guide
 ```
 

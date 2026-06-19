@@ -9,7 +9,7 @@ metadata:
   step: 2
 ---
 
-# Model Project Scan Validation
+# Model Project Scan Guidance
 
 ## When To Use
 
@@ -17,7 +17,7 @@ metadata:
 - 학습 entrypoint, 모델 artifact, 환경 변수/설정 방식, 입력 예제를 확인할 때
 - 수정 전 read-only 확인 기준이 필요할 때
 
-## Checklist
+## Guidance Checks
 
 - `requirements.txt` 존재 여부
 - `train.py` 또는 추론 entrypoint 존재 여부
@@ -49,23 +49,18 @@ metadata:
 - 여러 후보가 있으면 primary model framework와 preprocessing framework를 분리해 표시한다.
 - framework를 확정할 수 없으면 `unknown/custom`으로 두고 wrapper 요구사항을 먼저 안내한다.
 
-## Model-Specific Output
-
-- detected model type candidates
-- artifact evidence by model type
-- required runtime dependencies
-- missing model-specific files
-- recommended MLflow flavor or pyfunc wrapper direction
-
 ## Output
 
 - pass/warn/block 판정
 - 발견된 파일 목록
 - 누락 파일 목록
 - framework와 artifact 요약
+- 모델 유형별 근거와 필요한 runtime 요소
+- 권장 MLflow flavor 또는 pyfunc wrapper 방향
 - 다음 단계: `agent-mlflow-skill-mlflow-check`
 
 ## Safety
 
 - 이 단계에서는 파일을 수정하지 않는다.
 - credential 값은 출력하지 않고 key 이름만 표시한다.
+- framework는 추정 결과일 수 있으며, 확정이 어려우면 `unknown/custom`으로 유지한다.
