@@ -7,8 +7,8 @@
 - Chat UI: FastAPI가 HTML/CSS/JS를 직접 서빙
 - LLM: 로컬 Ollama OpenAI-compatible API
 - Observability: 로컬 MLflow Tracking/Tracing
-- LangChain: `langchain_agent.py`
-- LangGraph: `langgraph_agent.py`
+- LangChain: `offline_weather_agent_313/frameworks/langchain_agent.py`
+- LangGraph: `offline_weather_agent_313/frameworks/langgraph_agent.py`
 - AI Studio pyfunc: `aiu_custom/`, `run_model.py`
 - Prompt Registry: `offline-weather-agent-313-chat`
 - Model Registry: `offline-weather-agent-313-qwen`
@@ -16,14 +16,21 @@
 
 ## Module Layout
 
-유지보수를 쉽게 하기 위해 실제 로직은 `offline_weather_agent_313/` 패키지로 나뉘어 있다.
-루트의 `app.py`, `agent.py`, `langchain_agent.py`, `langgraph_agent.py`는 기존 실행 명령을 유지하기 위한 얇은 entrypoint/wrapper다.
+유지보수를 쉽게 하기 위해 루트에는 설명/설정/실행 보조 파일만 두고,
+실제 에이전트 로직은 `offline_weather_agent_313/`, MLflow 등록 로직은 `registry/` 패키지로 나뉘어 있다.
 `aiu_custom/`은 AI Studio 스타일 MLflow pyfunc 등록에서 사용하는 필수 custom code package다.
 
 ```text
+README.md                    # 샘플 설명
+.env.example                 # MLflow 3.13 / Qwen 환경변수 예시
+requirements.txt             # MLflow 3.13 샘플 의존성
+run_model.py                 # AI Studio 스타일 pyfunc 등록 entrypoint
 aiu_custom/
 └── predict.py                # AI Studio 스타일 MLflow pyfunc ModelWrapper
-run_model.py                  # AI Studio 스타일 pyfunc 등록 entrypoint
+registry/
+├── prompt.py                 # Prompt Registry 등록
+├── model.py                  # 기본 pyfunc Model Registry 등록
+└── judge.py                  # MLflow 3.13용 LLM judge 등록/평가
 offline_weather_agent_313/
 ├── config.py                 # .env, MLflow, OpenAI-compatible LLM 설정
 ├── weather.py                # 도시 추출, 로컬 날씨 도구
@@ -94,10 +101,15 @@ OpenAI 호환 endpoint로 Qwen을 사용할 수도 있다. 이 경우 `LLM_PROVI
 
 ```bash
 LLM_PROVIDER=openai
-OPENAI_BASE_URL=http://127.0.0.1:11434/v1
-OPENAI_API_KEY=ollama
-OPENAI_MODEL=qwen2.5-coder:14b
+OPENAI_API_KEY=your-internal-qwen-key
+OPENAI_BASE_URL=http://xxx.xxx.xxx.xxx:포트/v1
+OPENAI_MODEL=qwen3.6
+OPENAI_MODELS=qwen3.6,gpt20,gamma
 ```
+
+`OPENAI_MODEL`은 실제 호출할 기본 모델이다.
+`OPENAI_MODELS`는 AI Studio 화면에서 선택 가능한 모델 목록으로 사용할 수 있다.
+`OPENAI_MODEL`이 비어 있으면 `OPENAI_MODELS`의 첫 번째 모델을 fallback으로 사용한다.
 
 실제 OpenAI API를 쓰려면:
 
@@ -119,7 +131,10 @@ OPENAI_MODEL=gpt-4o-mini
 ## Run Chatbot
 
 ```bash
-.venv-mlflow313/bin/uvicorn app:app --app-dir .opencode/samples/offline_weather_agent_mlflow313 --host 127.0.0.1 --port 8013
+.venv-mlflow313/bin/uvicorn offline_weather_agent_313.web:app \
+  --app-dir .opencode/samples/offline_weather_agent_mlflow313 \
+  --host 127.0.0.1 \
+  --port 8013
 ```
 
 브라우저:
@@ -142,14 +157,16 @@ LangChain 샘플:
 
 ```bash
 MLFLOW_TRACKING_URI=http://127.0.0.1:5013 \
-.venv-mlflow313/bin/python .opencode/samples/offline_weather_agent_mlflow313/langchain_agent.py "서울 날씨 알려줘"
+PYTHONPATH=.opencode/samples/offline_weather_agent_mlflow313 \
+.venv-mlflow313/bin/python -m offline_weather_agent_313.frameworks.langchain_agent "서울 날씨 알려줘"
 ```
 
 LangGraph 샘플:
 
 ```bash
 MLFLOW_TRACKING_URI=http://127.0.0.1:5013 \
-.venv-mlflow313/bin/python .opencode/samples/offline_weather_agent_mlflow313/langgraph_agent.py "부산 날씨 알려줘"
+PYTHONPATH=.opencode/samples/offline_weather_agent_mlflow313 \
+.venv-mlflow313/bin/python -m offline_weather_agent_313.frameworks.langgraph_agent "부산 날씨 알려줘"
 ```
 
 두 샘플 모두 `mlflow.langchain.autolog()`를 사용한다. LangGraph도 LangChain runnable/callback
@@ -185,19 +202,22 @@ MLFLOW_TRACKING_URI=http://127.0.0.1:5013 \
 프롬프트 등록:
 
 ```bash
-.venv-mlflow313/bin/python .opencode/samples/offline_weather_agent_mlflow313/register_prompt.py
+PYTHONPATH=.opencode/samples/offline_weather_agent_mlflow313 \
+.venv-mlflow313/bin/python -m registry.prompt
 ```
 
 모델 등록:
 
 ```bash
-.venv-mlflow313/bin/python .opencode/samples/offline_weather_agent_mlflow313/register_model.py
+PYTHONPATH=.opencode/samples/offline_weather_agent_mlflow313 \
+.venv-mlflow313/bin/python -m registry.model
 ```
 
 Judge/Scorer 등록 및 수동 평가:
 
 ```bash
-.venv-mlflow313/bin/python .opencode/samples/offline_weather_agent_mlflow313/register_judge.py
+PYTHONPATH=.opencode/samples/offline_weather_agent_mlflow313 \
+.venv-mlflow313/bin/python -m registry.judge
 ```
 
 ## MLflow Screens

@@ -14,8 +14,7 @@ def judge_base_url() -> str:
 
 
 def main() -> None:
-    # MLflow 3.13에는 이후 버전의 ResponseLength scorer가 없다.
-    # 그래서 이 샘플은 make_judge()로 로컬 Qwen을 LLM 평가자로 사용한다.
+    """MLflow 3.13용 LLM judge를 등록하고, 기존 trace가 있으면 수동 평가를 실행한다."""
     configure_mlflow()
     experiment = mlflow.get_experiment_by_name(os.getenv("MLFLOW_EXPERIMENT_NAME", "offline-weather-agent-313"))
     if experiment is None:

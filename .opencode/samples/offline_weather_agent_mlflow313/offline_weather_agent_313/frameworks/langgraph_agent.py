@@ -3,6 +3,7 @@ from typing import TypedDict
 import mlflow
 from mlflow.entities import SpanType
 
+from offline_weather_agent_313.config import configure_mlflow
 from offline_weather_agent_313.config import llm_api_key, llm_base_url, qwen_model_name
 from offline_weather_agent_313.weather import extract_city, get_weather, weather_data_text
 
@@ -86,3 +87,16 @@ def answer_with_langgraph(question: str, user_id: str = "langgraph-user", sessio
     result = graph.invoke({"question": question, "city": "", "weather_data": "", "answer": ""})
     return result["answer"]
 
+
+def main() -> None:
+    """CLI에서 LangGraph 샘플을 실행한다."""
+    import sys
+
+    configure_mlflow()
+    mlflow.langchain.autolog()
+    question = " ".join(sys.argv[1:]).strip() or "부산 날씨 알려줘"
+    print(answer_with_langgraph(question))
+
+
+if __name__ == "__main__":
+    main()

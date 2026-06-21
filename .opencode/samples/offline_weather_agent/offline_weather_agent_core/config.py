@@ -34,8 +34,10 @@ def configure_mlflow() -> None:
 
 def qwen_model_name() -> str:
     """provider prefix가 있으면 제거하고 실제 Qwen 모델명만 남긴다."""
+    first_openai_model = os.getenv("OPENAI_MODELS", "").split(",", 1)[0].strip()
     model = (
         os.getenv("OPENAI_MODEL")
+        or first_openai_model
         or os.getenv("WEATHER_AGENT_MODEL")
         or os.getenv("OPENCODE_MODEL", "qwen2.5-coder:14b")
     )

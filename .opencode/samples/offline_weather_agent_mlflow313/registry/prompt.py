@@ -7,8 +7,7 @@ from offline_weather_agent_313.prompts import PROMPT_NAME, PROMPT_TEMPLATE
 
 
 def main() -> None:
-    # MLflow Prompts 탭에서 버전이 보이도록 프롬프트를 별도로 등록한다.
-    # 에이전트는 prompts:/offline-weather-agent-313-chat@production 형태로 불러온다.
+    """MLflow Prompts 화면에서 볼 수 있게 프롬프트를 등록한다."""
     configure_mlflow()
     genai = get_genai_module()
     register_prompt = getattr(genai, "register_prompt", None) if genai else getattr(mlflow, "register_prompt", None)
@@ -18,6 +17,7 @@ def main() -> None:
         print("prompt registry API is not available in this MLflow installation")
         return
 
+    model_name = os.getenv("OPENAI_MODEL") or os.getenv("WEATHER_AGENT_MODEL", "qwen2.5-coder:14b")
     version = register_prompt(
         name=PROMPT_NAME,
         template=PROMPT_TEMPLATE,
@@ -26,10 +26,10 @@ def main() -> None:
             "app": "offline-weather-agent-313",
             "network": "closed",
             "provider": os.getenv("LLM_PROVIDER", "ollama"),
-            "model": os.getenv("OPENAI_MODEL") or os.getenv("WEATHER_AGENT_MODEL", "qwen2.5-coder:14b"),
+            "model": model_name,
         },
         model_config={
-            "model": os.getenv("OPENAI_MODEL") or os.getenv("WEATHER_AGENT_MODEL", "qwen2.5-coder:14b"),
+            "model": model_name,
             "temperature": 0.2,
         },
     )

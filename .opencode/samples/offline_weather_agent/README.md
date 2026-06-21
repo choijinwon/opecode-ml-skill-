@@ -86,10 +86,15 @@ OpenAI 호환 endpoint로 Qwen을 사용할 수도 있다.
 
 ```bash
 LLM_PROVIDER=openai
-OPENAI_BASE_URL=http://127.0.0.1:11434/v1
-OPENAI_API_KEY=ollama
-OPENAI_MODEL=qwen2.5-coder:14b
+OPENAI_API_KEY=your-internal-qwen-key
+OPENAI_BASE_URL=http://xxx.xxx.xxx.xxx:포트/v1
+OPENAI_MODEL=qwen3.6
+OPENAI_MODELS=qwen3.6,gpt20,gamma
 ```
+
+`OPENAI_MODEL`은 실제 호출할 기본 모델이다.
+`OPENAI_MODELS`는 AI Studio 화면에서 선택 가능한 모델 목록으로 사용할 수 있다.
+`OPENAI_MODEL`이 비어 있으면 `OPENAI_MODELS`의 첫 번째 모델을 fallback으로 사용한다.
 
 ## Run Chatbot
 

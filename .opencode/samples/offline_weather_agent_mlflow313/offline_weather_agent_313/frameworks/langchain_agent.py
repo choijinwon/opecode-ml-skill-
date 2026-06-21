@@ -1,6 +1,7 @@
 import mlflow
 from mlflow.entities import SpanType
 
+from offline_weather_agent_313.config import configure_mlflow
 from offline_weather_agent_313.config import llm_api_key, llm_base_url, qwen_model_name
 from offline_weather_agent_313.weather import extract_city, get_weather, weather_data_text
 
@@ -46,3 +47,16 @@ def answer_with_langchain(question: str, user_id: str = "langchain-user", sessio
     response = chain.invoke({"question": question, "weather_data": weather_data_text(weather)})
     return response.content
 
+
+def main() -> None:
+    """CLI에서 LangChain 샘플을 실행한다."""
+    import sys
+
+    configure_mlflow()
+    mlflow.langchain.autolog()
+    question = " ".join(sys.argv[1:]).strip() or "서울 날씨 알려줘"
+    print(answer_with_langchain(question))
+
+
+if __name__ == "__main__":
+    main()

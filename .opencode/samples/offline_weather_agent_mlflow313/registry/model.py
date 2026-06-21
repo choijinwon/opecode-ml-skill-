@@ -8,9 +8,10 @@ from offline_weather_agent_313.core import answer_weather
 
 
 class OfflineWeatherAgent313Model(mlflow.pyfunc.PythonModel):
-    """채팅 에이전트를 MLflow pyfunc 모델처럼 호출하기 위한 얇은 wrapper다."""
+    """채팅 에이전트를 MLflow pyfunc 모델처럼 호출하기 위한 wrapper다."""
 
     def predict(self, context, model_input, params=None):
+        """DataFrame/list/string 입력을 질문 리스트로 바꿔 에이전트 답변을 반환한다."""
         if isinstance(model_input, pd.DataFrame):
             questions = model_input["question"].fillna("서울 날씨 알려줘").tolist()
         elif isinstance(model_input, list):
@@ -22,8 +23,7 @@ class OfflineWeatherAgent313Model(mlflow.pyfunc.PythonModel):
 
 
 def main() -> None:
-    # MLflow Model Registry에는 에이전트 wrapper를 등록한다. Qwen 원본 weight는
-    # Ollama에 그대로 있고, MLflow에는 호출 가능한 wrapper와 metadata만 저장된다.
+    """MLflow 3.13 Model Registry에 날씨 에이전트 wrapper를 등록한다."""
     configure_mlflow()
     input_example = pd.DataFrame({"question": ["서울 날씨 알려줘"]})
     model_name = "offline-weather-agent-313-qwen"
