@@ -42,6 +42,7 @@ def _normalize_framework(value: str | None) -> str:
 
 
 def _answer_with_framework(message: str, framework: str, user_id: str, session_id: str) -> str:
+    # 웹 입력 하나로 core/langchain/langgraph 경로를 공통 API에서 분기한다.
     if framework == "langchain":
         try:
             from offline_weather_agent_core.frameworks.langchain_agent import answer_with_langchain
@@ -79,6 +80,7 @@ def create_app() -> FastAPI:
         configure_tracing_destination()
         session_id = request.session_id or f"weather-web-{uuid.uuid4().hex[:10]}"
         framework = _normalize_framework(request.framework)
+        # session/user/tags/metadata를 여기서 고정해야 MLflow chat sessions와 traces 화면이 안정적으로 묶인다.
         with mlflow.tracing.context(
             session_id=session_id,
             user=request.user_id,

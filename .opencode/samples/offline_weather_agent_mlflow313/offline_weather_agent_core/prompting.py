@@ -15,6 +15,7 @@ def load_registered_prompt(
         return None
 
     try:
+        # traced 실행 안에서 load_prompt를 호출해야 MLflow UI에 Linked prompts가 남는다.
         prompt = genai.load_prompt(
             f"prompts:/{PROMPT_NAME}@production",
             allow_missing=True,
@@ -36,6 +37,7 @@ def render_prompt_messages(
     weather: WeatherReport,
     contexts: list[dict[str, str]] | None = None,
 ) -> list[dict[str, str]]:
+    # Registry 프롬프트가 있으면 우선 사용하고, 없으면 로컬 기본 템플릿으로 fallback한다.
     registered = load_registered_prompt(question, weather, contexts)
     if registered is not None:
         return registered

@@ -78,6 +78,7 @@ def _retrieve_from_api(question: str, top_k: int) -> list[dict[str, str]]:
 def _retrieve_from_local_documents(question: str, top_k: int) -> list[dict[str, str]]:
     """API가 없거나 실패했을 때 사용하는 의존성 없는 로컬 fallback 검색."""
     query_tokens = _tokens(question)
+    # 폐쇄망 데모에서는 외부 embedding 없이도 동작하도록 단순 keyword overlap으로 정렬한다.
     ranked = sorted(
         (
             (_score(query_tokens, f"{document['title']} {document['text']}"), document)

@@ -36,6 +36,31 @@ MLflow 설정값은 코드 내부 상수 또는 config/mlflow_config.json 기준
 secret 값은 출력하지 마.
 ```
 
+## Quick Run
+
+샘플 루트에서 아래처럼 짧게 실행할 수 있습니다.
+
+```bash
+./run.sh mlflow
+./run.sh web
+./run.sh register
+./run.sh prompt
+./run.sh judge
+```
+
+프레임워크 샘플:
+
+```bash
+./run.sh langchain "서울 날씨 알려줘"
+./run.sh langgraph "부산 날씨 알려줘"
+```
+
+도움말:
+
+```bash
+./run.sh help
+```
+
 ## MLflow Settings
 
 MLflow 값은 `.env`가 아니라 아래 위치에서 확인합니다.
@@ -64,4 +89,3 @@ MLflow 값은 `.env`가 아니라 아래 위치에서 확인합니다.
 - `model/`: MLflow 등록용 pyfunc 모델 패키지를 보관합니다.
 - `artifacts/`: MLflow run, experiment, model registry 기록을 보관합니다.
 - `local_serving/`: 배포 없이 로컬 서빙으로 확인한 테스트 결과를 보관합니다.
-
