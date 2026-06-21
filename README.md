@@ -53,6 +53,37 @@
 cp -R .opencode /path/to/user-project/
 ```
 
+OpenCode provider API 키를 환경변수로 관리하려면 `.env.example`을 복사해 `.env`를 만들고 필요한 값만 채웁니다. 실제 `.env`는 Git에 올리지 않습니다.
+
+```bash
+cp .env.example .env
+```
+
+macOS/Linux 셸에서 `.env`를 로드한 뒤 OpenCode를 실행할 수 있습니다.
+
+```bash
+set -a
+source .env
+set +a
+opencode
+```
+
+OpenCode는 `/connect`로 입력한 인증 정보를 `~/.local/share/opencode/auth.json`에 저장할 수도 있고, `opencode.json`에서는 `{env:VARIABLE_NAME}` 형식으로 환경변수를 참조할 수 있습니다.
+
+로컬 Qwen 모델을 쓰는 경우에는 예시 설정을 복사해서 시작할 수 있습니다. Ollama 기본 포트 기준으로 작성되어 있으며, LM Studio나 llama.cpp를 쓰면 `.env`의 `LOCAL_QWEN_BASE_URL`만 바꿉니다.
+
+```bash
+cp opencode.local.example.json opencode.json
+cp .env.example .env
+```
+
+```bash
+set -a
+source .env
+set +a
+opencode
+```
+
 그다음 사용자는 OpenCode에서 자연어로 요청합니다.
 
 ```text

@@ -1,0 +1,5 @@
+mlflow==3.13.0
+fastapi
+uvicorn
+pandas
+pydantic

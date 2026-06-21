@@ -1,4 +1,8 @@
 .venv/
+.venv-mlflow313/
+.env
+.env.*
+!.env.example
 __pycache__/
 *.pyc
 .opencode/scripts/__pycache__/
@@ -11,3 +15,7 @@ __pycache__/
 .opencode/samples/*/saved_model/
 .opencode/samples/*/config/
 mlruns/
+mlflow.db
+mlflow313.db
+mlartifacts/
+mlartifacts313/

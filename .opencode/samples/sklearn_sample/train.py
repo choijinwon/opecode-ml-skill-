@@ -2,11 +2,15 @@ import json
 from pathlib import Path
 
 import joblib
+import mlflow
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 
 
 def main():
+    mlflow.set_tracking_uri("http://127.0.0.1:5001")
+    mlflow.set_experiment("sklearn-tracing-test")
+    mlflow.sklearn.autolog()
     root = Path(__file__).resolve().parent
     config = json.loads((root / "config.json").read_text(encoding="utf-8"))
     artifact_path = root / config["artifact_path"]

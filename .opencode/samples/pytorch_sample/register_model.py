@@ -31,18 +31,18 @@ def prepare(root: Path):
     artifact_path = root / config["artifact_path"]
     if not artifact_path.exists():
         raise FileNotFoundError(f"missing artifact: {artifact_path}")
-    _ = load_inputs(root / "input_example.json")
-    return config, artifact_path
+    example = load_inputs(root / "input_example.json")
+    return config, artifact_path, example
 
 
 def register(root: Path):
-    config, artifact_path = prepare(root)
+    config, artifact_path, example = prepare(root)
     model = SimpleNet(input_size=config["input_size"])
     model.load_state_dict(torch.load(artifact_path, map_location="cpu"))
     model.eval()
     with mlflow.start_run():
         mlflow.log_dict(config, "config.json")
-        mlflow.pytorch.log_model(model, artifact_path="model")
+        mlflow.pytorch.log_model(model, artifact_path="model", input_example=example, serialization_format="pickle")
 
 
 def main():
