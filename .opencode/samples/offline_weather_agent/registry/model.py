@@ -52,3 +52,7 @@ def main() -> None:
 
     print(f"registered model: {model_name}")
     print(f"model uri: {info.model_uri}")
+
+
+if __name__ == "__main__":
+    main()

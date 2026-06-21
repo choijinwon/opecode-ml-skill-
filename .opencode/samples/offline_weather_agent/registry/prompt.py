@@ -31,3 +31,7 @@ def main() -> None:
     print(f"version: {version.version}")
     print(f"uri: prompts:/{PROMPT_NAME}/{version.version}")
     print(f"alias uri: prompts:/{PROMPT_NAME}@production")
+
+
+if __name__ == "__main__":
+    main()

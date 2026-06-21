@@ -7,8 +7,9 @@
 - Chat UI: FastAPI가 HTML/CSS/JS를 직접 서빙
 - LLM: 로컬 Ollama OpenAI-compatible API
 - Observability: 로컬 MLflow Tracking/Tracing
-- LangChain: `langchain_agent.py`
-- LangGraph: `langgraph_agent.py`
+- RAG: `offline_weather_agent_core/retrieval.py`가 로컬 문서를 검색해 프롬프트에 추가
+- LangChain: `offline_weather_agent_core/frameworks/langchain_agent.py`
+- LangGraph: `offline_weather_agent_core/frameworks/langgraph_agent.py`
 - AI Studio pyfunc: `aiu_custom/`, `run_model.py`
 - Prompt Registry: `offline-weather-agent-chat`
 - Model Registry: `offline-weather-agent-qwen`
@@ -16,46 +17,33 @@
 
 ## Module Layout
 
-유지보수를 쉽게 하기 위해 실행 파일은 `entrypoints/`, 실제 로직은 `offline_weather_agent_core/`, MLflow 등록 로직은 `registry/` 패키지로 나뉘어 있다.
-루트의 `app.py`, `agent.py`, `langchain_agent.py`, `langgraph_agent.py`, `register_*.py`는 기존 실행 명령을 유지하기 위한 얇은 호환 wrapper다.
+유지보수를 쉽게 하기 위해 루트에는 설명/설정/실행 보조 파일만 두고, 실제 실행 파일은 `offline_weather_agent_core/`와 `registry/` 패키지로 나뉘어 있다.
 `aiu_custom/`은 AI Studio 스타일 MLflow pyfunc 등록에서 사용하는 필수 custom code package다.
 
 ```text
-agent.py                    # 기존 import 호환 wrapper -> entrypoints/agent.py
-app.py                      # 기존 uvicorn app:app 호환 wrapper -> entrypoints/app.py
-prompts.py                  # 기존 prompt import 호환 wrapper -> entrypoints/prompts.py
-langchain_agent.py          # 기존 실행 호환 wrapper -> entrypoints/langchain_agent.py
-langgraph_agent.py          # 기존 실행 호환 wrapper -> entrypoints/langgraph_agent.py
-register_prompt.py          # 기존 실행 호환 wrapper -> entrypoints/register_prompt.py
-register_model.py           # 기존 실행 호환 wrapper -> entrypoints/register_model.py
-register_judge.py           # 기존 실행 호환 wrapper -> entrypoints/register_judge.py
-run_model.py                # AI Studio 스타일 pyfunc 등록 entrypoint
-entrypoints/
-├── agent.py                # agent 공개 API 관리
-├── app.py                  # FastAPI app 객체 생성
-├── prompts.py              # prompt 공개 API 관리
-├── langchain_agent.py      # LangChain 실행 entrypoint
-├── langgraph_agent.py      # LangGraph 실행 entrypoint
-├── register_prompt.py      # Prompt Registry 실행 entrypoint
-├── register_model.py       # 기본 Model Registry 실행 entrypoint
-└── register_judge.py       # Judge/Scorer 실행 entrypoint
+README.md                  # 샘플 설명
+.env.example               # 로컬/폐쇄망 환경 변수 예시
+requirements.txt           # 샘플 의존성
+run_model.py               # AI Studio 스타일 pyfunc 등록 entrypoint
 aiu_custom/
-└── predict.py                # AI Studio 스타일 MLflow pyfunc ModelWrapper
+└── predict.py              # AI Studio 스타일 MLflow pyfunc ModelWrapper
 registry/
-├── prompt.py                 # Prompt Registry 등록
-├── model.py                  # 기본 pyfunc Model Registry 등록
-└── judge.py                  # Judges/Scorers 등록 및 평가
+├── prompt.py               # Prompt Registry 등록
+├── model.py                # 기본 pyfunc Model Registry 등록
+└── judge.py                # Judges/Scorers 등록 및 평가
 offline_weather_agent_core/
-├── config.py                 # .env, MLflow, OpenAI-compatible LLM 설정
-├── weather.py                # 도시 추출, 로컬 날씨 도구
-├── prompts.py                # 기본 프롬프트 템플릿
-├── prompting.py              # MLflow Prompt Registry 로딩 및 fallback
-├── llm.py                    # OpenAI-compatible Qwen 호출
-├── core.py                   # 기본 weather agent
-├── web.py                    # FastAPI 챗봇 앱
+├── config.py               # .env, MLflow, OpenAI-compatible LLM 설정
+├── weather.py              # 도시 추출, 로컬 날씨 도구
+├── documents.py            # 폐쇄망 RAG용 로컬 문서
+├── retrieval.py            # 의존성 없는 keyword retrieval
+├── prompts.py              # 기본 프롬프트 템플릿
+├── prompting.py            # MLflow Prompt Registry 로딩 및 fallback
+├── llm.py                  # OpenAI-compatible Qwen 호출
+├── core.py                 # 기본 weather agent
+├── web.py                  # FastAPI 챗봇 앱
 └── frameworks/
-    ├── langchain_agent.py    # LangChain 체인 샘플
-    └── langgraph_agent.py    # LangGraph workflow 샘플
+    ├── langchain_agent.py  # LangChain 체인 샘플
+    └── langgraph_agent.py  # LangGraph workflow 샘플
 ```
 
 ## Prerequisites
@@ -106,7 +94,10 @@ OPENAI_MODEL=qwen2.5-coder:14b
 ## Run Chatbot
 
 ```bash
-.venv/bin/uvicorn app:app --app-dir .opencode/samples/offline_weather_agent --host 127.0.0.1 --port 8010
+.venv/bin/uvicorn offline_weather_agent_core.web:app \
+  --app-dir .opencode/samples/offline_weather_agent \
+  --host 127.0.0.1 \
+  --port 8010
 ```
 
 브라우저:
@@ -129,14 +120,65 @@ LangChain 샘플:
 
 ```bash
 MLFLOW_TRACKING_URI=http://127.0.0.1:5001 \
-.venv/bin/python .opencode/samples/offline_weather_agent/langchain_agent.py "서울 날씨 알려줘"
+PYTHONPATH=.opencode/samples/offline_weather_agent \
+.venv/bin/python -m offline_weather_agent_core.frameworks.langchain_agent "서울 날씨 알려줘"
 ```
+
+## Local RAG
+
+이 샘플의 RAG는 검색 API와 로컬 fallback을 모두 지원한다.
+`RAG_SEARCH_API_URL`이 설정되어 있으면 `offline_weather_agent_core/retrieval.py`가 검색 API를 호출하고,
+API가 없거나 실패하면 `offline_weather_agent_core/documents.py`의 로컬 문서를 검색한다.
+
+현재 구조:
+
+```text
+사용자 질문
+-> get_weather() 로컬 날씨 도구
+-> retrieve_context() 로컬 문서 검색
+-> call_qwen() 프롬프트에 weather_data + rag_context 전달
+-> MLflow trace에 RETRIEVER/LLM/AGENT span 기록
+```
+
+검색 API 요청 형식:
+
+```json
+{
+  "query": "MLflow 세션값은 어디에 남아?",
+  "top_k": 2
+}
+```
+
+검색 API 응답 형식:
+
+```json
+{
+  "results": [
+    {
+      "id": "doc-1",
+      "title": "MLflow Chat Sessions",
+      "text": "MLflow Chat Sessions는 mlflow.trace.session metadata로 대화를 묶는다."
+    }
+  ]
+}
+```
+
+환경변수:
+
+```bash
+RAG_SEARCH_API_URL=http://127.0.0.1:8020/search
+RAG_SEARCH_API_KEY=
+RAG_SEARCH_TIMEOUT_SECONDS=5
+```
+
+FAISS나 Chroma를 붙일 때는 별도 검색 API를 만들고 `RAG_SEARCH_API_URL`만 연결하면 된다.
 
 LangGraph 샘플:
 
 ```bash
 MLFLOW_TRACKING_URI=http://127.0.0.1:5001 \
-.venv/bin/python .opencode/samples/offline_weather_agent/langgraph_agent.py "부산 날씨 알려줘"
+PYTHONPATH=.opencode/samples/offline_weather_agent \
+.venv/bin/python -m offline_weather_agent_core.frameworks.langgraph_agent "부산 날씨 알려줘"
 ```
 
 ## AI Studio Style pyfunc
@@ -168,19 +210,22 @@ MLFLOW_TRACKING_URI=http://127.0.0.1:5001 \
 프롬프트 등록:
 
 ```bash
-.venv/bin/python .opencode/samples/offline_weather_agent/register_prompt.py
+PYTHONPATH=.opencode/samples/offline_weather_agent \
+.venv/bin/python -m registry.prompt
 ```
 
 모델 등록:
 
 ```bash
-.venv/bin/python .opencode/samples/offline_weather_agent/register_model.py
+PYTHONPATH=.opencode/samples/offline_weather_agent \
+.venv/bin/python -m registry.model
 ```
 
 Judge/Scorer 등록 및 수동 평가:
 
 ```bash
-.venv/bin/python .opencode/samples/offline_weather_agent/register_judge.py
+PYTHONPATH=.opencode/samples/offline_weather_agent \
+.venv/bin/python -m registry.judge
 ```
 
 ## MLflow Screens

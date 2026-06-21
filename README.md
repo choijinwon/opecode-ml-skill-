@@ -33,6 +33,7 @@
 적용 방법은 [SKILL_APPLY_GUIDE.md](SKILL_APPLY_GUIDE.md)를 확인하세요.
 폐쇄망 등록 가이드 프롬프트도 [SKILL_APPLY_GUIDE.md](SKILL_APPLY_GUIDE.md)의 "폐쇄망 등록 가이드 프롬프트" 섹션에 포함되어 있습니다.
 테스트 시나리오는 [SKILL_TEST_SCENARIOS.md](SKILL_TEST_SCENARIOS.md)를 확인하세요.
+AI Studio Agent Builder 제안서는 [docs/ai-studio-agent-builder-proposal.md](docs/ai-studio-agent-builder-proposal.md)를 확인하세요.
 
 ## 단계
 

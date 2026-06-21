@@ -1,6 +1,8 @@
 import os
 
 import mlflow
+from mlflow.entities import ViewType
+from mlflow.tracking import MlflowClient
 
 
 def load_dotenv(path: str = ".env") -> None:
@@ -21,7 +23,13 @@ def configure_mlflow() -> None:
     """MLflow 호출이 로컬 tracking server와 지정 experiment로 향하게 설정한다."""
     load_dotenv()
     mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://127.0.0.1:5001"))
-    mlflow.set_experiment(os.getenv("MLFLOW_EXPERIMENT_NAME", "offline-weather-agent"))
+    experiment_name = os.getenv("MLFLOW_EXPERIMENT_NAME", "offline-weather-agent")
+    client = MlflowClient()
+    for experiment in client.search_experiments(view_type=ViewType.ALL):
+        if experiment.name == experiment_name and experiment.lifecycle_stage == "deleted":
+            client.restore_experiment(experiment.experiment_id)
+            break
+    mlflow.set_experiment(experiment_name)
 
 
 def qwen_model_name() -> str:

@@ -1,7 +1,9 @@
 import mlflow
 from mlflow.entities import SpanType
 
+from offline_weather_agent_core.config import configure_mlflow
 from offline_weather_agent_core.config import llm_api_key, llm_base_url, qwen_model_name
+from offline_weather_agent_core.retrieval import context_text, retrieve_context
 from offline_weather_agent_core.weather import extract_city, get_weather, weather_data_text
 
 
@@ -18,7 +20,7 @@ def build_chain():
             ),
             (
                 "user",
-                "질문: {question}\n날씨 데이터: {weather_data}\n한국어로 자연스럽게 답해줘.",
+                "질문: {question}\n날씨 데이터: {weather_data}\n로컬 검색 문서:\n{rag_context}\n한국어로 자연스럽게 답해줘.",
             ),
         ]
     )
@@ -35,13 +37,38 @@ def build_chain():
 def answer_with_langchain(question: str, user_id: str = "langchain-user", session_id: str = "langchain-session") -> str:
     """LangChain 실행 전체를 MLflow agent span으로 묶는다."""
     mlflow.update_current_trace(
+        user=user_id,
+        session_id=session_id,
+        tags={
+            "user_id": user_id,
+            "session_id": session_id,
+        },
         metadata={
-            "mlflow.trace.user": user_id,
-            "mlflow.trace.session": session_id,
             "framework": "langchain",
         }
     )
     weather = get_weather(extract_city(question))
+    contexts = retrieve_context(question)
     chain = build_chain()
-    response = chain.invoke({"question": question, "weather_data": weather_data_text(weather)})
+    response = chain.invoke(
+        {
+            "question": question,
+            "weather_data": weather_data_text(weather),
+            "rag_context": context_text(contexts),
+        }
+    )
     return response.content
+
+
+def main() -> None:
+    """CLI에서 LangChain 샘플을 실행한다."""
+    import sys
+
+    configure_mlflow()
+    mlflow.langchain.autolog()
+    question = " ".join(sys.argv[1:]).strip() or "서울 날씨 알려줘"
+    print(answer_with_langchain(question))
+
+
+if __name__ == "__main__":
+    main()

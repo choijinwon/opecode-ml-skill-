@@ -8,9 +8,19 @@ from offline_weather_agent_core.config import configure_mlflow
 from offline_weather_agent_core.core import answer_weather
 
 
+class ChatRequest(BaseModel):
+    message: str
+    session_id: str | None = None
+    user_id: str = "offline-web-user"
+
+
+class ChatResponse(BaseModel):
+    answer: str
+    session_id: str
+
+
 def create_app() -> FastAPI:
-    """FastAPI 앱 factory다. uvicorn에서는 app.py의 app 객체가 이 함수를 사용한다."""
-    configure_mlflow()
+    """FastAPI 앱 factory다. uvicorn에서는 이 모듈의 app 객체가 이 함수를 사용한다."""
     app = FastAPI(title="Offline Weather Agent MLflow")
 
     @app.get("/", response_class=HTMLResponse)
@@ -24,22 +34,15 @@ def create_app() -> FastAPI:
     @app.post("/api/chat", response_model=ChatResponse)
     def chat(request: ChatRequest) -> ChatResponse:
         """HTML 화면에서 호출하는 채팅 API다. session_id는 MLflow chat session으로 연결된다."""
-        session_id = request.session_id or f"offline-weather-{uuid.uuid4().hex[:10]}"
+        configure_mlflow()
+        session_id = request.session_id or f"weather-web-{uuid.uuid4().hex[:10]}"
         answer = answer_weather(request.message, user_id=request.user_id, session_id=session_id)
         return ChatResponse(answer=answer, session_id=session_id)
 
     return app
 
 
-class ChatRequest(BaseModel):
-    message: str
-    session_id: str | None = None
-    user_id: str = "offline-web-user"
-
-
-class ChatResponse(BaseModel):
-    answer: str
-    session_id: str
+app = create_app()
 
 
 HTML = """
@@ -210,7 +213,8 @@ HTML = """
     const input = document.getElementById("input");
     const send = document.getElementById("send");
     const session = document.getElementById("session");
-    let sessionId = localStorage.getItem("offline-weather-session-id") || "";
+    let sessionId = localStorage.getItem("weather-web-session-id") || "";
+    if (sessionId) session.textContent = sessionId;
 
     function addMessage(role, text) {
       const node = document.createElement("div");
@@ -236,7 +240,7 @@ HTML = """
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         sessionId = data.session_id;
-        localStorage.setItem("offline-weather-session-id", sessionId);
+        localStorage.setItem("weather-web-session-id", sessionId);
         session.textContent = sessionId;
         addMessage("assistant", data.answer);
       } catch (error) {

@@ -42,3 +42,7 @@ def main() -> None:
     result = mlflow.genai.evaluate(data=traces, scorers=[scorer])
     print(f"evaluated traces: {len(traces)}")
     print(result.metrics)
+
+
+if __name__ == "__main__":
+    main()
