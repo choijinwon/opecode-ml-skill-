@@ -5,34 +5,21 @@ from mlflow.entities import SpanType
 
 from offline_weather_agent_core.config import configure_mlflow
 from offline_weather_agent_core.config import llm_api_key, llm_base_url, qwen_model_name
-from offline_weather_agent_core.retrieval import context_text, retrieve_context
-from offline_weather_agent_core.weather import extract_city, get_weather, weather_data_text
+from offline_weather_agent_core.prompting import render_prompt_messages, to_langchain_messages
+from offline_weather_agent_core.retrieval import retrieve_context
+from offline_weather_agent_core.weather import extract_city, get_weather
 
 
-def build_chain():
-    """LangChain 체인을 만든다. import는 autolog 설정 이후에 수행한다."""
-    from langchain_core.prompts import ChatPromptTemplate
+def build_llm():
+    """LangChain LLM client를 만든다. import는 autolog 설정 이후에 수행한다."""
     from langchain_openai import ChatOpenAI
 
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            (
-                "system",
-                "너는 폐쇄망에서 동작하는 한국어 날씨 비서다. 제공된 날씨 데이터만 사용해서 짧게 답한다.",
-            ),
-            (
-                "user",
-                "질문: {question}\n날씨 데이터: {weather_data}\n로컬 검색 문서:\n{rag_context}\n한국어로 자연스럽게 답해줘.",
-            ),
-        ]
-    )
-    llm = ChatOpenAI(
+    return ChatOpenAI(
         model=qwen_model_name(),
         base_url=llm_base_url(),
         api_key=llm_api_key(),
         temperature=0.2,
     )
-    return prompt | llm
 
 
 def _missing_dependency_message() -> str | None:
@@ -62,14 +49,9 @@ def answer_with_langchain(question: str, user_id: str = "langchain-user", sessio
         return missing
     weather = get_weather(extract_city(question))
     contexts = retrieve_context(question)
-    chain = build_chain()
-    response = chain.invoke(
-        {
-            "question": question,
-            "weather_data": weather_data_text(weather),
-            "rag_context": context_text(contexts),
-        }
-    )
+    llm = build_llm()
+    prompt_messages = render_prompt_messages(question, weather, contexts)
+    response = llm.invoke(to_langchain_messages(prompt_messages))
     return response.content
 
 

@@ -6,6 +6,7 @@ from mlflow.entities import SpanType
 
 from offline_weather_agent_core.config import configure_mlflow
 from offline_weather_agent_core.config import llm_api_key, llm_base_url, qwen_model_name
+from offline_weather_agent_core.prompting import render_prompt_messages, to_langchain_messages
 from offline_weather_agent_core.retrieval import context_text, retrieve_context
 from offline_weather_agent_core.weather import extract_city, get_weather, weather_data_text
 
@@ -49,22 +50,11 @@ def retrieve_context_node(state: WeatherState) -> WeatherState:
 
 def llm_node(state: WeatherState) -> WeatherState:
     """Qwen 모델로 최종 답변을 생성하는 LangGraph node다."""
-    from langchain_core.messages import HumanMessage, SystemMessage
-
     llm = build_llm()
-    response = llm.invoke(
-        [
-            SystemMessage(content="너는 폐쇄망에서 동작하는 한국어 날씨 비서다. 제공된 날씨 데이터만 사용한다."),
-            HumanMessage(
-                content=(
-                    f"질문: {state['question']}\n"
-                    f"날씨 데이터: {state['weather_data']}\n"
-                    f"로컬 검색 문서:\n{state['rag_context']}\n"
-                    "한국어로 짧고 자연스럽게 답해줘."
-                )
-            ),
-        ]
-    )
+    weather = get_weather(state["city"])
+    contexts = retrieve_context(state["question"])
+    prompt_messages = render_prompt_messages(state["question"], weather, contexts)
+    response = llm.invoke(to_langchain_messages(prompt_messages))
     return {**state, "answer": response.content}
 
 

@@ -52,3 +52,20 @@ def render_prompt_messages(
         }
         for message in PROMPT_TEMPLATE
     ]
+
+
+def to_langchain_messages(messages: list[dict[str, str]]):
+    """Prompt registry/소스 프롬프트 메시지를 LangChain 메시지 객체로 바꾼다."""
+    from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+
+    converted = []
+    for message in messages:
+        role = message.get("role", "user")
+        content = message.get("content", "")
+        if role == "system":
+            converted.append(SystemMessage(content=content))
+        elif role == "assistant":
+            converted.append(AIMessage(content=content))
+        else:
+            converted.append(HumanMessage(content=content))
+    return converted
