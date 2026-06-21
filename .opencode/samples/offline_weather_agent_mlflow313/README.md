@@ -82,6 +82,7 @@ MLflow 값은 `.env`가 아니라 아래 위치에서 확인합니다.
 - `local_serving/`은 로컬 서빙 책임을 분리하기 위한 참고 구조입니다.
 - `saved_model/local_model.*`는 로컬 모델 export 또는 학습 산출물 위치입니다.
 - OpenCode 챗봇 응답에서는 직접 실행 명령 대신 구조와 보완 기준만 안내합니다.
+- MLflow 메뉴 설명은 저장소 루트의 `docs/mlflow-menu-guide.md`를 참고합니다.
 
 ## Output Folder Roles
 
