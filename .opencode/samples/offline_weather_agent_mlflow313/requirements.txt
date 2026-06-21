@@ -3,3 +3,6 @@ fastapi
 uvicorn
 pandas
 pydantic
+langchain
+langchain-openai
+langgraph

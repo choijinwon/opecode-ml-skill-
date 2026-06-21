@@ -2,7 +2,7 @@ import os
 
 import mlflow
 
-from agent import configure_mlflow, get_genai_module, llm_api_key, llm_base_url, qwen_model_name
+from offline_weather_agent_313.config import configure_mlflow, get_genai_module, llm_api_key, llm_base_url, qwen_model_name
 
 
 def judge_base_url() -> str:

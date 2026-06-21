@@ -3,7 +3,8 @@ import os
 import mlflow
 import pandas as pd
 
-from agent import answer_weather, configure_mlflow
+from offline_weather_agent_313.config import configure_mlflow
+from offline_weather_agent_313.core import answer_weather
 
 
 class OfflineWeatherAgent313Model(mlflow.pyfunc.PythonModel):
@@ -36,6 +37,9 @@ def main() -> None:
             pip_requirements=[
                 "mlflow==3.13.0",
                 "fastapi",
+                "langchain",
+                "langchain-openai",
+                "langgraph",
                 "pandas",
                 "pydantic",
             ],

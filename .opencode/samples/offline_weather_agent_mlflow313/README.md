@@ -7,9 +7,35 @@
 - Chat UI: FastAPI가 HTML/CSS/JS를 직접 서빙
 - LLM: 로컬 Ollama OpenAI-compatible API
 - Observability: 로컬 MLflow Tracking/Tracing
+- LangChain: `langchain_agent.py`
+- LangGraph: `langgraph_agent.py`
+- AI Studio pyfunc: `aiu_custom/`, `run_model.py`
 - Prompt Registry: `offline-weather-agent-313-chat`
 - Model Registry: `offline-weather-agent-313-qwen`
 - Judge/Scorer: 가능하면 `offline_weather_313_response_length` 등록
+
+## Module Layout
+
+유지보수를 쉽게 하기 위해 실제 로직은 `offline_weather_agent_313/` 패키지로 나뉘어 있다.
+루트의 `app.py`, `agent.py`, `langchain_agent.py`, `langgraph_agent.py`는 기존 실행 명령을 유지하기 위한 얇은 entrypoint/wrapper다.
+`aiu_custom/`은 AI Studio 스타일 MLflow pyfunc 등록에서 사용하는 필수 custom code package다.
+
+```text
+aiu_custom/
+└── predict.py                # AI Studio 스타일 MLflow pyfunc ModelWrapper
+run_model.py                  # AI Studio 스타일 pyfunc 등록 entrypoint
+offline_weather_agent_313/
+├── config.py                 # .env, MLflow, OpenAI-compatible LLM 설정
+├── weather.py                # 도시 추출, 로컬 날씨 도구
+├── prompts.py                # 기본 프롬프트 템플릿
+├── prompting.py              # MLflow Prompt Registry 로딩 및 fallback
+├── llm.py                    # OpenAI-compatible Qwen 호출
+├── core.py                   # 기본 weather agent
+├── web.py                    # FastAPI 챗봇 앱
+└── frameworks/
+    ├── langchain_agent.py    # LangChain 체인 샘플
+    └── langgraph_agent.py    # LangGraph workflow 샘플
+```
 
 ## Create Environment
 
@@ -108,6 +134,50 @@ API 테스트:
 curl -s -X POST http://127.0.0.1:8013/api/chat \
   -H 'Content-Type: application/json' \
   -d '{"message":"서울 날씨 알려줘","session_id":"offline-313-test","user_id":"offline-user"}'
+```
+
+## Run LangChain/LangGraph Samples
+
+LangChain 샘플:
+
+```bash
+MLFLOW_TRACKING_URI=http://127.0.0.1:5013 \
+.venv-mlflow313/bin/python .opencode/samples/offline_weather_agent_mlflow313/langchain_agent.py "서울 날씨 알려줘"
+```
+
+LangGraph 샘플:
+
+```bash
+MLFLOW_TRACKING_URI=http://127.0.0.1:5013 \
+.venv-mlflow313/bin/python .opencode/samples/offline_weather_agent_mlflow313/langgraph_agent.py "부산 날씨 알려줘"
+```
+
+두 샘플 모두 `mlflow.langchain.autolog()`를 사용한다. LangGraph도 LangChain runnable/callback
+기반으로 동작하므로 같은 autolog 설정으로 trace를 남긴다. 추가로 각 스크립트의 최상위 함수에
+`@mlflow.trace(..., span_type=SpanType.AGENT)`를 붙여 chat session metadata도 남긴다.
+
+## AI Studio Style pyfunc
+
+`aiu_custom` 폴더는 AI Studio 스타일 등록에서 필수로 사용하는 custom code package다.
+`run_model.py`는 `mlflow.pyfunc.log_model()` 호출 시 다음 값을 사용한다.
+
+```python
+code_paths=["aiu_custom", "offline_weather_agent_313"]
+python_model=ModelWrapper()
+artifacts={"config": "generated/config/config.json"}
+```
+
+사전 준비 검증:
+
+```bash
+.venv-mlflow313/bin/python .opencode/samples/offline_weather_agent_mlflow313/run_model.py --prepare-only
+```
+
+MLflow 등록:
+
+```bash
+MLFLOW_TRACKING_URI=http://127.0.0.1:5013 \
+.venv-mlflow313/bin/python .opencode/samples/offline_weather_agent_mlflow313/run_model.py --register
 ```
 
 ## MLflow Setup

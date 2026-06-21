@@ -2,8 +2,8 @@ import os
 
 import mlflow
 
-from agent import configure_mlflow, get_genai_module
-from prompts import PROMPT_NAME, PROMPT_TEMPLATE
+from offline_weather_agent_313.config import configure_mlflow, get_genai_module
+from offline_weather_agent_313.prompts import PROMPT_NAME, PROMPT_TEMPLATE
 
 
 def main() -> None:
