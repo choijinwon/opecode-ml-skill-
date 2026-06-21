@@ -1,31 +1,30 @@
 import os
+import sys
+from pathlib import Path
 
-import mlflow
+import mlflow.genai
 
-from offline_weather_agent_313.config import configure_mlflow, get_genai_module
-from offline_weather_agent_313.prompts import PROMPT_NAME, PROMPT_TEMPLATE
+ROOT = Path(__file__).resolve().parent.parent
+if ROOT.as_posix() not in sys.path:
+    sys.path.insert(0, ROOT.as_posix())
+
+from offline_weather_agent_core.config import configure_mlflow
+from offline_weather_agent_core.prompts import PROMPT_NAME, PROMPT_TEMPLATE
 
 
 def main() -> None:
-    """MLflow Prompts 화면에서 볼 수 있게 프롬프트를 등록한다."""
-    configure_mlflow()
-    genai = get_genai_module()
-    register_prompt = getattr(genai, "register_prompt", None) if genai else getattr(mlflow, "register_prompt", None)
-    set_prompt_alias = getattr(genai, "set_prompt_alias", None) if genai else getattr(mlflow, "set_prompt_alias", None)
+    """MLflow Prompt Registry에 날씨 에이전트 프롬프트를 등록한다."""
+    settings = configure_mlflow()
+    model_name = settings["base_model"]
 
-    if register_prompt is None or set_prompt_alias is None:
-        print("prompt registry API is not available in this MLflow installation")
-        return
-
-    model_name = os.getenv("OPENAI_MODEL") or os.getenv("WEATHER_AGENT_MODEL", "qwen2.5-coder:14b")
-    version = register_prompt(
+    version = mlflow.genai.register_prompt(
         name=PROMPT_NAME,
         template=PROMPT_TEMPLATE,
-        commit_message="MLflow 3.13 폐쇄망 날씨 에이전트 프롬프트 등록",
+        commit_message="Register closed-network weather agent prompt.",
         tags={
-            "app": "offline-weather-agent-313",
+            "app": "offline-weather-agent",
             "network": "closed",
-            "provider": os.getenv("LLM_PROVIDER", "ollama"),
+            "provider": settings["provider"],
             "model": model_name,
         },
         model_config={
@@ -33,7 +32,7 @@ def main() -> None:
             "temperature": 0.2,
         },
     )
-    set_prompt_alias(name=PROMPT_NAME, alias="production", version=version.version)
+    mlflow.genai.set_prompt_alias(name=PROMPT_NAME, alias="production", version=version.version)
     print(f"registered prompt: {PROMPT_NAME}")
     print(f"version: {version.version}")
     print(f"uri: prompts:/{PROMPT_NAME}/{version.version}")

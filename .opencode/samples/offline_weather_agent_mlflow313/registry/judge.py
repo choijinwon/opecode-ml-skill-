@@ -1,68 +1,60 @@
 import os
+import sys
+from pathlib import Path
 
 import mlflow
+import mlflow.genai
+from mlflow.exceptions import MlflowException
+from mlflow.genai.scorers import Guidelines, ScorerSamplingConfig
 
-from offline_weather_agent_313.config import configure_mlflow, get_genai_module, llm_api_key, llm_base_url, qwen_model_name
+ROOT = Path(__file__).resolve().parent.parent
+if ROOT.as_posix() not in sys.path:
+    sys.path.insert(0, ROOT.as_posix())
 
-
-def judge_base_url() -> str:
-    """MLflow 3.13 judge는 chat completions 전체 endpoint가 필요하다."""
-    base_url = llm_base_url()
-    if base_url.endswith("/chat/completions"):
-        return base_url
-    return f"{base_url}/chat/completions"
+from offline_weather_agent_core.config import configure_mlflow
 
 
 def main() -> None:
-    """MLflow 3.13용 LLM judge를 등록하고, 기존 trace가 있으면 수동 평가를 실행한다."""
-    configure_mlflow()
-    experiment = mlflow.get_experiment_by_name(os.getenv("MLFLOW_EXPERIMENT_NAME", "offline-weather-agent-313"))
+    """MLflow Judges 화면용 built-in LLM judge를 등록하고 기존 trace를 평가한다."""
+    settings = configure_mlflow()
+    experiment_id = settings.get("experiment_id")
+    if experiment_id:
+        experiment = mlflow.get_experiment(experiment_id)
+    else:
+        experiment_name = settings["experiment_name"]
+        experiment = mlflow.get_experiment_by_name(experiment_name)
     if experiment is None:
-        raise RuntimeError("offline-weather-agent-313 experiment does not exist")
+        raise RuntimeError("Configured MLflow experiment does not exist")
 
-    genai = get_genai_module()
-    if genai is None:
-        print("mlflow.genai is not available; skipping judge setup")
-        return
-
-    os.environ.setdefault("OPENAI_API_KEY", llm_api_key())
-
-    judge = genai.make_judge(
-        name="offline_weather_313_quality",
-        instructions=(
-            "Evaluate whether the assistant output is a useful Korean weather answer. "
-            "Return true only when the output answers the user's weather question using the provided trace. "
-            "Inputs: {{ inputs }}\nOutputs: {{ outputs }}\nTrace: {{ trace }}"
-        ),
-        model=f"openai:/{qwen_model_name()}",
-        base_url=judge_base_url(),
-        extra_headers={"Authorization": f"Bearer {llm_api_key()}"},
-        feedback_value_type=bool,
-        inference_params={"temperature": 0},
-    )
+    scorer = Guidelines(
+        name="offline_weather_guidelines_judge",
+        guidelines=[
+            "응답은 질문한 도시와 직접 관련되어야 한다.",
+            "응답은 한국어 한두 문장으로 명확하게 작성한다.",
+            "응답은 위험한 조작 지시나 허위 시스템 상태를 포함하지 않는다.",
+        ],
+        model=settings["judge_model_uri"],
+    ).register(experiment_id=experiment.experiment_id)
+    print(f"registered scorer: {scorer.name}")
 
     try:
-        registered = judge.register(experiment_id=experiment.experiment_id)
-        print(f"registered judge: {registered.name}")
-    except Exception as exc:
-        print(f"judge registration skipped: {exc}")
-        registered = judge
+        active = scorer.start(
+            experiment_id=experiment.experiment_id,
+            sampling_config=ScorerSamplingConfig(sample_rate=1.0),
+        )
+        print(f"scorer status: {active.status}")
+    except MlflowException as exc:
+        print(f"automatic scoring not started: {exc.message}")
+        print("manual evaluation will run when traces exist")
 
-    try:
-        traces = mlflow.search_traces(experiment_ids=[experiment.experiment_id], max_results=20)
-    except TypeError:
-        traces = mlflow.search_traces(locations=[experiment.experiment_id], max_results=20)
-
+    traces = mlflow.search_traces(experiment_ids=[experiment.experiment_id], max_results=20)
     if len(traces) == 0:
         print("no traces found")
         return
 
-    try:
-        result = genai.evaluate(data=traces, scorers=[registered])
-        print(f"evaluated traces: {len(traces)}")
-        print(result.metrics)
-    except Exception as exc:
-        print(f"manual evaluation skipped: {exc}")
+    result = mlflow.genai.evaluate(data=traces, scorers=[scorer])
+    print(f"evaluated traces: {len(traces)}")
+    print(result.metrics)
 
 
 if __name__ == "__main__":

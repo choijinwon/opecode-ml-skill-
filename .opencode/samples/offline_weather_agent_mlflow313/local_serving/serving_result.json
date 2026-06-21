@@ -1,0 +1,5 @@
+{
+  "status": "success",
+  "result_file": "local_serving/local_prediction.json",
+  "deployment_executed": false
+}

@@ -1,1 +1,1 @@
-"""MLflow 3.13 등록 스크립트를 모아두는 패키지."""
+"""MLflow registry helper modules for the offline weather agent sample."""

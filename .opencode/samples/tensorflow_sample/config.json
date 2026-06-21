@@ -1,7 +1,0 @@
-{
-  "framework": "tensorflow",
-  "task": "binary_classification",
-  "artifact_path": "artifacts/model.keras",
-  "input_size": 4,
-  "registered_model_name": "tensorflow-sample-model"
-}

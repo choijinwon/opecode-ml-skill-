@@ -1,0 +1,6 @@
+model_type: ElasticNet
+dataset: sklearn diabetes
+source_model: saved_model/model.pkl
+rmse: 53.416710
+mae: 43.137212
+r2: 0.461445

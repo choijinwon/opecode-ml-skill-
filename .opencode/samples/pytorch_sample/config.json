@@ -1,7 +1,0 @@
-{
-  "framework": "pytorch",
-  "task": "binary_classification",
-  "artifact_path": "artifacts/model.pt",
-  "input_size": 4,
-  "registered_model_name": "pytorch-sample-model"
-}

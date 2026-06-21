@@ -1,17 +1,24 @@
 import os
+import sys
+from pathlib import Path
 
 import mlflow
 import pandas as pd
+from mlflow.exceptions import MlflowException
 
-from offline_weather_agent_313.config import configure_mlflow
-from offline_weather_agent_313.core import answer_weather
+ROOT = Path(__file__).resolve().parent.parent
+if ROOT.as_posix() not in sys.path:
+    sys.path.insert(0, ROOT.as_posix())
+
+from offline_weather_agent_core.config import configure_mlflow
+from offline_weather_agent_core.core import answer_weather
 
 
-class OfflineWeatherAgent313Model(mlflow.pyfunc.PythonModel):
-    """채팅 에이전트를 MLflow pyfunc 모델처럼 호출하기 위한 wrapper다."""
+class OfflineWeatherAgentModel(mlflow.pyfunc.PythonModel):
+    """MLflow Model Registry에 올릴 pyfunc 모델 래퍼다."""
 
     def predict(self, context, model_input, params=None):
-        """DataFrame/list/string 입력을 질문 리스트로 바꿔 에이전트 답변을 반환한다."""
+        """DataFrame/list/string 입력을 받아 날씨 에이전트 답변 리스트로 변환한다."""
         if isinstance(model_input, pd.DataFrame):
             questions = model_input["question"].fillna("서울 날씨 알려줘").tolist()
         elif isinstance(model_input, list):
@@ -23,19 +30,19 @@ class OfflineWeatherAgent313Model(mlflow.pyfunc.PythonModel):
 
 
 def main() -> None:
-    """MLflow 3.13 Model Registry에 날씨 에이전트 wrapper를 등록한다."""
-    configure_mlflow()
+    """기본 pyfunc 형태로 오프라인 날씨 에이전트를 MLflow에 등록한다."""
+    settings = configure_mlflow()
     input_example = pd.DataFrame({"question": ["서울 날씨 알려줘"]})
-    model_name = "offline-weather-agent-313-qwen"
+    model_name = settings["registered_model_name"]
 
-    with mlflow.start_run(run_name="register-offline-weather-agent-313"):
+    with mlflow.start_run(run_name="register-offline-weather-agent") as run:
         info = mlflow.pyfunc.log_model(
-            artifact_path="offline_weather_agent_313",
-            python_model=OfflineWeatherAgent313Model(),
+            name="ai_studio",
+            python_model=OfflineWeatherAgentModel(),
             input_example=input_example,
-            registered_model_name=model_name,
+            code_paths=[(ROOT / "offline_weather_agent_core").as_posix()],
             pip_requirements=[
-                "mlflow==3.13.0",
+                f"mlflow=={mlflow.__version__}",
                 "fastapi",
                 "langchain",
                 "langchain-openai",
@@ -44,15 +51,29 @@ def main() -> None:
                 "pydantic",
             ],
             metadata={
-                "base_model": os.getenv("OPENAI_MODEL") or os.getenv("WEATHER_AGENT_MODEL", "qwen2.5-coder:14b"),
-                "provider": os.getenv("LLM_PROVIDER", "ollama"),
+                "base_model": settings["base_model"],
+                "provider": settings["provider"],
                 "network": "closed",
-                "mlflow_target_version": "3.13.0",
             },
         )
 
+    client = mlflow.MlflowClient()
+    try:
+        client.create_registered_model(model_name)
+    except MlflowException as exc:
+        if "already exists" not in str(exc):
+            raise
+
+    version = client.create_model_version(
+        name=model_name,
+        source=info.model_uri,
+        run_id=run.info.run_id,
+        model_id=getattr(info, "model_id", None),
+    )
+
     print(f"registered model: {model_name}")
     print(f"model uri: {info.model_uri}")
+    print(f"model version: {version.version}")
 
 
 if __name__ == "__main__":

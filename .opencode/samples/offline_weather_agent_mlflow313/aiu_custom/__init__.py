@@ -1,2 +1,1 @@
-"""AI Studio 스타일 MLflow pyfunc custom package."""
-
+from .model_wrapper import ModelWrapper
