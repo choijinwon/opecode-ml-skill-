@@ -1,0 +1,34 @@
+artifact_path: file:///Users/choijinwon/Desktop/www/opecode-ml-skill-/.opencode/samples/offline_weather_agent_mlflow313/artifacts/ai_studio/models/m-ccc1b86fde3f4ee3bdac2c02e928754b/artifacts
+flavors:
+  python_function:
+    cloudpickle_version: 3.1.2
+    code: code
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.pyfunc.model
+    python_model: python_model.pkl
+    python_version: 3.14.6
+    streamable: false
+is_signature_from_type_hint: false
+metadata:
+  base_model: qwen2.5-coder:14b
+  network: closed
+  provider: ollama
+mlflow_version: 3.13.0
+model_id: m-ccc1b86fde3f4ee3bdac2c02e928754b
+model_size_bytes: 2816
+model_uuid: m-ccc1b86fde3f4ee3bdac2c02e928754b
+prompts: null
+run_id: 9b2b5ff52d7f457bab02637b36a866a8
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "string", "name": "question", "required": true}]'
+  outputs: '[{"type": "string", "required": true}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2026-06-21 09:37:18.137557'

@@ -1,0 +1,15 @@
+channels:
+- conda-forge
+dependencies:
+- python=3.14.6
+- pip<=26.1.2
+- pip:
+  - mlflow==3.13.0
+  - fastapi
+  - uvicorn
+  - pandas
+  - pydantic
+  - langchain
+  - langchain-openai
+  - langgraph
+name: mlflow-env

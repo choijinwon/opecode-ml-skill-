@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLES_DIR = ROOT / "samples"
-DEFAULT_SAMPLES = ["pytorch_sample", "sklearn_sample", "tensorflow_sample"]
+DEFAULT_SAMPLES = ["sklearn_sample", "pytorch_sample", "tensorflow_sample"]
 
 
 def python_in_venv(venv_dir: Path) -> Path:

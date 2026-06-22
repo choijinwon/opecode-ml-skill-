@@ -1,0 +1,29 @@
+{
+  "framework": "sklearn",
+  "task": "diabetes_regression",
+  "model_file": "saved_model/model.pkl",
+  "feature_names": [
+    "age",
+    "sex",
+    "bmi",
+    "bp",
+    "s1",
+    "s2",
+    "s3",
+    "s4",
+    "s5",
+    "s6"
+  ],
+  "target_name": "target",
+  "params": {
+    "alpha": 0.001,
+    "l1_ratio": 0.5,
+    "random_state": 42
+  },
+  "metrics": {
+    "rmse": 53.41670986365369,
+    "mae": 43.137211802220435,
+    "r2": 0.4614452306964123
+  },
+  "registered_model_name": "offline-weather-agent-mlflow313"
+}

@@ -13,6 +13,8 @@ __pycache__/
 !.opencode/samples/*/artifacts/.gitkeep
 .opencode/samples/*/model/*
 !.opencode/samples/*/model/.gitkeep
+.opencode/samples/*/save_model/*
+!.opencode/samples/*/save_model/.gitkeep
 .opencode/samples/*/generated/
 .opencode/samples/*/saved_model/
 .opencode/samples/*/config/

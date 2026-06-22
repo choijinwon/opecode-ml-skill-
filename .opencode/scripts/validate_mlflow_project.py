@@ -30,6 +30,7 @@ ENTRYPOINT_NAMES = [
 ]
 
 CONFIG_NAMES = [
+    "ai_studio.env",
     "config.json",
     "model_config.json",
     "mlflow_config.json",
@@ -57,11 +58,26 @@ ARTIFACT_SUFFIXES = [
 ]
 
 ARTIFACT_DIR_HINTS = [
+    "save_model",
     "saved_model.pb",
     "variables",
     "tokenizer.json",
     "pytorch_model.bin",
     "model.safetensors",
+]
+
+REQUIRED_DIRS = [
+    "aiu_custom",
+    "local_serving",
+    "save_model",
+]
+
+AI_STUDIO_ENV_KEYS = [
+    "mlflow_tracking_url",
+    "mlflow_tracking_username",
+    "mlflow_tracking_password",
+    "mlflow_experiment_name",
+    "mlflow_register_model_name",
 ]
 
 
@@ -114,7 +130,7 @@ def has_project_markers(path: Path) -> bool:
     }
     if any((path / name).exists() for name in marker_names):
         return True
-    direct_artifact_dirs = [path / "artifacts", path / "model", path / "saved_model"]
+    direct_artifact_dirs = [path / "save_model", path / "artifacts", path / "model", path / "saved_model"]
     if any(candidate.exists() for candidate in direct_artifact_dirs):
         return True
     return any(file_path.suffix.lower() in ARTIFACT_SUFFIXES for file_path in path.iterdir() if file_path.is_file())
@@ -235,6 +251,48 @@ def check_json_file(path: Path) -> tuple[bool, str]:
     return True, "valid json"
 
 
+def parse_env_file(path: Path) -> dict[str, str]:
+    values: dict[str, str] = {}
+    if not path.exists():
+        return values
+    for raw_line in path.read_text(encoding="utf-8", errors="ignore").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        values[key.strip()] = value.strip().strip('"').strip("'")
+    return values
+
+
+def check_ai_studio_env(project: Path) -> Check:
+    path = project / "ai_studio.env"
+    values = parse_env_file(path)
+    evidence = []
+    missing = []
+    if path.exists():
+        evidence.append("ai_studio.env")
+    else:
+        missing.append("ai_studio.env")
+    for key in AI_STUDIO_ENV_KEYS:
+        if key not in values or values[key] == "":
+            missing.append(key)
+        else:
+            evidence.append(f"{key}: set")
+    if missing:
+        return Check(
+            "ai_studio.env required settings",
+            "block",
+            "required ai_studio.env settings are missing or empty",
+            [f"missing_or_empty: {', '.join(missing)}"] + evidence,
+        )
+    return Check(
+        "ai_studio.env required settings",
+        "pass",
+        "required ai_studio.env settings are available",
+        evidence,
+    )
+
+
 def find_first_existing(project: Path, names: list[str]) -> Path | None:
     for name in names:
         candidate = project / name
@@ -260,7 +318,8 @@ def check_aiu_custom(project: Path, entrypoints: list[Path]) -> Check:
         for marker in ["aiu_custom", "ModelWrapper", "code_paths", "PythonModel"]
     )
     aiu_dir = project / "aiu_custom"
-    predict_file = aiu_dir / "predict.py"
+    model_wrapper_file = aiu_dir / "model_wrapper.py"
+    predict_file = model_wrapper_file if model_wrapper_file.exists() else aiu_dir / "predict.py"
 
     if not required and not aiu_dir.exists():
         return Check(
@@ -273,7 +332,9 @@ def check_aiu_custom(project: Path, entrypoints: list[Path]) -> Check:
     evidence = []
     if aiu_dir.exists():
         evidence.append("aiu_custom/")
-    if predict_file.exists():
+    if model_wrapper_file.exists():
+        evidence.append("aiu_custom/model_wrapper.py")
+    elif predict_file.exists():
         evidence.append("aiu_custom/predict.py")
     predict_text = read_text(predict_file)
     if "ModelWrapper" in predict_text:
@@ -285,7 +346,7 @@ def check_aiu_custom(project: Path, entrypoints: list[Path]) -> Check:
     if not aiu_dir.exists():
         missing.append("aiu_custom/")
     if not predict_file.exists():
-        missing.append("aiu_custom/predict.py")
+        missing.append("aiu_custom/model_wrapper.py or aiu_custom/predict.py")
     if predict_file.exists() and "ModelWrapper" not in predict_text:
         missing.append("ModelWrapper class")
 
@@ -300,6 +361,29 @@ def check_aiu_custom(project: Path, entrypoints: list[Path]) -> Check:
         "AI Studio custom wrapper",
         "pass",
         "aiu_custom wrapper is available",
+        evidence,
+    )
+
+
+def check_required_dirs(project: Path) -> Check:
+    evidence = []
+    missing = []
+    for name in REQUIRED_DIRS:
+        if (project / name).is_dir():
+            evidence.append(f"{name}/")
+        else:
+            missing.append(f"{name}/")
+    if missing:
+        return Check(
+            "required project folders",
+            "block",
+            "required folders are missing",
+            [f"missing: {', '.join(missing)}"] + evidence,
+        )
+    return Check(
+        "required project folders",
+        "pass",
+        "required folders are available",
         evidence,
     )
 
@@ -415,6 +499,7 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
             project_evidence + framework_evidence,
         )
     )
+    checks.append(check_required_dirs(project))
     checks.append(check_aiu_custom(project, entrypoints))
 
     mlflow_evidence = []
@@ -459,6 +544,7 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
             ],
         )
     )
+    checks.append(check_ai_studio_env(project))
 
     register_found, register_evidence = has_register_flow(entrypoints)
     checks.append(

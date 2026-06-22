@@ -1,0 +1,41 @@
+flavors:
+  python_function:
+    artifacts:
+      config:
+        path: artifacts/config.json
+        uri: /Users/choijinwon/Desktop/www/opecode-ml-skill-/.opencode/samples/offline_weather_agent_mlflow313/config/config.json
+      model:
+        path: artifacts/model.pkl
+        uri: /Users/choijinwon/Desktop/www/opecode-ml-skill-/.opencode/samples/offline_weather_agent_mlflow313/saved_model/model.pkl
+    cloudpickle_version: 3.1.2
+    code: code
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.pyfunc.model
+    python_model: python_model.pkl
+    python_version: 3.14.6
+    streamable: false
+is_signature_from_type_hint: false
+mlflow_version: 3.13.0
+model_id: null
+model_size_bytes: 7319
+model_uuid: 9e7797ae29a2411a99711a62ddc0c429
+prompts: null
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "double", "name": "age", "required": true}, {"type": "double",
+    "name": "sex", "required": true}, {"type": "double", "name": "bmi", "required":
+    true}, {"type": "double", "name": "bp", "required": true}, {"type": "double",
+    "name": "s1", "required": true}, {"type": "double", "name": "s2", "required":
+    true}, {"type": "double", "name": "s3", "required": true}, {"type": "double",
+    "name": "s4", "required": true}, {"type": "double", "name": "s5", "required":
+    true}, {"type": "double", "name": "s6", "required": true}]'
+  outputs: '[{"type": "tensor", "tensor-spec": {"dtype": "float64", "shape": [-1]}}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2026-06-21 09:53:38.716808'

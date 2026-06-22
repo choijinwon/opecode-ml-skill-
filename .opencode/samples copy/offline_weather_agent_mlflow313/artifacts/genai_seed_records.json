@@ -1,0 +1,31 @@
+{
+  "tracking_uri": "http://127.0.0.1:5001",
+  "experiment_name": "offline_weather_agent_local",
+  "experiment_id": "4",
+  "prompt_name": "offline-weather-agent-mlflow313-chat-prompt",
+  "prompt_version": 2,
+  "chat_sessions_seeded": [
+    {
+      "session_id": "session-seoul-001",
+      "question": "서울 날씨 알려줘",
+      "answer": "서울 기준 폐쇄망 데모 응답입니다. 현재 날씨 시스템은 MLflow trace 데모용으로 연결되었습니다."
+    },
+    {
+      "session_id": "session-seoul-001",
+      "question": "서울은 오늘 어때?",
+      "answer": "서울 기준 폐쇄망 데모 응답입니다. 현재 날씨 시스템은 MLflow trace 데모용으로 연결되었습니다."
+    },
+    {
+      "session_id": "session-busan-001",
+      "question": "부산 날씨 알려줘",
+      "answer": "부산 기준 폐쇄망 데모 응답입니다. 현재 날씨 시스템은 MLflow trace 데모용으로 연결되었습니다."
+    }
+  ],
+  "scorer_name": "offline_weather_response_length_judge",
+  "judge_registration": {
+    "registered": false,
+    "reason": "Custom scorer registration (using @scorer decorator) is not supported outside of Databricks tracking environments due to security concerns. Custom scorers require arbitrary code execution during deserialization.\n\nTo use custom scorers:\n1. Configure MLflow to use a Databricks tracking URI, or\n2. Manage your custom scorer code in a source code repository (e.g., GitHub) and import it directly, or\n3. Use built-in scorers or make_judge() scorers instead.",
+    "scorer_name": "offline_weather_response_length_judge"
+  },
+  "evaluation_run_id": "2f8aaa0c4e3546feba76f10db4c15cc2"
+}

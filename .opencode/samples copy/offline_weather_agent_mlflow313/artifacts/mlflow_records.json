@@ -1,0 +1,20 @@
+{
+  "artifact_type": "mlflow_tracking_records",
+  "tracking_backend": "remote",
+  "tracking_uri": "http://127.0.0.1:5001",
+  "artifact_location": "artifacts/ai_studio",
+  "experiment_id": "4",
+  "experiment_name": "offline_weather_agent_local",
+  "registered_model_name": "offline-weather-agent-mlflow313",
+  "model_version": "5",
+  "run_id": "8703faaca02a4ab9bd59e0d1ed6ce57e",
+  "source": "models:/m-fc5ba9e49025495f80eb858715c7f3d9",
+  "model_uri": "models:/m-fc5ba9e49025495f80eb858715c7f3d9",
+  "metrics": {
+    "rmse": 53.41670986365369,
+    "mae": 43.137211802220435,
+    "r2": 0.4614452306964123
+  },
+  "deployment_executed": false,
+  "mlflow_registration_executed": true
+}

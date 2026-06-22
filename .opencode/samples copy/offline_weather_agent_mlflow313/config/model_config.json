@@ -1,0 +1,5 @@
+{
+  "model_type": "ElasticNet",
+  "framework": "sklearn",
+  "artifact": "saved_model/model.pkl"
+}

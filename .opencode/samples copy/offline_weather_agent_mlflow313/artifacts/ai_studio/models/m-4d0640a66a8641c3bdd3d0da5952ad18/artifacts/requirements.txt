@@ -1,0 +1,7 @@
+mlflow==3.13.0
+fastapi
+langchain
+langchain-openai
+langgraph
+pandas
+pydantic
