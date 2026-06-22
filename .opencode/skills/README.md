@@ -24,6 +24,7 @@ MLflow Run 생성 확인
 ```
 
 상세 설명은 [MLFLOW_5_STEP_GUIDE.md](./MLFLOW_5_STEP_GUIDE.md)를 참고한다.
+아키텍처는 [MLFLOW_5_STEP_ARCHITECTURE.md](./MLFLOW_5_STEP_ARCHITECTURE.md)를 참고한다.
 
 ## Skill Boundaries
 
