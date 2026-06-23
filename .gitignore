@@ -6,6 +6,8 @@
 __pycache__/
 *.pyc
 .opencode/scripts/__pycache__/
+.opencode/.launch_seen
+.opencode/.welcome_guide_seen
 .opencode/samples/*/.venv/
 .opencode/samples/*/__pycache__/
 .opencode/samples/*/**/__pycache__/
@@ -18,6 +20,11 @@ __pycache__/
 .opencode/samples/*/generated/
 .opencode/samples/*/saved_model/
 .opencode/samples/*/config/
+!.opencode/samples/*/config/
+!.opencode/samples/*/config/.gitkeep
+!.opencode/samples/*/config/*.json
+!.opencode/samples/*/config/*.env.example
+.opencode/samples/*/config/ai_studio.env
 mlruns/
 mlflow.db
 mlflow313.db

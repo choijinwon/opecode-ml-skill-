@@ -7,6 +7,8 @@
 - `pytorch_sample`
 - `sklearn_sample`
 - `tensorflow_sample`
+- `legal_agent_mlflow_aistudio`: GenAI + MLflow + AI Studio endpoint 연결용 법률 에이전트 샘플
+- `design_agent_mlflow_aistudio`: GenAI + MLflow + AI Studio endpoint 연결용 디자인 에이전트 샘플
 
 공통 원칙:
 

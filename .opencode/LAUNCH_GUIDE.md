@@ -2,9 +2,9 @@
 
 이 가이드는 `.opencode` 패키지를 받은 사용자가 OpenCode를 어떻게 실행해야 하는지 설명합니다.
 
-## 첫 채팅 응답용 짧은 가이드
+## 실행 화면용 짧은 가이드
 
-OpenCode 채팅에 처음 진입한 뒤 사용자가 어떤 첫 메시지를 입력하더라도, 기본 `launch` agent는 아래 짧은 가이드를 먼저 보여줍니다.
+OpenCode TUI plugin이 실행 화면에서 아래 짧은 가이드를 처음 한 번만 보여줍니다. 빌드/테스트/모델 등록 중에는 자동 출력하지 않습니다.
 
 ```text
 [Launch Guide]
@@ -35,22 +35,34 @@ OpenCode 채팅에 처음 진입한 뒤 사용자가 어떤 첫 메시지를 입
 opencode .
 ```
 
-동작 순서:
+이 방식은 Launch Guide를 자동 출력하지 않습니다.
 
-```text
-1. OpenCode가 .opencode/opencode.json 설정을 읽음
-2. 기본 launch agent가 적용됨
-3. 사용자의 첫 메시지에 대해 Launch Guide 요약을 먼저 출력
-4. 이후 사용자의 실제 요청을 이어서 처리
-```
-
-## 터미널 가이드 출력 방식
-
-채팅 진입 전에 터미널에서 상세 가이드를 먼저 보고 싶으면 아래 실행 파일을 사용할 수 있습니다.
+TUI plugin을 사용할 수 없는 환경에서 OpenCode 실행 직전에 Launch Guide를 한 번만 보고 싶으면 아래 스크립트를 사용합니다.
 
 ```bash
 ./.opencode/start
 ```
+
+동작 순서:
+
+```text
+1. .opencode/start 실행
+2. .opencode/.launch_seen 파일이 없으면 짧은 Launch Guide 출력
+3. 사용자가 Enter 입력
+4. .opencode/.launch_seen 생성
+5. opencode 프로젝트 실행
+6. 다음 실행부터는 Launch Guide를 건너뜀
+```
+
+## 터미널 가이드 출력 방식
+
+다시 보고 싶으면 sentinel 파일을 초기화합니다.
+
+```bash
+./.opencode/start --reset-launch
+```
+
+TUI plugin으로 표시된 welcome guide는 `.opencode/.welcome_guide_seen` 파일로 표시 여부를 저장합니다. 일반적인 재실행에서는 다시 뜨지 않고, 다시 보고 싶으면 채팅에서 `/launch`를 입력합니다.
 
 또는 특정 프로젝트 폴더를 직접 지정합니다.
 

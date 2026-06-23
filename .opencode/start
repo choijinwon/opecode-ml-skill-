@@ -4,14 +4,24 @@ set -euo pipefail
 OPENCODE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$OPENCODE_DIR/.." && pwd)"
 GUIDE_FILE="$OPENCODE_DIR/LAUNCH_GUIDE.md"
+SEEN_FILE="$OPENCODE_DIR/.launch_seen"
+TUI_SEEN_FILE="$OPENCODE_DIR/.welcome_guide_seen"
 
-if [[ -f "$GUIDE_FILE" ]]; then
+if [[ "${1:-}" == "--reset-launch" ]]; then
+  rm -f "$SEEN_FILE"
+  rm -f "$TUI_SEEN_FILE"
+  shift
+fi
+
+if [[ -f "$GUIDE_FILE" && ! -f "$SEEN_FILE" ]]; then
   clear || true
   printf '\n'
-  sed -n '1,220p' "$GUIDE_FILE"
+  sed -n '/^\[Launch Guide\]/,/^```$/p' "$GUIDE_FILE" | sed '1d;$d'
   printf '\n'
+  printf '이 안내는 이 프로젝트에서 한 번만 표시됩니다. 다시 보려면 ./.opencode/start --reset-launch 를 실행하세요.\n'
   printf '계속하려면 Enter를 누르세요. 종료하려면 Ctrl+C를 누르세요.\n'
   read -r _
+  touch "$SEEN_FILE"
 fi
 
 exec opencode "$PROJECT_DIR" "$@"

@@ -1,0 +1,9 @@
+{
+  "agent_name": "design-agent-ai-studio",
+  "domain": "design",
+  "language": "ko",
+  "request_column": "request",
+  "default_user_id": "design-demo-user",
+  "default_session_id": "design-demo-session",
+  "output_format": "design_brief"
+}

@@ -1,0 +1,9 @@
+{
+  "agent_name": "legal-agent-ai-studio",
+  "domain": "legal",
+  "language": "ko",
+  "question_column": "question",
+  "default_user_id": "legal-demo-user",
+  "default_session_id": "legal-demo-session",
+  "safety_notice": "본 답변은 일반적인 법률 정보 안내이며, 구체적인 사건 판단은 변호사 등 전문가와 상담해야 합니다."
+}

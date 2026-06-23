@@ -61,15 +61,21 @@ cp -R .opencode /path/to/user-project/
 opencode .
 ```
 
-`.opencode/opencode.json`이 기본 `launch` agent를 지정하므로, 채팅의 첫 응답에는 입력 내용과 무관하게 짧은 Launch Guide가 먼저 표시됩니다. 다시 보고 싶으면 OpenCode 안에서 `/launch`를 입력합니다.
+이 방식은 OpenCode TUI plugin이 실행 화면에 Launch Guide를 처음 한 번만 보여줍니다. 빌드/테스트/모델 등록 중에는 출력하지 않습니다. OpenCode 안에서 다시 보고 싶으면 `/launch`를 입력합니다.
 
-채팅 진입 전에 터미널에서 상세 가이드를 먼저 보고 싶으면 `.opencode` 폴더 안의 실행 파일을 직접 사용할 수 있습니다.
+TUI plugin을 사용할 수 없는 환경에서 OpenCode 실행 직전에 Launch Guide를 한 번만 보여주고 싶으면 `.opencode` 폴더 안의 실행 파일을 사용합니다.
 
 ```bash
 ./.opencode/start
 ```
 
-이 명령은 `.opencode/LAUNCH_GUIDE.md`를 터미널에 먼저 보여준 뒤 `opencode`를 실행합니다. 상세 시작 가이드는 `.opencode/START_GUIDE.md`에 있고, 에이전트가 항상 참고해야 하는 기본 지침은 `.opencode/agent/launch.md`에 정리되어 있습니다.
+이 명령은 `.opencode/LAUNCH_GUIDE.md`의 짧은 안내를 처음 한 번만 터미널에 보여준 뒤 `opencode`를 실행합니다. 다시 보고 싶으면 아래처럼 초기화합니다.
+
+```bash
+./.opencode/start --reset-launch
+```
+
+상세 시작 가이드는 `.opencode/START_GUIDE.md`에 있고, `/launch` 명령은 `.opencode/agent/launch.md`와 `.opencode/command/launch.md`에 정리되어 있습니다.
 
 OpenCode provider API 키를 환경변수로 관리하려면 `.env.example`을 복사해 `.env`를 만들고 필요한 값만 채웁니다. 실제 `.env`는 Git에 올리지 않습니다.
 
