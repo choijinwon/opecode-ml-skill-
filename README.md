@@ -55,13 +55,21 @@ MLflow 메뉴 상세 설명은 [docs/mlflow-menu-guide.md](docs/mlflow-menu-guid
 cp -R .opencode /path/to/user-project/
 ```
 
-처음 실행 시 가이드를 먼저 보고 OpenCode를 열려면 저장소 루트에서 아래 명령을 사용합니다.
+기본 실행 방식은 저장소 루트에서 OpenCode를 그대로 실행하는 것입니다.
 
 ```bash
-./opencode-start
+opencode .
 ```
 
-이 명령은 `.opencode/START_GUIDE.md`를 터미널에 먼저 보여준 뒤 `opencode`를 실행합니다. 에이전트가 항상 참고해야 하는 기본 지침은 루트의 `AGENTS.md`에 정리되어 있습니다.
+`.opencode/opencode.json`이 기본 `launch` agent를 지정하므로, 채팅의 첫 응답에는 입력 내용과 무관하게 짧은 Launch Guide가 먼저 표시됩니다. 다시 보고 싶으면 OpenCode 안에서 `/launch`를 입력합니다.
+
+채팅 진입 전에 터미널에서 상세 가이드를 먼저 보고 싶으면 `.opencode` 폴더 안의 실행 파일을 직접 사용할 수 있습니다.
+
+```bash
+./.opencode/start
+```
+
+이 명령은 `.opencode/LAUNCH_GUIDE.md`를 터미널에 먼저 보여준 뒤 `opencode`를 실행합니다. 상세 시작 가이드는 `.opencode/START_GUIDE.md`에 있고, 에이전트가 항상 참고해야 하는 기본 지침은 `.opencode/agent/launch.md`에 정리되어 있습니다.
 
 OpenCode provider API 키를 환경변수로 관리하려면 `.env.example`을 복사해 `.env`를 만들고 필요한 값만 채웁니다. 실제 `.env`는 Git에 올리지 않습니다.
 

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+OPENCODE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(cd "$OPENCODE_DIR/.." && pwd)"
+GUIDE_FILE="$OPENCODE_DIR/LAUNCH_GUIDE.md"
+
+if [[ -f "$GUIDE_FILE" ]]; then
+  clear || true
+  printf '\n'
+  sed -n '1,220p' "$GUIDE_FILE"
+  printf '\n'
+  printf '계속하려면 Enter를 누르세요. 종료하려면 Ctrl+C를 누르세요.\n'
+  read -r _
+fi
+
+exec opencode "$PROJECT_DIR" "$@"
