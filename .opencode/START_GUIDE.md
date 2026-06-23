@@ -1,0 +1,58 @@
+# OpenCode MLflow 5단계 시작 가이드
+
+이 프로젝트는 ML 개발자가 로컬/폐쇄망 모델 프로젝트를 AI Studio와 MLflow에 연결하기 전에 필요한 점검을 챗봇으로 수행하도록 돕습니다.
+
+## 먼저 할 일
+
+1. 점검할 모델 프로젝트 폴더를 정합니다.
+2. 프로젝트에 아래 필수 구성이 있는지 확인합니다.
+
+```text
+aiu_custom/
+local_serving/
+save_model/
+ai_studio.env
+```
+
+3. `ai_studio.env`에 MLflow 연결 값을 준비합니다.
+
+```env
+mlflow_tracking_url=""
+mlflow_tracking_username=""
+mlflow_tracking_password=""
+mlflow_experiment_name=""
+mlflow_register_model_name=""
+```
+
+## OpenCode에 이렇게 요청하세요
+
+```text
+내 모델 프로젝트 폴더를 MLflow 5단계 기준으로 분석해줘.
+```
+
+```text
+/path/to/my-model-project 경로를 기준으로 프로젝트 구조 분석부터 MLflow 기록 확인까지 진행해줘.
+```
+
+```text
+모델이 없으면 표준 샘플 중 하나로 모델 생성과 추론 테스트까지 해줘.
+```
+
+## 5단계 흐름
+
+```text
+Step 1 Project Analyze
+Step 2 Environment Check
+Step 3 Train Model
+Step 4 Inference Test
+Step 5 MLflow Verify
+```
+
+## 중요한 규칙
+
+- API key, password, token 값은 출력하지 않습니다.
+- `mlflow_tracking_password`는 값이 아니라 `set`, `empty`, `missing` 상태만 확인합니다.
+- 모델 프로젝트에 모델이 있으면 샘플을 사용하지 않습니다.
+- 모델이 없을 때만 `sklearn_sample`, `pytorch_sample`, `tensorflow_sample` 중 하나를 선택합니다.
+- 외부 다운로드나 원격 등록은 사용자가 명확히 요청한 경우에만 수행합니다.
+
