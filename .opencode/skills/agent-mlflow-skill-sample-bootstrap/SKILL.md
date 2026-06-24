@@ -17,6 +17,8 @@ metadata:
 - 모델 프로젝트 폴더에 `.opencode`만 있고 실제 모델 코드가 없을 때
 - 폐쇄망 기본 모델 샘플을 빠르게 프로젝트 루트에 구성해야 할 때
 
+이 스킬은 `agent-mlflow-skill-project-analyze` 결과가 `model_found: false`일 때만 사용한다. 모델 파일이나 실행 entrypoint가 있으면 이 스킬을 실행하지 않는다.
+
 ## Selectable Samples
 
 사용자에게 아래 3개 중 하나를 선택하게 한다.
@@ -137,6 +139,20 @@ python .opencode/scripts/bootstrap_sample_project.py --project <model-project-fo
 원하는 샘플 번호 또는 이름을 알려주세요.
 ```
 
+선택 질문을 출력해야 하는 조건:
+
+```text
+model_found: false
+project_empty: true
+```
+
+선택 질문을 출력하지 않는 조건:
+
+```text
+model_found: true
+project_empty: false
+```
+
 사용자가 선택하면 아래 정보를 출력한다.
 
 ```text
@@ -151,6 +167,7 @@ next_action
 ## Safety
 
 - 사용자 선택 없이 임의로 샘플을 복사하지 않는다.
+- 모델이 발견된 워크스페이스에서는 샘플 선택을 요청하지 않는다.
 - 프로젝트 루트가 비어 있지 않으면 기본적으로 중단한다.
 - secret 값은 복사 후에도 출력하지 않는다.
 - `.env`, `ai_studio.env`의 실제 key/password/token 값은 출력하지 않는다.

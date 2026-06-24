@@ -50,6 +50,7 @@ MLflow Tracking / Model Registry
 ```text
 모델 프로젝트 폴더에 모델이 있으면
   -> 기존 프로젝트를 분석해서 실행한다.
+  -> 샘플 선택 질문을 하지 않는다.
 
 모델 프로젝트 폴더에 모델이 없으면
   -> 사용자가 sklearn/pytorch/tensorflow 샘플 3개 중 하나를 선택한다.
