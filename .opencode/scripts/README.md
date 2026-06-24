@@ -101,7 +101,7 @@ python .opencode/scripts/check_environment.py --project <model-project-folder> -
 
 ### run_training.py
 
-기존 모델 프로젝트를 실행한다. 모델이 없고 샘플을 루트로 가져와야 하면 먼저 `bootstrap_sample_project.py`로 사용자가 선택한 샘플을 복사한다.
+기존 모델 프로젝트를 실행한다. 모델이 없고 샘플을 가져와야 하면 먼저 `bootstrap_sample_project.py`로 사용자가 선택한 샘플 폴더를 복사한다.
 
 기본값은 안전 모드다. 실제 실행은 `--execute`를 명시해야 한다.
 실행 전 `ai_studio.env` 필수 키가 있는지 확인한다.

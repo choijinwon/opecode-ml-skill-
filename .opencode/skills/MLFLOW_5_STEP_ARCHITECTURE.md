@@ -54,7 +54,7 @@ MLflow Tracking / Model Registry
 
 모델 프로젝트 폴더에 모델이 없으면
   -> 사용자가 sklearn/pytorch/tensorflow 샘플 3개 중 하나를 선택한다.
-  -> 비어 있는 프로젝트 루트에 샘플을 복사한다.
+  -> 선택한 샘플 폴더를 워크스페이스 아래로 폴더째 복사한다.
   -> 모델을 생성하고 테스트한다.
 ```
 
@@ -239,7 +239,7 @@ Step 1 구조 분석
       sklearn / pytorch / tensorflow 사용자 선택
         |
         v
-      <model-project-folder>/ 루트로 샘플 복사
+      <model-project-folder>/<sample-folder>/ 로 샘플 폴더 복사
 
 Step 2 환경 검증
   |
