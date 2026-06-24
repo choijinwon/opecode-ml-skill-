@@ -8,7 +8,7 @@ OpenCode 기본 로고 자체는 OpenCode 내장 화면이라 `.opencode` 설정
 
 ```text
 [Launch Guide]
-이 프로젝트는 GenAI - MLflow - AI Studio 적용을 돕는 OpenCode 패키지입니다.
+이 프로젝트는 MLflow 모델 프로젝트 분석과 샘플 생성을 돕는 OpenCode 패키지입니다.
 처음 진입하면 워크스페이스를 먼저 분석해 모델 있음/없음을 확인합니다.
 
 모델이 있으면 본인 모델 경로를 기준으로 MLflow 5단계를 진행합니다.
@@ -77,7 +77,7 @@ opencode /path/to/model-project
 
 ## 환경변수 로드 후 실행
 
-로컬 Qwen 또는 사내 OpenAI 호환 endpoint를 사용할 때는 `.env` 또는 서버 환경변수를 먼저 로드합니다.
+로컬 모델 또는 사내 OpenAI 호환 endpoint를 사용할 때는 `.env` 또는 서버 환경변수를 먼저 로드합니다.
 
 ```bash
 set -a
