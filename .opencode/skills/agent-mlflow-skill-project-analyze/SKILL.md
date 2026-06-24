@@ -104,6 +104,14 @@ local_serving/
 save_model/
 ```
 
+아래 폴더는 사용자가 폐쇄망 모델을 직접 넣는 기본 슬롯이다. 내용이 비어 있으면 선택형 루트 복사 대상으로 사용하지 않는다.
+
+```text
+sklearn_sample/
+pytorch_sample/
+tensorflow_sample/
+```
+
 ### Empty Project Root Rule
 
 프로젝트 루트에 아래 항목만 있으면 비어 있는 프로젝트로 본다.

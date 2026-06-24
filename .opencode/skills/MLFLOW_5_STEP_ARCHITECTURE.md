@@ -67,6 +67,14 @@ design  -> .opencode/samples/design_agent_mlflow_aistudio
 
 다른 샘플은 임의로 선택하지 않는다.
 
+아래 폴더는 사용자가 폐쇄망에서 직접 모델 코드와 데이터를 넣는 기본 슬롯이며, 기본 자동 복사 대상이 아니다.
+
+```text
+sklearn_sample/
+pytorch_sample/
+tensorflow_sample/
+```
+
 ## 필수 프로젝트 계약
 
 모델 프로젝트 폴더는 아래 계약을 만족해야 한다.

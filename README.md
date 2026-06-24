@@ -23,10 +23,15 @@
 
 ```text
 .opencode/samples/
+├── sklearn_sample/
+├── pytorch_sample/
+├── tensorflow_sample/
 ├── offline_weather_agent/
 ├── legal_agent_mlflow_aistudio/
 └── design_agent_mlflow_aistudio/
 ```
+
+`sklearn_sample/`, `pytorch_sample/`, `tensorflow_sample/`은 폐쇄망에서 사용자가 직접 모델 코드와 데이터를 넣기 위한 기본 폴더입니다. 루트 복사용 선택형 샘플은 `weather`, `legal`, `design`입니다.
 
 상세 요구사항은 [SKILL_REQUIREMENTS.md](SKILL_REQUIREMENTS.md)를 확인하세요.
 구성 분석은 [SKILL_ANALYSIS_REPORT.md](SKILL_ANALYSIS_REPORT.md)를 확인하세요.

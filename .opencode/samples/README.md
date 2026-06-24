@@ -4,6 +4,9 @@
 
 포함된 샘플:
 
+- `sklearn_sample`: 폐쇄망 sklearn 모델을 넣기 위한 사용자 모델 슬롯
+- `pytorch_sample`: 폐쇄망 PyTorch 모델을 넣기 위한 사용자 모델 슬롯
+- `tensorflow_sample`: 폐쇄망 TensorFlow/Keras 모델을 넣기 위한 사용자 모델 슬롯
 - `offline_weather_agent`: 기본 폴더 구조 기반 날씨 에이전트 샘플
 - `offline_weather_agent_mlflow313`: MLflow 3.13 기반 로컬/폐쇄망 날씨 에이전트 참고 샘플
 - `legal_agent_mlflow_aistudio`: GenAI + MLflow + AI Studio endpoint 연결용 법률 에이전트 샘플
@@ -28,6 +31,8 @@ python .opencode/scripts/bootstrap_sample_project.py --project <model-project-fo
 ```
 
 루트 복사 대상으로 쓰는 샘플은 `aiu_custom/`, `local_serving/`, `save_model/` 기본 폴더를 가지고 있어야 한다.
+
+`sklearn_sample/`, `pytorch_sample/`, `tensorflow_sample/`은 사용자가 폐쇄망에서 직접 모델 코드와 데이터를 넣기 위한 기본 폴더다. 기본 자동 복사 대상은 아니며, 사용자가 내용을 채운 뒤 명시적으로 점검 대상으로 지정한다.
 
 배포 전 로컬 환경 테스트:
 
