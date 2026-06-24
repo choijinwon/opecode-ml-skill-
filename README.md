@@ -23,9 +23,9 @@
 
 ```text
 .opencode/samples/
-├── pytorch_sample/
-├── sklearn_sample/
-└── tensorflow_sample/
+├── offline_weather_agent/
+├── legal_agent_mlflow_aistudio/
+└── design_agent_mlflow_aistudio/
 ```
 
 상세 요구사항은 [SKILL_REQUIREMENTS.md](SKILL_REQUIREMENTS.md)를 확인하세요.
@@ -124,7 +124,7 @@ opencode
 그다음 사용자는 OpenCode에서 자연어로 요청합니다.
 
 ```text
-나는 처음 모델을 개발하는 개발자야. sklearn 기준으로 MLflow 등록 가능한 모델 프로젝트 구조를 잡아줘
+나는 처음 모델을 개발하는 개발자야. weather, legal, design 샘플 중 하나로 MLflow 등록 가능한 모델 프로젝트 구조를 잡아줘
 이 로컬 모델 프로젝트를 MLflow 등록 준비 관점에서 단계별로 봐줘
 ./my-model 경로를 기준으로 필요한 파일이 뭔지 알려줘
 등록/실행 entrypoint가 어떤 기능을 제공하면 좋은지 알려줘
@@ -149,7 +149,7 @@ python .opencode/scripts/test_local_sample.py --sample all --python /path/to/pyt
 특정 샘플만 테스트할 수도 있습니다.
 
 ```bash
-python .opencode/scripts/test_local_sample.py --sample pytorch_sample --python /path/to/python3.12
+python .opencode/scripts/test_local_sample.py --sample weather --python /path/to/python3.12
 ```
 
 `kserve==0.15.0` 제약 때문에 로컬 테스트에는 Python 3.9~3.12가 필요합니다.
@@ -157,7 +157,7 @@ python .opencode/scripts/test_local_sample.py --sample pytorch_sample --python /
 스킬의 7단계 기준으로 프로젝트를 검증하려면 아래 스크립트를 사용할 수 있습니다. Windows 10/11에서도 같은 명령 구조로 동작합니다.
 
 ```bash
-python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/sklearn_sample
+python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/offline_weather_agent
 ```
 
 경로를 주지 않으면 현재 루트 또는 `.opencode/samples/`에서 자동 후보를 선택합니다.

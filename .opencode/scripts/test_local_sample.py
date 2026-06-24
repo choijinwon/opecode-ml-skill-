@@ -9,7 +9,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLES_DIR = ROOT / "samples"
-DEFAULT_SAMPLES = ["sklearn_sample", "pytorch_sample", "tensorflow_sample"]
+SAMPLE_PATHS = {
+    "weather": "offline_weather_agent",
+    "legal": "legal_agent_mlflow_aistudio",
+    "design": "design_agent_mlflow_aistudio",
+}
+DEFAULT_SAMPLES = list(SAMPLE_PATHS)
 
 
 def python_in_venv(venv_dir: Path) -> Path:
@@ -55,7 +60,7 @@ def install_requirements(python_bin: Path, sample_dir: Path):
 
 
 def test_sample(sample_name: str, rebuild: bool, do_install: bool, do_register: bool, base_python: Path):
-    sample_dir = SAMPLES_DIR / sample_name
+    sample_dir = SAMPLES_DIR / SAMPLE_PATHS[sample_name]
     if not sample_dir.exists():
         raise FileNotFoundError(f"unknown sample: {sample_name}")
 
@@ -63,17 +68,24 @@ def test_sample(sample_name: str, rebuild: bool, do_install: bool, do_register: 
     if do_install:
         install_requirements(python_bin, sample_dir)
 
-    # Each sample must be able to create its local artifact and then verify the
-    # registration prerequisites without contacting a remote MLflow server.
-    run([str(python_bin), "train.py"], cwd=sample_dir)
-    run([str(python_bin), "register_model.py", "--prepare-only"], cwd=sample_dir)
+    # Each current sample exposes run_model.py as the main local prepare/export
+    # entrypoint. Older train.py/register_model.py files are optional.
+    if (sample_dir / "train.py").exists():
+        run([str(python_bin), "train.py"], cwd=sample_dir)
+    if (sample_dir / "register_model.py").exists():
+        run([str(python_bin), "register_model.py", "--prepare-only"], cwd=sample_dir)
     if (sample_dir / "run_model.py").exists():
         run([str(python_bin), "run_model.py", "--prepare-only"], cwd=sample_dir)
+    else:
+        raise FileNotFoundError(f"missing run_model.py: {sample_dir}")
 
     # Full registration is optional because each user may have different local
     # or remote MLflow tracking settings.
     if do_register:
-        run([str(python_bin), "register_model.py"], cwd=sample_dir)
+        if (sample_dir / "register_model.py").exists():
+            run([str(python_bin), "register_model.py"], cwd=sample_dir)
+        else:
+            run([str(python_bin), "run_model.py"], cwd=sample_dir)
 
 
 def main():

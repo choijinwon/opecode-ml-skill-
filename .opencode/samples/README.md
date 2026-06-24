@@ -4,9 +4,6 @@
 
 포함된 샘플:
 
-- `pytorch_sample`
-- `sklearn_sample`
-- `tensorflow_sample`
 - `offline_weather_agent`: 기본 폴더 구조 기반 날씨 에이전트 샘플
 - `offline_weather_agent_mlflow313`: MLflow 3.13 기반 로컬/폐쇄망 날씨 에이전트 참고 샘플
 - `legal_agent_mlflow_aistudio`: GenAI + MLflow + AI Studio endpoint 연결용 법률 에이전트 샘플
@@ -35,9 +32,9 @@ python .opencode/scripts/bootstrap_sample_project.py --project <model-project-fo
 배포 전 로컬 환경 테스트:
 
 - 전체 샘플 테스트: `python .opencode/scripts/test_local_sample.py --sample all --python /path/to/python3.12`
-- 특정 샘플 테스트: `python .opencode/scripts/test_local_sample.py --sample pytorch_sample --python /path/to/python3.12`
-- 의존성 재설치 없이 재검증: `python .opencode/scripts/test_local_sample.py --sample sklearn_sample --skip-install --python /path/to/python3.12`
-- 가상환경 재생성: `python .opencode/scripts/test_local_sample.py --sample tensorflow_sample --rebuild-venv --python /path/to/python3.12`
+- 특정 샘플 테스트: `python .opencode/scripts/test_local_sample.py --sample weather --python /path/to/python3.12`
+- 의존성 재설치 없이 재검증: `python .opencode/scripts/test_local_sample.py --sample legal --skip-install --python /path/to/python3.12`
+- 가상환경 재생성: `python .opencode/scripts/test_local_sample.py --sample design --rebuild-venv --python /path/to/python3.12`
 
 테스트 스크립트의 내부 동작:
 
@@ -54,9 +51,9 @@ python .opencode/scripts/bootstrap_sample_project.py --project <model-project-fo
 스킬 기준 검증:
 
 - 자동 후보 선택: `python .opencode/scripts/validate_mlflow_project.py`
-- 특정 샘플 검증: `python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/sklearn_sample`
-- JSON 출력: `python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/sklearn_sample --json`
-- 쓰기 권한 확인 제외: `python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/sklearn_sample --no-write-check`
+- 특정 샘플 검증: `python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/offline_weather_agent`
+- JSON 출력: `python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/offline_weather_agent --json`
+- 쓰기 권한 확인 제외: `python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/offline_weather_agent --no-write-check`
 
 Python 버전 조건:
 

@@ -123,10 +123,10 @@ design
 
 ### test_local_sample.py
 
-표준 샘플 자체를 테스트한다.
+선택형 샘플 자체를 테스트한다.
 
 ```text
-python .opencode/scripts/test_local_sample.py --sample sklearn_sample
+python .opencode/scripts/test_local_sample.py --sample weather
 python .opencode/scripts/test_local_sample.py --sample all
 ```
 

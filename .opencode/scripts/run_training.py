@@ -1,6 +1,5 @@
 import argparse
 import json
-import shutil
 import subprocess
 import sys
 from dataclasses import asdict, dataclass, field
@@ -9,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLES_DIR = ROOT / "samples"
-SAMPLE_PRIORITY = ["sklearn_sample", "pytorch_sample", "tensorflow_sample"]
+SAMPLE_OPTIONS = ["weather", "legal", "design"]
 ENTRYPOINTS = ["train.py", "run_model.py", "scripts/train.py"]
 REQUIRED_DIRS = ["aiu_custom", "local_serving", "save_model"]
 ARTIFACT_DIRS = ["save_model", "model", "artifacts", "saved_model"]
@@ -45,26 +44,6 @@ def has_model_project(project: Path) -> bool:
     if any((project / name).exists() for name in ARTIFACT_DIRS):
         return True
     return any(path.suffix in ARTIFACT_SUFFIXES for path in project.glob("*") if path.is_file())
-
-
-def select_sample() -> Path:
-    for name in SAMPLE_PRIORITY:
-        candidate = SAMPLES_DIR / name
-        if candidate.exists():
-            return candidate
-    raise FileNotFoundError("sample_not_found: sklearn_sample, pytorch_sample, tensorflow_sample are missing")
-
-
-def prepare_sample(project: Path, force: bool) -> tuple[Path, str]:
-    sample = select_sample()
-    work_path = project / "work" / sample.name
-    if work_path.exists():
-        if not force:
-            raise FileExistsError(f"sample_prepare_error: work path already exists: {work_path}")
-        shutil.rmtree(work_path)
-    work_path.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(sample, work_path)
-    return work_path, sample.name
 
 
 def find_entrypoint(project: Path) -> Path | None:
@@ -129,11 +108,11 @@ def run_command(cmd: list[str], cwd: Path) -> int:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run local training or prepare a standard sample model after ai_studio.env checks.")
+    parser = argparse.ArgumentParser(description="Run local training for an existing project after ai_studio.env checks.")
     parser.add_argument("--project", default=".", help="user-specified model project folder")
     parser.add_argument("--python", default=sys.executable, help="Python interpreter to use")
     parser.add_argument("--execute", action="store_true", help="actually run the selected command")
-    parser.add_argument("--force-sample", action="store_true", help="overwrite existing sample work path")
+    parser.add_argument("--force-sample", action="store_true", help="deprecated; use bootstrap_sample_project.py for sample root copy")
     parser.add_argument("--prepare-only", action="store_true", help="prefer prepare-only mode when supported")
     parser.add_argument("--json", action="store_true", help="print machine-readable JSON")
     args = parser.parse_args()
@@ -149,15 +128,9 @@ def main():
     work_path = project
 
     if not model_found:
-        try:
-            work_path, selected_sample = prepare_sample(project, force=args.force_sample)
-        except Exception as exc:
-            failures.append(str(exc))
-            entrypoint = None
-            cmd: list[str] = []
-            report = TrainingReport(str(project), False, None, str(project), None, cmd, False, None, [], failures, [])
-            print(json.dumps(asdict(report), ensure_ascii=False, indent=2) if args.json else f"[error] {exc}")
-            sys.exit(1)
+        failures.append("model_not_found")
+        failures.append("sample_bootstrap_required: choose one of weather, legal, design and copy it to the project root first")
+        next_steps.append("python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample weather --execute")
 
     entrypoint = find_entrypoint(work_path)
     if entrypoint is None:

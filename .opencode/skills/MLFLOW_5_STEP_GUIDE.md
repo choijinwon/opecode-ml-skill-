@@ -347,7 +347,7 @@ model_found: true
 7. Step 4에 model path와 input_example path를 넘긴다.
 ```
 
-기존 모델 프로젝트가 있으면 표준 샘플은 사용하지 않는다.
+기존 모델 프로젝트가 있으면 선택형 샘플은 사용하지 않는다.
 
 ### 샘플 기반 모델 생성
 
@@ -355,14 +355,14 @@ model_found: true
 
 ```text
 model_found: false
-selected_sample: sklearn_sample | pytorch_sample | tensorflow_sample
+selected_sample: weather | legal | design
 ```
 
 동작:
 
 ```text
 1. sample_source_path를 확인한다.
-2. <model-project-folder>/work/<selected-sample-name> 작업 경로를 준비한다.
+2. target_project_root가 사용자가 지정한 모델 프로젝트 루트인지 확인한다.
 3. 샘플 원본은 직접 수정하지 않는다.
 4. ai_studio.env 필수 키를 확인한다.
 5. prepare-only 또는 smoke test가 있으면 먼저 실행한다.
@@ -388,7 +388,7 @@ input_example.json
 기존 모델 프로젝트 실행 여부
 샘플 기반 생성 여부
 선택된 학습 entrypoint
-선택된 샘플 이름과 작업 경로
+선택된 샘플 이름과 프로젝트 루트
 학습 실행 방식
 생성된 save_model 산출물
 생성되지 않은 필수 산출물
@@ -401,7 +401,7 @@ input_example.json
 ```text
 missing_train_entrypoint
 sample_not_found
-sample_prepare_error
+sample_bootstrap_required
 missing_dataset
 missing_config
 missing_env
@@ -547,8 +547,8 @@ Step 5  MLflow Run/Model 기록 확인
 
 - 사용자가 지정한 모델 프로젝트 폴더를 먼저 분석한다.
 - 모델이 있으면 샘플을 사용하지 않는다.
-- 모델이 없을 때만 표준 샘플 3개 중 하나를 선택한다.
-- 표준 샘플 외 다른 샘플은 임의 선택하지 않는다.
+- 모델이 없고 프로젝트 루트가 비어 있을 때만 weather, legal, design 중 하나를 사용자가 선택한다.
+- 선택형 샘플 외 다른 샘플은 임의 선택하지 않는다.
 - `offline_weather_agent_core/`, `registry/`는 필수 폴더가 아니다.
 - `ai_studio.env` 값은 출력하지 않는다.
 - `mlflow_tracking_password` 값은 절대 출력하지 않는다.

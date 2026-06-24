@@ -12,9 +12,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLES_DIR = ROOT / "samples"
 
-# When no project path is provided, sample projects are selected in this order.
-# sklearn stays first because it is the lightest sample for a quick local check.
-SAMPLE_PRIORITY = ["sklearn_sample", "pytorch_sample", "tensorflow_sample"]
+# When no project path is provided, selectable sample projects are inspected in
+# this order. They match the bootstrap choices exposed to users.
+SAMPLE_PRIORITY = ["offline_weather_agent", "legal_agent_mlflow_aistudio", "design_agent_mlflow_aistudio"]
 
 # The skill pack does not require a fixed file name. These common names are
 # used only as hints when detecting a registration or inference entrypoint.
@@ -166,12 +166,10 @@ def select_project(explicit: str | None) -> tuple[Path, str]:
     if has_project_markers(cwd):
         return cwd, "current directory has model project markers"
 
-    sample_candidates = [SAMPLES_DIR / name for name in SAMPLE_PRIORITY if (SAMPLES_DIR / name).exists()]
-    scored = [(score_project(path), path) for path in sample_candidates]
-    scored = [(score, path) for score, path in scored if score > 0]
-    if scored:
-        scored.sort(key=lambda item: (-item[0], SAMPLE_PRIORITY.index(item[1].name)))
-        return scored[0][1].resolve(), f"sample priority: {scored[0][1].name}"
+    for name in SAMPLE_PRIORITY:
+        candidate = SAMPLES_DIR / name
+        if candidate.exists() and score_project(candidate) > 0:
+            return candidate.resolve(), f"sample priority: {candidate.name}"
 
     raise FileNotFoundError("No model project candidate found. Provide --project.")
 

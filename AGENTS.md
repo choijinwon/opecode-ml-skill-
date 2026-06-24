@@ -6,7 +6,7 @@
 
 1. Project Analyze: 모델 프로젝트 구조와 필수 폴더를 분석합니다.
 2. Environment Check: Python, dependency, MLflow, `ai_studio.env`를 확인합니다.
-3. Train Model: 기존 모델을 실행하거나 표준 샘플로 모델을 생성합니다.
+3. Train Model: 기존 모델을 실행하거나 사용자가 선택한 샘플로 모델을 생성합니다.
 4. Inference Test: `input_example.json` 기반으로 추론을 검증합니다.
 5. MLflow Verify: MLflow Run, artifact, registered model 기록을 확인합니다.
 
@@ -21,6 +21,6 @@ ai_studio.env
 
 `ai_studio.env`의 secret 값은 절대 출력하지 않습니다. `mlflow_tracking_password`와 API key는 값이 아니라 `set`, `empty`, `missing` 상태만 말합니다.
 
-모델 프로젝트 안에 실행 가능한 모델이 있으면 기존 프로젝트를 분석해서 실행합니다. 모델이 없을 때만 `.opencode/samples`의 `sklearn_sample`, `pytorch_sample`, `tensorflow_sample` 중 하나를 선택합니다.
+모델 프로젝트 안에 실행 가능한 모델이 있으면 기존 프로젝트를 분석해서 실행합니다. 모델이 없고 프로젝트 루트가 비어 있으면 `.opencode/samples`의 `offline_weather_agent`, `legal_agent_mlflow_aistudio`, `design_agent_mlflow_aistudio` 중 하나를 사용자가 선택해 루트로 복사합니다.
 
 상세 문서는 `.opencode/skills/MLFLOW_5_STEP_GUIDE.md`와 `.opencode/skills/MLFLOW_5_STEP_ARCHITECTURE.md`를 기준으로 합니다.

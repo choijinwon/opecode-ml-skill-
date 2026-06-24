@@ -52,20 +52,20 @@ MLflow Tracking / Model Registry
   -> 기존 프로젝트를 분석해서 실행한다.
 
 모델 프로젝트 폴더에 모델이 없으면
-  -> 표준 샘플 3개 중 하나를 선택한다.
-  -> 작업 경로에 샘플을 준비한다.
+  -> 사용자가 선택형 샘플 3개 중 하나를 선택한다.
+  -> 비어 있는 프로젝트 루트에 샘플을 복사한다.
   -> 모델을 생성하고 테스트한다.
 ```
 
-표준 샘플은 아래 3개만 허용한다.
+선택형 샘플은 아래 3개만 허용한다.
 
 ```text
-sklearn_sample
-pytorch_sample
-tensorflow_sample
+weather -> .opencode/samples/offline_weather_agent
+legal   -> .opencode/samples/legal_agent_mlflow_aistudio
+design  -> .opencode/samples/design_agent_mlflow_aistudio
 ```
 
-다른 샘플은 자동 선택하지 않는다.
+다른 샘플은 임의로 선택하지 않는다.
 
 ## 필수 프로젝트 계약
 
@@ -157,6 +157,7 @@ secret 값은 로그, 응답, trace에 출력하지 않는다.
 ```text
 .opencode/scripts/
 ├── validate_mlflow_project.py
+├── bootstrap_sample_project.py
 ├── check_environment.py
 ├── run_training.py
 ├── test_inference.py
@@ -177,7 +178,9 @@ Step 1 Project Analyze
   |     -> 기존 프로젝트 실행 경로 선택
   |
   |-- model_found=false
-        -> sklearn_sample / pytorch_sample / tensorflow_sample 선택
+        -> bootstrap_sample_project.py
+        -> weather / legal / design 중 사용자 선택
+        -> 비어 있는 프로젝트 루트로 복사
 
 Step 2 Environment Check
   |
@@ -224,10 +227,10 @@ Step 1 구조 분석
   +-- 모델 없음
         |
         v
-      표준 샘플 선택
+      weather / legal / design 사용자 선택
         |
         v
-      <model-project-folder>/work/<sample-name> 준비
+      <model-project-folder>/ 루트로 샘플 복사
 
 Step 2 환경 검증
   |
@@ -408,7 +411,7 @@ missing_env:<key>
 missing_dependency
 missing_train_entrypoint
 sample_not_found
-sample_prepare_error
+sample_bootstrap_required
 artifact_not_created
 artifact_invalid
 missing_inference_entrypoint
