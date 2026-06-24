@@ -21,11 +21,7 @@ OpenCode 기본 로고 자체는 OpenCode 내장 화면이라 `.opencode` 설정
 상세 가이드: .opencode/LAUNCH_GUIDE.md
 ```
 
-다시 보고 싶으면 OpenCode 안에서 아래 명령을 입력합니다.
-
-```text
-/launch
-```
+다시 보고 싶으면 `opencode --reset-launch` 또는 `./.opencode/start --reset-launch`로 초기화한 뒤 다시 실행합니다.
 
 ## 권장 실행 방식
 
@@ -42,7 +38,7 @@ opencode .
 
 이 방식은 Launch Guide를 최초 1회 출력한 뒤 OpenCode를 실행합니다.
 
-TUI plugin을 사용할 수 없는 환경에서 OpenCode 실행 직전에 Launch Guide를 한 번만 보고 싶으면 아래 스크립트를 사용합니다.
+OpenCode 실행 직전에 Launch Guide를 한 번만 보고 싶으면 아래 스크립트를 직접 사용할 수도 있습니다.
 
 ```bash
 ./.opencode/start
@@ -67,7 +63,7 @@ TUI plugin을 사용할 수 없는 환경에서 OpenCode 실행 직전에 Launch
 ./.opencode/start --reset-launch
 ```
 
-TUI plugin으로 표시된 welcome guide는 `.opencode/.welcome_guide_seen` 파일로 표시 여부를 저장합니다. 일반적인 재실행에서는 다시 뜨지 않고, 다시 보고 싶으면 채팅에서 `/launch`를 입력합니다.
+초기 진입 안내는 플러그인이 아니라 터미널 런처가 담당합니다. 표시 여부는 `.opencode/.launch_seen` 파일로 저장합니다.
 
 또는 특정 프로젝트 폴더를 직접 지정합니다.
 

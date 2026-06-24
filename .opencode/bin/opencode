@@ -40,11 +40,10 @@ fi
 if PROJECT_DIR="$(find_project_dir)"; then
   GUIDE_FILE="$PROJECT_DIR/.opencode/LAUNCH_GUIDE.md"
   SEEN_FILE="$PROJECT_DIR/.opencode/.launch_seen"
-  TUI_SEEN_FILE="$PROJECT_DIR/.opencode/.welcome_guide_seen"
   SHOULD_SHOW_GUIDE=1
 
   if [[ "${1:-}" == "--reset-launch" ]]; then
-    rm -f "$SEEN_FILE" "$TUI_SEEN_FILE"
+    rm -f "$SEEN_FILE"
     shift
   fi
 

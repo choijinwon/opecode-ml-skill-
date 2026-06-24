@@ -5,11 +5,9 @@ OPENCODE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$OPENCODE_DIR/.." && pwd)"
 GUIDE_FILE="$OPENCODE_DIR/LAUNCH_GUIDE.md"
 SEEN_FILE="$OPENCODE_DIR/.launch_seen"
-TUI_SEEN_FILE="$OPENCODE_DIR/.welcome_guide_seen"
 
 if [[ "${1:-}" == "--reset-launch" ]]; then
   rm -f "$SEEN_FILE"
-  rm -f "$TUI_SEEN_FILE"
   shift
 fi
 

@@ -1,8 +1,5 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": [
-    "./plugins/welcome-guide.js"
-  ],
   "instructions": [
     ".opencode/LAUNCH_GUIDE.md",
     ".opencode/START_GUIDE.md"
