@@ -1,6 +1,6 @@
 ---
 name: agent-mlflow-skill-project-analyze
-description: 사용자가 지정한 모델 프로젝트 폴더의 ML 프로젝트 구조를 분석하고 framework, entrypoint, artifact, config, input example, aiu_custom 구성 여부를 정리한다.
+description: Use when the user asks "분석해줘", "MLflow 5단계", "모델 있음/없음", "워크스페이스 분석", or project structure analysis; analyzes framework, entrypoint, artifact, config, input example, aiu_custom/local_serving/save_model.
 license: MIT
 compatibility: opencode
 metadata:

@@ -1,6 +1,6 @@
 ---
 name: agent-mlflow-skill-mlflow-verify
-description: MLflow Run 생성, params/metrics/artifacts 기록, pyfunc model logging, Model Registry 등록 여부를 확인한다.
+description: Use when the user asks "MLflow 확인", "run 생성 확인", "artifact 확인", "registered model", "Model Registry", or MLflow verify; checks runs, params, metrics, artifacts, pyfunc logging, and registered model status.
 license: MIT
 compatibility: opencode
 metadata:

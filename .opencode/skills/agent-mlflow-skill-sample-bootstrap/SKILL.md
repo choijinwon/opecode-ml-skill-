@@ -1,6 +1,6 @@
 ---
 name: agent-mlflow-skill-sample-bootstrap
-description: 사용자가 지정한 워크스페이스에 실행 가능한 모델이 없을 때 OpenCode 샘플 3개 중 하나를 선택하게 하고, 선택한 샘플 폴더를 폴더째 복사해 MLflow 모델 프로젝트를 시작한다.
+description: Use when the user says "sklearn", "pytorch", "tensorflow", "샘플 생성", "폴더째 복사", "모델이 없음", or sample bootstrap; selects one bundled sample and copies the sample folder into the workspace.
 license: MIT
 compatibility: opencode
 metadata:

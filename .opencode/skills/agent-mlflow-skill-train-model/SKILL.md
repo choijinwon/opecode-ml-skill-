@@ -1,6 +1,6 @@
 ---
 name: agent-mlflow-skill-train-model
-description: 로컬 학습 entrypoint를 확인하고 학습 실행, 모델 artifact 생성, config/input example 생성 여부를 점검한다.
+description: Use when the user asks "학습 실행", "모델 생성", "run_model.py", "save_model 확인", "artifact 생성", or train model; checks local training entrypoint, model artifact creation, config, and input example.
 license: MIT
 compatibility: opencode
 metadata:

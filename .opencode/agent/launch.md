@@ -76,3 +76,36 @@ Print this exact guide on the first assistant response, and also when the user e
 - After sample creation, report `target_project_path` and tell the user to continue from that copied sample folder.
 - Tell the user that model creation, environment check, and verification actions should be selected in OpenCode build mode.
 - When implementation is requested, follow the repository patterns and avoid modifying unrelated files.
+
+## Skill Routing Rules
+
+After the Launch Guide is printed, do not handle MLflow model onboarding only from this launch prompt. Route concrete MLflow work to the matching project skill.
+
+Use these skills by name when the user request matches:
+
+```text
+agent-mlflow-skill-project-analyze
+  - workspace analysis
+  - model exists / model missing decision
+  - framework, entrypoint, aiu_custom, local_serving, save_model inspection
+
+agent-mlflow-skill-sample-bootstrap
+  - sklearn / pytorch / tensorflow sample selection
+  - copying the selected sample folder into the workspace
+
+agent-mlflow-skill-environment-check
+  - Python, dependency, MLflow, ai_studio.env, environment variable checks
+
+agent-mlflow-skill-train-model
+  - local training, run_model.py, model artifact creation, save_model checks
+
+agent-mlflow-skill-inference-test
+  - input_example.json, predict.py, aiu_custom, local_serving inference tests
+
+agent-mlflow-skill-mlflow-verify
+  - MLflow run, artifact, pyfunc model logging, registered model verification
+```
+
+If the user says a broad phrase such as `분석해줘`, `MLflow 5단계 진행해줘`, `모델 있음/없음 봐줘`, or `처음부터 봐줘`, start with `agent-mlflow-skill-project-analyze`.
+
+If the user says `sklearn`, `pytorch`, `tensorflow`, `샘플 생성`, `폴더째 복사`, or `모델이 없으면 샘플`, use `agent-mlflow-skill-sample-bootstrap`.

@@ -1,6 +1,6 @@
 ---
 name: agent-mlflow-skill-inference-test
-description: 생성된 로컬 모델을 로드하고 input example 기반 추론 테스트를 수행해 predict 계약과 응답 schema를 확인한다.
+description: Use when the user asks "추론 테스트", "input_example.json", "predict.py", "aiu_custom 테스트", "local_serving", or inference test; loads the local model and verifies predict contract and response schema.
 license: MIT
 compatibility: opencode
 metadata:

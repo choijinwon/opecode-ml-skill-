@@ -1,6 +1,6 @@
 ---
 name: agent-mlflow-skill-environment-check
-description: 사용자가 지정한 모델 프로젝트 폴더의 Python 실행 환경, dependency, MLflow 설치 상태, 환경 변수 설정 위치를 검증한다.
+description: Use when the user asks "환경 검증", "dependency 확인", "MLflow 설치", "ai_studio.env", "API key 위치", or environment check; verifies Python, dependencies, MLflow, env vars, and required AI Studio settings.
 license: MIT
 compatibility: opencode
 metadata:
