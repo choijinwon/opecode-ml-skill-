@@ -23,8 +23,8 @@ metadata:
 
 ```text
 1. weather
-   샘플 폴더: .opencode/samples/offline_weather_agent_mlflow313
-   목적: 로컬 Qwen/폐쇄망, MLflow 3.13, Prompt/Trace/Session/Judge/Dataset 구조 확인
+   샘플 폴더: .opencode/samples/offline_weather_agent
+   목적: 기본 폴더 구조 기반 날씨 에이전트, Prompt/Trace/Session/Judge/Dataset 구조 확인
 
 2. legal
    샘플 폴더: .opencode/samples/legal_agent_mlflow_aistudio
@@ -47,6 +47,18 @@ metadata:
 ```
 
 그 외 파일이나 폴더가 있으면 기존 작업물이 있다고 보고 기본적으로 루트 복사를 중단한다. 덮어쓰기는 사용자가 명시적으로 요청했을 때만 수행한다.
+
+## Required Sample Folder Rule
+
+선택형 샘플은 아래 기본 폴더를 원본 샘플 안에 가지고 있어야 한다.
+
+```text
+aiu_custom/
+local_serving/
+save_model/
+```
+
+기본 폴더가 없는 샘플은 선택형 루트 복사 대상으로 사용하지 않는다.
 
 ## Copy Rule
 

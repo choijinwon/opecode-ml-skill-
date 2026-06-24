@@ -42,12 +42,12 @@ ML 개발자가 챗봇을 통해 다음 작업을 순서대로 수행할 수 있
 사용자 선택 샘플은 아래 3개만 사용한다.
 
 ```text
-1. weather - .opencode/samples/offline_weather_agent_mlflow313
+1. weather - .opencode/samples/offline_weather_agent
 2. legal   - .opencode/samples/legal_agent_mlflow_aistudio
 3. design  - .opencode/samples/design_agent_mlflow_aistudio
 ```
 
-다른 샘플은 임의로 선택하지 않는다.
+다른 샘플은 임의로 선택하지 않는다. 선택형 샘플은 `aiu_custom/`, `local_serving/`, `save_model/` 기본 폴더가 원본에 있어야 한다.
 
 ## 필수 구성
 
@@ -213,7 +213,7 @@ next_action: Step 2 환경 검증
 선택지:
 
 ```text
-1. weather - .opencode/samples/offline_weather_agent_mlflow313
+1. weather - .opencode/samples/offline_weather_agent
 2. legal   - .opencode/samples/legal_agent_mlflow_aistudio
 3. design  - .opencode/samples/design_agent_mlflow_aistudio
 ```
@@ -226,7 +226,7 @@ next_action: Step 2 환경 검증
 model_found: false
 sample_options: weather, legal, design
 selected_sample: weather
-sample_source_path: .opencode/samples/offline_weather_agent_mlflow313
+sample_source_path: .opencode/samples/offline_weather_agent
 target_project_root: <model-project-folder>
 copy_mode: root
 next_action: Step 2 환경 검증 후 Step 3 모델 생성

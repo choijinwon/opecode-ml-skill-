@@ -7,7 +7,8 @@
 - `pytorch_sample`
 - `sklearn_sample`
 - `tensorflow_sample`
-- `offline_weather_agent_mlflow313`: MLflow 3.13 기반 로컬/폐쇄망 날씨 에이전트 샘플
+- `offline_weather_agent`: 기본 폴더 구조 기반 날씨 에이전트 샘플
+- `offline_weather_agent_mlflow313`: MLflow 3.13 기반 로컬/폐쇄망 날씨 에이전트 참고 샘플
 - `legal_agent_mlflow_aistudio`: GenAI + MLflow + AI Studio endpoint 연결용 법률 에이전트 샘플
 - `design_agent_mlflow_aistudio`: GenAI + MLflow + AI Studio endpoint 연결용 디자인 에이전트 샘플
 
@@ -28,6 +29,8 @@ python .opencode/scripts/bootstrap_sample_project.py --project <model-project-fo
 python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample legal --execute
 python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample design --execute
 ```
+
+루트 복사 대상으로 쓰는 샘플은 `aiu_custom/`, `local_serving/`, `save_model/` 기본 폴더를 가지고 있어야 한다.
 
 배포 전 로컬 환경 테스트:
 

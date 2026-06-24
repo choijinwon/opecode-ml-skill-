@@ -11,9 +11,9 @@ SAMPLES_DIR = ROOT / "samples"
 
 SAMPLES = {
     "weather": {
-        "path": "offline_weather_agent_mlflow313",
+        "path": "offline_weather_agent",
         "label": "날씨 에이전트",
-        "description": "폐쇄망/로컬 Qwen 연동, MLflow 3.13, Prompt/Trace/Session/Judge/Dataset 구조 확인용",
+        "description": "기본 폴더 구조 기반 날씨 에이전트, Prompt/Trace/Session/Judge/Dataset 구조 확인용",
     },
     "legal": {
         "path": "legal_agent_mlflow_aistudio",
@@ -85,9 +85,14 @@ def list_samples() -> list[dict[str, str]]:
                 "description": meta["description"],
                 "source_path": str(source),
                 "available": str(source.exists()).lower(),
+                "required_dirs": str(has_required_dirs(source)).lower(),
             }
         )
     return rows
+
+
+def has_required_dirs(sample: Path) -> bool:
+    return all((sample / name).is_dir() for name in REQUIRED_PROJECT_DIRS)
 
 
 def is_project_empty(project: Path) -> bool:
@@ -193,6 +198,8 @@ def main():
 
     if not sample_source.exists():
         failures.append(f"sample_not_found:{sample_source}")
+    elif not has_required_dirs(sample_source):
+        failures.append(f"sample_missing_required_dirs:{','.join(REQUIRED_PROJECT_DIRS)}")
 
     project_empty = is_project_empty(project)
     if project.exists() and not project.is_dir():

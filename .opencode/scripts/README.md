@@ -40,6 +40,8 @@ python .opencode/scripts/validate_mlflow_project.py --project <model-project-fol
 
 모델 프로젝트 폴더가 비어 있거나 `.opencode`만 있을 때, 샘플 3개 중 하나를 선택해 프로젝트 루트로 복사한다.
 
+선택 가능한 샘플은 원본에 `aiu_custom/`, `local_serving/`, `save_model/` 기본 폴더가 있어야 한다.
+
 샘플 목록:
 
 ```text

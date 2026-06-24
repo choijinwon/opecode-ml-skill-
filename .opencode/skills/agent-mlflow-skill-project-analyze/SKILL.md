@@ -82,8 +82,8 @@ next_action: 발견된 프로젝트로 Step 2 환경 검증 후 Step 3 실행
 
 ```text
 1. weather
-   source: .opencode/samples/offline_weather_agent_mlflow313
-   purpose: 로컬 Qwen/폐쇄망, MLflow 3.13, Prompt/Trace/Session/Judge/Dataset 구조 확인
+   source: .opencode/samples/offline_weather_agent
+   purpose: 기본 폴더 구조 기반 날씨 에이전트, Prompt/Trace/Session/Judge/Dataset 구조 확인
 
 2. legal
    source: .opencode/samples/legal_agent_mlflow_aistudio
@@ -95,6 +95,14 @@ next_action: 발견된 프로젝트로 Step 2 환경 검증 후 Step 3 실행
 ```
 
 이 3개 외의 샘플은 임의로 선택하지 않는다.
+
+선택형 샘플은 원본 폴더에 아래 기본 폴더가 있어야 한다.
+
+```text
+aiu_custom/
+local_serving/
+save_model/
+```
 
 ### Empty Project Root Rule
 
@@ -159,6 +167,7 @@ selected_sample
 sample_source_path
 target_project_root
 copy_mode: root
+required_dirs: aiu_custom, local_serving, save_model
 next_action
 ```
 
