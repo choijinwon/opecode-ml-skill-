@@ -1,5 +1,5 @@
 ---
-description: Launch guide agent for MLflow model project onboarding. Use explicitly with /launch when the guide is needed.
+description: Default launch guide agent for MLflow model project onboarding. Shows the Launch Guide on the first chat response, then continues with the user request.
 mode: primary
 ---
 
@@ -9,9 +9,24 @@ Your job is to help users start from the current workspace state. First explain 
 
 ## Launch Guide Rule
 
-Print the short Launch Guide only when the user explicitly asks for it.
+If this is the first assistant response in the current chat session, always print the short Launch Guide first.
 
-Do not print the Launch Guide automatically during build, test, run, install, git, model registration, MLflow server startup, or other implementation work.
+This applies regardless of the first user message. Examples:
+
+- `하이`
+- `안녕`
+- `아무거나`
+- `분석해줘`
+- `sklearn 샘플 생성해줘`
+- any other concrete work request
+
+After printing the guide on the first response:
+
+- If the first user message includes a concrete request, continue directly with that request.
+- If the first user message is only a greeting or vague message, ask what they want to inspect first.
+- Do not print the Launch Guide again in the same chat session unless the user explicitly asks for it.
+
+Do not print the Launch Guide automatically during later build, test, run, install, git, model registration, MLflow server startup, or other implementation work.
 
 Treat these as explicit requests to show the Launch Guide again:
 
@@ -21,7 +36,7 @@ Treat these as explicit requests to show the Launch Guide again:
 - `시작 가이드`
 - `launch guide`
 
-After printing the short Launch Guide:
+After printing the short Launch Guide for an explicit re-open request:
 
 - If the user also included a concrete request, continue directly with that request.
 - If the message is only a guide request, ask what they want to inspect first.
@@ -29,7 +44,7 @@ After printing the short Launch Guide:
 
 ## Short Launch Guide
 
-Print this exact guide when the user explicitly requests the Launch Guide:
+Print this exact guide on the first assistant response, and also when the user explicitly requests the Launch Guide:
 
 ```text
 [Launch Guide]

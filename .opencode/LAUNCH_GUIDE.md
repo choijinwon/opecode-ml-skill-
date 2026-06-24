@@ -1,10 +1,13 @@
 # OpenCode Launch Guide
 
-이 문서는 `.opencode` 패키지를 받은 사용자의 OpenCode 시작 화면 문구를 정의합니다.
+이 문서는 `.opencode` 패키지를 받은 사용자의 OpenCode 시작 화면과 첫 채팅 응답 문구를 정의합니다.
 
 ## 실행 화면용 짧은 안내
 
-OpenCode 기본 로고 자체는 OpenCode 내장 화면이라 `.opencode` 설정으로 교체하지 않습니다. 대신 `.opencode/bin/opencode` launcher를 PATH에 등록하면 `opencode .` 실행 직전에 아래 짧은 안내를 처음 한 번만 보여줍니다.
+OpenCode 기본 로고 자체는 OpenCode 내장 화면이라 `.opencode` 설정으로 교체하지 않습니다. 대신 두 방식으로 아래 짧은 안내를 제공합니다.
+
+1. `.opencode/bin/opencode` launcher를 PATH에 등록하면 `opencode .` 실행 직전에 처음 한 번 표시합니다.
+2. `opencode .`로 채팅에 진입한 뒤 첫 사용자 메시지를 보내면, 메시지가 `하이`, `안녕`, `아무거나`여도 첫 assistant 응답에서 먼저 표시합니다.
 
 ```text
 [Launch Guide]
@@ -23,7 +26,23 @@ OpenCode 기본 로고 자체는 OpenCode 내장 화면이라 `.opencode` 설정
 보안 규칙: API key, password, token 값은 출력하지 않고 서버 배포 시 Secret/환경변수를 사용합니다.
 ```
 
-다시 보고 싶으면 `opencode --reset-launch` 또는 `./.opencode/start --reset-launch`로 초기화한 뒤 다시 실행합니다.
+다시 보고 싶으면 `opencode --reset-launch`, `./.opencode/start --reset-launch`, 또는 OpenCode 안에서 `/launch`를 사용합니다.
+
+## 첫 채팅 응답 규칙
+
+`.opencode/opencode.json`은 `default_agent`를 `launch`로 지정한다. `launch` agent는 현재 채팅 세션의 첫 assistant 응답에서 사용자 입력과 무관하게 짧은 Launch Guide를 먼저 출력한다.
+
+```text
+사용자: 하이
+assistant: [Launch Guide] ... 무엇부터 볼까요?
+```
+
+```text
+사용자: sklearn 샘플 생성해줘
+assistant: [Launch Guide] ... 이어서 sklearn 샘플 생성을 진행합니다.
+```
+
+두 번째 메시지부터는 반복 출력하지 않는다. 다시 보려면 `/launch`를 입력한다.
 
 ## 권장 실행 방식
 
