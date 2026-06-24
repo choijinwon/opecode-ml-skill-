@@ -81,17 +81,17 @@ next_action: 발견된 프로젝트로 Step 2 환경 검증 후 Step 3 실행
 사용자가 선택할 수 있는 샘플은 아래 3개다.
 
 ```text
-1. weather
-   source: .opencode/samples/offline_weather_agent
-   purpose: 기본 폴더 구조 기반 날씨 에이전트, Prompt/Trace/Session/Judge/Dataset 구조 확인
+1. sklearn
+   source: .opencode/samples/sklearn_sample
+   purpose: 폐쇄망 sklearn 모델 프로젝트 기본 구조
 
-2. legal
-   source: .opencode/samples/legal_agent_mlflow_aistudio
-   purpose: 국가법령정보 API, 법률 질의응답, GenAI/MLflow/AI Studio endpoint 연결
+2. pytorch
+   source: .opencode/samples/pytorch_sample
+   purpose: 폐쇄망 PyTorch 모델 프로젝트 기본 구조
 
-3. design
-   source: .opencode/samples/design_agent_mlflow_aistudio
-   purpose: 소스 분석 기반 디자인 가이드 생성, GenAI/MLflow/AI Studio endpoint 연결
+3. tensorflow
+   source: .opencode/samples/tensorflow_sample
+   purpose: 폐쇄망 TensorFlow/Keras 모델 프로젝트 기본 구조
 ```
 
 이 3개 외의 샘플은 임의로 선택하지 않는다.
@@ -104,7 +104,7 @@ local_serving/
 save_model/
 ```
 
-아래 폴더는 사용자가 폐쇄망 모델을 직접 넣는 기본 슬롯이다. 내용이 비어 있으면 선택형 루트 복사 대상으로 사용하지 않는다.
+아래 폴더는 사용자가 폐쇄망 모델을 직접 넣는 기본 슬롯이며, 워크스페이스에 모델이 없을 때 선택형 루트 복사 대상으로 사용한다.
 
 ```text
 sklearn_sample/
@@ -162,9 +162,9 @@ save_model/
 복사는 `agent-mlflow-skill-sample-bootstrap` 스킬과 아래 스크립트를 기준으로 한다.
 
 ```text
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample weather --execute
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample legal --execute
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample design --execute
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample sklearn --execute
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample pytorch --execute
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample tensorflow --execute
 ```
 
 샘플 선택 결과에는 반드시 다음을 포함한다.

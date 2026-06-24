@@ -51,15 +51,15 @@ python .opencode/scripts/bootstrap_sample_project.py --list
 복사 전 확인:
 
 ```text
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample weather
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample legal
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample design
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample sklearn
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample pytorch
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample tensorflow
 ```
 
 실제 루트 복사:
 
 ```text
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample weather --execute
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample sklearn --execute
 ```
 
 복사 대상은 소스 구조 중심이며 `.venv/`, `__pycache__/`, `model/`, `saved_model/`, `artifacts/ai_studio/`, `mlruns/`, `mlartifacts/`, `mlflow.db` 같은 생성 산출물은 제외한다.
@@ -69,7 +69,7 @@ python .opencode/scripts/bootstrap_sample_project.py --project <model-project-fo
 기존 파일이 있을 때 덮어쓰기는 사용자가 명시적으로 요청한 경우에만 사용한다.
 
 ```text
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample weather --execute --force
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample sklearn --execute --force
 ```
 
 ### check_environment.py
@@ -111,12 +111,12 @@ python .opencode/scripts/run_training.py --project <model-project-folder>
 python .opencode/scripts/run_training.py --project <model-project-folder> --execute
 ```
 
-GenAI/MLflow/AI Studio 선택 샘플:
+폐쇄망 모델 선택 샘플:
 
 ```text
-weather
-legal
-design
+sklearn
+pytorch
+tensorflow
 ```
 
 다른 샘플은 임의로 선택하지 않는다.
@@ -126,7 +126,7 @@ design
 선택형 샘플 자체를 테스트한다.
 
 ```text
-python .opencode/scripts/test_local_sample.py --sample weather
+python .opencode/scripts/test_local_sample.py --sample sklearn
 python .opencode/scripts/test_local_sample.py --sample all
 ```
 

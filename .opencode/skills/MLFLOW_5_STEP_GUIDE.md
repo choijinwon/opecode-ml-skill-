@@ -42,14 +42,14 @@ ML 개발자가 챗봇을 통해 다음 작업을 순서대로 수행할 수 있
 사용자 선택 샘플은 아래 3개만 사용한다.
 
 ```text
-1. weather - .opencode/samples/offline_weather_agent
-2. legal   - .opencode/samples/legal_agent_mlflow_aistudio
-3. design  - .opencode/samples/design_agent_mlflow_aistudio
+1. sklearn    - .opencode/samples/sklearn_sample
+2. pytorch    - .opencode/samples/pytorch_sample
+3. tensorflow - .opencode/samples/tensorflow_sample
 ```
 
 다른 샘플은 임의로 선택하지 않는다. 선택형 샘플은 `aiu_custom/`, `local_serving/`, `save_model/` 기본 폴더가 원본에 있어야 한다.
 
-아래 폴더는 폐쇄망에서 사용자가 직접 모델 코드와 데이터를 넣는 기본 모델 슬롯이다. 기본 자동 복사 대상이 아니다.
+아래 폴더는 폐쇄망에서 사용자가 직접 모델 코드와 데이터를 넣는 기본 모델 슬롯이며, 워크스페이스에 모델이 없을 때 선택해서 루트로 복사한다.
 
 ```text
 sklearn_sample/
@@ -108,7 +108,7 @@ missing
 
 ```text
 Step 0  Sample Bootstrap
-        프로젝트가 비어 있고 모델이 없으면 사용자에게 weather/legal/design 중 하나를 선택하게 한다.
+        프로젝트가 비어 있고 모델이 없으면 사용자에게 sklearn/pytorch/tensorflow 중 하나를 선택하게 한다.
         선택한 샘플을 프로젝트 루트로 복사한다.
 
 Step 1  Project Analyze
@@ -221,9 +221,9 @@ next_action: Step 2 환경 검증
 선택지:
 
 ```text
-1. weather - .opencode/samples/offline_weather_agent
-2. legal   - .opencode/samples/legal_agent_mlflow_aistudio
-3. design  - .opencode/samples/design_agent_mlflow_aistudio
+1. sklearn    - .opencode/samples/sklearn_sample
+2. pytorch    - .opencode/samples/pytorch_sample
+3. tensorflow - .opencode/samples/tensorflow_sample
 ```
 
 프로젝트 루트가 비어 있으면 선택한 샘플을 루트로 복사한다. 프로젝트 루트에 기존 파일이 있으면 기본적으로 복사를 중단하고 사용자 확인을 받는다.
@@ -232,9 +232,9 @@ next_action: Step 2 환경 검증
 
 ```text
 model_found: false
-sample_options: weather, legal, design
-selected_sample: weather
-sample_source_path: .opencode/samples/offline_weather_agent
+sample_options: sklearn, pytorch, tensorflow
+selected_sample: sklearn
+sample_source_path: .opencode/samples/sklearn_sample
 target_project_root: <model-project-folder>
 copy_mode: root
 next_action: Step 2 환경 검증 후 Step 3 모델 생성
@@ -363,7 +363,7 @@ model_found: true
 
 ```text
 model_found: false
-selected_sample: weather | legal | design
+selected_sample: sklearn | pytorch | tensorflow
 ```
 
 동작:
@@ -555,7 +555,7 @@ Step 5  MLflow Run/Model 기록 확인
 
 - 사용자가 지정한 모델 프로젝트 폴더를 먼저 분석한다.
 - 모델이 있으면 샘플을 사용하지 않는다.
-- 모델이 없고 프로젝트 루트가 비어 있을 때만 weather, legal, design 중 하나를 사용자가 선택한다.
+- 모델이 없고 프로젝트 루트가 비어 있을 때만 sklearn, pytorch, tensorflow 중 하나를 사용자가 선택한다.
 - 선택형 샘플 외 다른 샘플은 임의 선택하지 않는다.
 - `offline_weather_agent_core/`, `registry/`는 필수 폴더가 아니다.
 - `ai_studio.env` 값은 출력하지 않는다.

@@ -52,7 +52,7 @@ MLflow Tracking / Model Registry
   -> 기존 프로젝트를 분석해서 실행한다.
 
 모델 프로젝트 폴더에 모델이 없으면
-  -> 사용자가 선택형 샘플 3개 중 하나를 선택한다.
+  -> 사용자가 sklearn/pytorch/tensorflow 샘플 3개 중 하나를 선택한다.
   -> 비어 있는 프로젝트 루트에 샘플을 복사한다.
   -> 모델을 생성하고 테스트한다.
 ```
@@ -60,14 +60,14 @@ MLflow Tracking / Model Registry
 선택형 샘플은 아래 3개만 허용한다.
 
 ```text
-weather -> .opencode/samples/offline_weather_agent
-legal   -> .opencode/samples/legal_agent_mlflow_aistudio
-design  -> .opencode/samples/design_agent_mlflow_aistudio
+sklearn    -> .opencode/samples/sklearn_sample
+pytorch    -> .opencode/samples/pytorch_sample
+tensorflow -> .opencode/samples/tensorflow_sample
 ```
 
 다른 샘플은 임의로 선택하지 않는다.
 
-아래 폴더는 사용자가 폐쇄망에서 직접 모델 코드와 데이터를 넣는 기본 슬롯이며, 기본 자동 복사 대상이 아니다.
+아래 폴더는 사용자가 폐쇄망에서 직접 모델 코드와 데이터를 넣는 기본 슬롯이며, 워크스페이스에 모델이 없을 때 선택해서 루트로 복사한다.
 
 ```text
 sklearn_sample/
@@ -187,7 +187,7 @@ Step 1 Project Analyze
   |
   |-- model_found=false
         -> bootstrap_sample_project.py
-        -> weather / legal / design 중 사용자 선택
+        -> sklearn / pytorch / tensorflow 중 사용자 선택
         -> 비어 있는 프로젝트 루트로 복사
 
 Step 2 Environment Check
@@ -235,7 +235,7 @@ Step 1 구조 분석
   +-- 모델 없음
         |
         v
-      weather / legal / design 사용자 선택
+      sklearn / pytorch / tensorflow 사용자 선택
         |
         v
       <model-project-folder>/ 루트로 샘플 복사

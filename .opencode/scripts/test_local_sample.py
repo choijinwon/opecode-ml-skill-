@@ -10,9 +10,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLES_DIR = ROOT / "samples"
 SAMPLE_PATHS = {
-    "weather": "offline_weather_agent",
-    "legal": "legal_agent_mlflow_aistudio",
-    "design": "design_agent_mlflow_aistudio",
+    "sklearn": "sklearn_sample",
+    "pytorch": "pytorch_sample",
+    "tensorflow": "tensorflow_sample",
 }
 DEFAULT_SAMPLES = list(SAMPLE_PATHS)
 

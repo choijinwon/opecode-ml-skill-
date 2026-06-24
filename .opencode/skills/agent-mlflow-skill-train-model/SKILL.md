@@ -84,7 +84,7 @@ metadata:
 ### Required Behavior
 
 ```text
-1. selected_sample 값을 확인한다. 허용값은 weather, legal, design이다.
+1. selected_sample 값을 확인한다. 허용값은 sklearn, pytorch, tensorflow이다.
 2. target_project_root를 확인한다.
 3. 루트에 aiu_custom/, local_serving/, save_model/이 있는지 확인한다.
 4. requirements/config/input_example을 확인한다.
@@ -100,9 +100,9 @@ metadata:
 선택형 샘플은 아래 3개다.
 
 ```text
-weather -> .opencode/samples/offline_weather_agent
-legal   -> .opencode/samples/legal_agent_mlflow_aistudio
-design  -> .opencode/samples/design_agent_mlflow_aistudio
+sklearn    -> .opencode/samples/sklearn_sample
+pytorch    -> .opencode/samples/pytorch_sample
+tensorflow -> .opencode/samples/tensorflow_sample
 ```
 
 선택형 샘플이 루트에 복사되지 않았으면 이 단계에서 임의로 복사하지 않는다. `sample_bootstrap_required`로 분류하고 Step 0으로 돌아가 사용자의 샘플 선택을 받는다.

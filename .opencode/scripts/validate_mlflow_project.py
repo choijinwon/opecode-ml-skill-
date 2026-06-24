@@ -14,7 +14,7 @@ SAMPLES_DIR = ROOT / "samples"
 
 # When no project path is provided, selectable sample projects are inspected in
 # this order. They match the bootstrap choices exposed to users.
-SAMPLE_PRIORITY = ["offline_weather_agent", "legal_agent_mlflow_aistudio", "design_agent_mlflow_aistudio"]
+SAMPLE_PRIORITY = ["sklearn_sample", "pytorch_sample", "tensorflow_sample"]
 
 # The skill pack does not require a fixed file name. These common names are
 # used only as hints when detecting a registration or inference entrypoint.
@@ -149,6 +149,8 @@ def score_project(path: Path) -> int:
     if any((path / name).exists() for name in CONFIG_NAMES):
         score += 2
     if any((path / name).exists() for name in INPUT_EXAMPLE_NAMES):
+        score += 2
+    if all((path / name).is_dir() for name in REQUIRED_DIRS):
         score += 2
     return score
 

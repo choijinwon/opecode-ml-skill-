@@ -10,20 +10,20 @@ ROOT = Path(__file__).resolve().parents[1]
 SAMPLES_DIR = ROOT / "samples"
 
 SAMPLES = {
-    "weather": {
-        "path": "offline_weather_agent",
-        "label": "날씨 에이전트",
-        "description": "기본 폴더 구조 기반 날씨 에이전트, Prompt/Trace/Session/Judge/Dataset 구조 확인용",
+    "sklearn": {
+        "path": "sklearn_sample",
+        "label": "sklearn 모델",
+        "description": "폐쇄망에서 사용자가 sklearn 모델 코드와 데이터를 넣는 기본 샘플",
     },
-    "legal": {
-        "path": "legal_agent_mlflow_aistudio",
-        "label": "법률 에이전트",
-        "description": "국가법령정보 API, GenAI, MLflow, AI Studio endpoint 연결 구조 확인용",
+    "pytorch": {
+        "path": "pytorch_sample",
+        "label": "PyTorch 모델",
+        "description": "폐쇄망에서 사용자가 PyTorch 모델 코드와 데이터를 넣는 기본 샘플",
     },
-    "design": {
-        "path": "design_agent_mlflow_aistudio",
-        "label": "디자인 에이전트",
-        "description": "소스 분석 기반 디자인 가이드 생성, GenAI, MLflow, AI Studio endpoint 연결 구조 확인용",
+    "tensorflow": {
+        "path": "tensorflow_sample",
+        "label": "TensorFlow/Keras 모델",
+        "description": "폐쇄망에서 사용자가 TensorFlow/Keras 모델 코드와 데이터를 넣는 기본 샘플",
     },
 }
 
@@ -156,8 +156,9 @@ def copy_sample(sample: Path, project: Path, force: bool, execute: bool) -> tupl
 
 def build_next_steps(sample_key: str) -> list[str]:
     return [
+        "선택한 샘플 루트에 사용자 모델 코드, 데이터, requirements.txt, run_model.py를 추가한다.",
         "ai_studio.env 또는 config/ai_studio.env.example을 기준으로 MLflow/AI Studio 접속값을 설정한다.",
-        "python run_model.py --prepare-only 로 모델 저장 구조를 확인한다.",
+        "run_model.py를 추가한 뒤 python run_model.py --prepare-only 로 모델 저장 구조를 확인한다.",
         "python run_model.py 로 save_model/ 또는 MLflow artifact 생성 여부를 확인한다.",
         "local_serving/ 또는 aiu_custom/predict.py 기준으로 추론 테스트를 수행한다.",
         "MLflow UI에서 traces, chat-sessions, prompts, judges, datasets 기록을 확인한다.",
@@ -166,9 +167,9 @@ def build_next_steps(sample_key: str) -> list[str]:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Bootstrap one bundled GenAI/MLflow/AI Studio sample into an empty project root.")
+    parser = argparse.ArgumentParser(description="Bootstrap one bundled offline model sample into an empty project root.")
     parser.add_argument("--project", default=".", help="target project root")
-    parser.add_argument("--sample", choices=sorted(SAMPLES), help="sample key: weather, legal, design")
+    parser.add_argument("--sample", choices=sorted(SAMPLES), help="sample key: sklearn, pytorch, tensorflow")
     parser.add_argument("--list", action="store_true", help="list selectable samples")
     parser.add_argument("--execute", action="store_true", help="copy files into the project root")
     parser.add_argument("--force", action="store_true", help="allow overwriting existing files")

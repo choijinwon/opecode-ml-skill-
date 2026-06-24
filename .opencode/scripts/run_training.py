@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLES_DIR = ROOT / "samples"
-SAMPLE_OPTIONS = ["weather", "legal", "design"]
+SAMPLE_OPTIONS = ["sklearn", "pytorch", "tensorflow"]
 ENTRYPOINTS = ["train.py", "run_model.py", "scripts/train.py"]
 REQUIRED_DIRS = ["aiu_custom", "local_serving", "save_model"]
 ARTIFACT_DIRS = ["save_model", "model", "artifacts", "saved_model"]
@@ -129,8 +129,8 @@ def main():
 
     if not model_found:
         failures.append("model_not_found")
-        failures.append("sample_bootstrap_required: choose one of weather, legal, design and copy it to the project root first")
-        next_steps.append("python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample weather --execute")
+        failures.append("sample_bootstrap_required: choose one of sklearn, pytorch, tensorflow and copy it to the project root first")
+        next_steps.append("python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample sklearn --execute")
 
     entrypoint = find_entrypoint(work_path)
     if entrypoint is None:

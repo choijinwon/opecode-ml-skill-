@@ -35,7 +35,7 @@ mlflow_register_model_name=""
 ```
 
 ```text
-모델이 없으면 weather, legal, design 샘플 중 하나를 선택해서 프로젝트 루트로 가져와줘.
+모델이 없으면 sklearn, pytorch, tensorflow 샘플 중 하나를 선택해서 프로젝트 루트로 가져와줘.
 ```
 
 ## 5단계 흐름
@@ -53,6 +53,6 @@ Step 5 MLflow Verify
 - API key, password, token 값은 출력하지 않습니다.
 - `mlflow_tracking_password`는 값이 아니라 `set`, `empty`, `missing` 상태만 확인합니다.
 - 모델 프로젝트에 모델이 있으면 샘플을 사용하지 않습니다.
-- 모델이 없고 프로젝트 루트가 비어 있을 때만 `weather`, `legal`, `design` 중 하나를 사용자가 선택해 루트로 복사합니다.
+- 모델이 없고 프로젝트 루트가 비어 있을 때만 `sklearn`, `pytorch`, `tensorflow` 중 하나를 사용자가 선택해 루트로 복사합니다.
 - `sklearn_sample/`, `pytorch_sample/`, `tensorflow_sample/`은 폐쇄망에서 사용자가 직접 모델을 넣는 기본 폴더입니다.
 - 외부 다운로드나 원격 등록은 사용자가 명확히 요청한 경우에만 수행합니다.

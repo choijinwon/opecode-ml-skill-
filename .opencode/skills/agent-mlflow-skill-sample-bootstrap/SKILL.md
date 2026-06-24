@@ -15,24 +15,24 @@ metadata:
 
 - 사용자가 "현재 프로젝트에 아무것도 없다", "샘플을 루트로 가져오고 싶다", "샘플 3개 중 선택해서 시작하고 싶다"고 요청할 때
 - 모델 프로젝트 폴더에 `.opencode`만 있고 실제 모델 코드가 없을 때
-- GenAI, MLflow, AI Studio endpoint 연동 샘플을 빠르게 프로젝트 루트에 구성해야 할 때
+- 폐쇄망 기본 모델 샘플을 빠르게 프로젝트 루트에 구성해야 할 때
 
 ## Selectable Samples
 
 사용자에게 아래 3개 중 하나를 선택하게 한다.
 
 ```text
-1. weather
-   샘플 폴더: .opencode/samples/offline_weather_agent
-   목적: 기본 폴더 구조 기반 날씨 에이전트, Prompt/Trace/Session/Judge/Dataset 구조 확인
+1. sklearn
+   샘플 폴더: .opencode/samples/sklearn_sample
+   목적: 폐쇄망 sklearn 모델 프로젝트 기본 구조
 
-2. legal
-   샘플 폴더: .opencode/samples/legal_agent_mlflow_aistudio
-   목적: 국가법령정보 API, 법률 질의응답, GenAI/MLflow/AI Studio endpoint 연결
+2. pytorch
+   샘플 폴더: .opencode/samples/pytorch_sample
+   목적: 폐쇄망 PyTorch 모델 프로젝트 기본 구조
 
-3. design
-   샘플 폴더: .opencode/samples/design_agent_mlflow_aistudio
-   목적: 소스 분석 기반 디자인 가이드 생성, GenAI/MLflow/AI Studio endpoint 연결
+3. tensorflow
+   샘플 폴더: .opencode/samples/tensorflow_sample
+   목적: 폐쇄망 TensorFlow/Keras 모델 프로젝트 기본 구조
 ```
 
 ## Empty Project Rule
@@ -106,21 +106,21 @@ python .opencode/scripts/bootstrap_sample_project.py --list
 복사 전 dry-run:
 
 ```text
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample weather
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample legal
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample design
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample sklearn
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample pytorch
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample tensorflow
 ```
 
 실제 루트 복사:
 
 ```text
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample weather --execute
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample sklearn --execute
 ```
 
 기존 파일이 있는데 사용자가 명시적으로 덮어쓰기를 요청한 경우:
 
 ```text
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample weather --execute --force
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample sklearn --execute --force
 ```
 
 ## Required Response
@@ -130,9 +130,9 @@ python .opencode/scripts/bootstrap_sample_project.py --project <model-project-fo
 ```text
 현재 모델 프로젝트가 비어 있습니다. 아래 샘플 중 하나를 선택할 수 있습니다.
 
-1. weather - 날씨 에이전트
-2. legal - 법률 에이전트
-3. design - 디자인 에이전트
+1. sklearn - sklearn 모델
+2. pytorch - PyTorch 모델
+3. tensorflow - TensorFlow/Keras 모델
 
 원하는 샘플 번호 또는 이름을 알려주세요.
 ```

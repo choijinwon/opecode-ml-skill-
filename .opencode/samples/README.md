@@ -25,21 +25,21 @@
 
 ```text
 python .opencode/scripts/bootstrap_sample_project.py --list
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample weather --execute
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample legal --execute
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample design --execute
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample sklearn --execute
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample pytorch --execute
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample tensorflow --execute
 ```
 
 루트 복사 대상으로 쓰는 샘플은 `aiu_custom/`, `local_serving/`, `save_model/` 기본 폴더를 가지고 있어야 한다.
 
-`sklearn_sample/`, `pytorch_sample/`, `tensorflow_sample/`은 사용자가 폐쇄망에서 직접 모델 코드와 데이터를 넣기 위한 기본 폴더다. 기본 자동 복사 대상은 아니며, 사용자가 내용을 채운 뒤 명시적으로 점검 대상으로 지정한다.
+`sklearn_sample/`, `pytorch_sample/`, `tensorflow_sample/`은 사용자가 폐쇄망에서 직접 모델 코드와 데이터를 넣기 위한 기본 폴더다. 사용자 워크스페이스에 모델이 없으면 이 3개 중 하나를 선택해 프로젝트 루트로 복사한다.
 
 배포 전 로컬 환경 테스트:
 
 - 전체 샘플 테스트: `python .opencode/scripts/test_local_sample.py --sample all --python /path/to/python3.12`
-- 특정 샘플 테스트: `python .opencode/scripts/test_local_sample.py --sample weather --python /path/to/python3.12`
-- 의존성 재설치 없이 재검증: `python .opencode/scripts/test_local_sample.py --sample legal --skip-install --python /path/to/python3.12`
-- 가상환경 재생성: `python .opencode/scripts/test_local_sample.py --sample design --rebuild-venv --python /path/to/python3.12`
+- 특정 샘플 테스트: `python .opencode/scripts/test_local_sample.py --sample sklearn --python /path/to/python3.12`
+- 의존성 재설치 없이 재검증: `python .opencode/scripts/test_local_sample.py --sample pytorch --skip-install --python /path/to/python3.12`
+- 가상환경 재생성: `python .opencode/scripts/test_local_sample.py --sample tensorflow --rebuild-venv --python /path/to/python3.12`
 
 테스트 스크립트의 내부 동작:
 
@@ -56,9 +56,9 @@ python .opencode/scripts/bootstrap_sample_project.py --project <model-project-fo
 스킬 기준 검증:
 
 - 자동 후보 선택: `python .opencode/scripts/validate_mlflow_project.py`
-- 특정 샘플 검증: `python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/offline_weather_agent`
-- JSON 출력: `python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/offline_weather_agent --json`
-- 쓰기 권한 확인 제외: `python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/offline_weather_agent --no-write-check`
+- 특정 샘플 검증: `python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/sklearn_sample`
+- JSON 출력: `python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/sklearn_sample --json`
+- 쓰기 권한 확인 제외: `python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/sklearn_sample --no-write-check`
 
 Python 버전 조건:
 
