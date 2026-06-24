@@ -8,6 +8,7 @@ __pycache__/
 .opencode/scripts/__pycache__/
 .opencode/.launch_seen
 .opencode/.welcome_guide_seen
+.opencode/welcome-guide.log
 .opencode/samples/*/.venv/
 .opencode/samples/*/__pycache__/
 .opencode/samples/*/**/__pycache__/
