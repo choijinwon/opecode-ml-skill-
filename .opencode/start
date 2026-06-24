@@ -24,4 +24,4 @@ if [[ -f "$GUIDE_FILE" && ! -f "$SEEN_FILE" ]]; then
   touch "$SEEN_FILE"
 fi
 
-exec opencode "$PROJECT_DIR" "$@"
+exec "${OPENCODE_REAL_BIN:-opencode}" "$PROJECT_DIR" "$@"

@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+WRAPPER_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/opencode"
+PROJECT_DIR="$PWD"
+
+find_project_dir() {
+  local dir="$PWD"
+  while [[ "$dir" != "/" ]]; do
+    if [[ -f "$dir/.opencode/LAUNCH_GUIDE.md" ]]; then
+      printf '%s\n' "$dir"
+      return 0
+    fi
+    dir="$(dirname "$dir")"
+  done
+  return 1
+}
+
+find_real_opencode() {
+  local candidate
+  while IFS= read -r candidate; do
+    if [[ "$candidate" != "$WRAPPER_PATH" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done < <(which -a opencode 2>/dev/null || true)
+  return 1
+}
+
+REAL_OPENCODE="${OPENCODE_REAL_BIN:-}"
+if [[ -z "$REAL_OPENCODE" ]]; then
+  REAL_OPENCODE="$(find_real_opencode || true)"
+fi
+
+if [[ -z "$REAL_OPENCODE" ]]; then
+  printf 'error: real opencode binary was not found in PATH.\n' >&2
+  exit 127
+fi
+
+if PROJECT_DIR="$(find_project_dir)"; then
+  GUIDE_FILE="$PROJECT_DIR/.opencode/LAUNCH_GUIDE.md"
+  SEEN_FILE="$PROJECT_DIR/.opencode/.launch_seen"
+  TUI_SEEN_FILE="$PROJECT_DIR/.opencode/.welcome_guide_seen"
+
+  if [[ "${1:-}" == "--reset-launch" ]]; then
+    rm -f "$SEEN_FILE" "$TUI_SEEN_FILE"
+    shift
+  fi
+
+  if [[ -f "$GUIDE_FILE" && ! -f "$SEEN_FILE" ]]; then
+    clear || true
+    printf '\n'
+    sed -n '/^\[Launch Guide\]/,/^```$/p' "$GUIDE_FILE" | sed '1d;$d'
+    printf '\n'
+    printf '이 안내는 이 프로젝트에서 한 번만 표시됩니다. 다시 보려면 opencode --reset-launch 를 실행하세요.\n'
+    printf '계속하려면 Enter를 누르세요. 종료하려면 Ctrl+C를 누르세요.\n'
+    read -r _
+    touch "$SEEN_FILE"
+  fi
+
+  if [[ "$#" -eq 0 ]]; then
+    exec "$REAL_OPENCODE" "$PROJECT_DIR"
+  fi
+fi
+
+exec "$REAL_OPENCODE" "$@"

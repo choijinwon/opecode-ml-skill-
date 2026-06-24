@@ -4,7 +4,7 @@
 
 ## 실행 화면용 짧은 가이드
 
-OpenCode TUI plugin이 실행 화면에서 아래 짧은 가이드를 처음 한 번만 보여줍니다. 빌드/테스트/모델 등록 중에는 자동 출력하지 않습니다.
+OpenCode 기본 로고 자체는 OpenCode 내장 화면이라 `.opencode` 설정으로 교체하지 않습니다. 대신 `.opencode/bin/opencode` launcher를 PATH에 등록하면 `opencode .` 실행 직전에 아래 짧은 가이드를 처음 한 번만 보여줍니다.
 
 ```text
 [Launch Guide]
@@ -29,13 +29,18 @@ OpenCode TUI plugin이 실행 화면에서 아래 짧은 가이드를 처음 한
 
 ## 권장 실행 방식
 
-기본 실행 방식은 저장소 루트에서 OpenCode를 그대로 실행하는 것입니다.
+권장 실행 방식은 shell launcher를 설치한 뒤 저장소 루트에서 OpenCode를 그대로 실행하는 것입니다.
+
+```bash
+./.opencode/install-shell-launcher.sh
+source ~/.zshrc
+```
 
 ```bash
 opencode .
 ```
 
-이 방식은 Launch Guide를 자동 출력하지 않습니다.
+이 방식은 Launch Guide를 최초 1회 출력한 뒤 OpenCode를 실행합니다.
 
 TUI plugin을 사용할 수 없는 환경에서 OpenCode 실행 직전에 Launch Guide를 한 번만 보고 싶으면 아래 스크립트를 사용합니다.
 

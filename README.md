@@ -61,7 +61,22 @@ cp -R .opencode /path/to/user-project/
 opencode .
 ```
 
-이 방식은 OpenCode TUI plugin이 실행 화면에 Launch Guide를 처음 한 번만 보여줍니다. 빌드/테스트/모델 등록 중에는 출력하지 않습니다. OpenCode 안에서 다시 보고 싶으면 `/launch`를 입력합니다.
+OpenCode 기본 로고 자체는 OpenCode 내장 화면이라 `.opencode` 설정으로 교체하지 않습니다. 대신 `.opencode/bin/opencode` launcher를 PATH에 등록하면 평소처럼 `opencode .`를 입력했을 때 Launch Guide가 터미널에 처음 한 번만 표시된 뒤 OpenCode가 실행됩니다.
+
+launcher 설치:
+
+```bash
+./.opencode/install-shell-launcher.sh
+source ~/.zshrc
+```
+
+다시 보고 싶으면:
+
+```bash
+opencode --reset-launch
+```
+
+OpenCode 안에서 다시 보고 싶으면 `/launch`를 입력합니다.
 
 TUI plugin을 사용할 수 없는 환경에서 OpenCode 실행 직전에 Launch Guide를 한 번만 보여주고 싶으면 `.opencode` 폴더 안의 실행 파일을 사용합니다.
 
