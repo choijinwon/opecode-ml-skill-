@@ -7,6 +7,7 @@
 - `pytorch_sample`
 - `sklearn_sample`
 - `tensorflow_sample`
+- `offline_weather_agent_mlflow313`: MLflow 3.13 기반 로컬/폐쇄망 날씨 에이전트 샘플
 - `legal_agent_mlflow_aistudio`: GenAI + MLflow + AI Studio endpoint 연결용 법률 에이전트 샘플
 - `design_agent_mlflow_aistudio`: GenAI + MLflow + AI Studio endpoint 연결용 디자인 에이전트 샘플
 
@@ -18,6 +19,15 @@
 - `run_model.py`와 `aiu_custom/`은 AI Studio 스타일 pyfunc 등록 흐름 예시를 담는다.
 - 샘플은 사용자가 자신의 프로젝트 구조를 이해하는 참고용이며, 고정 표준을 강제하지 않는다.
 - OpenCode 챗봇 응답에서는 사용자에게 개별 Python 명령 실행을 지시하지 않고, 파일/기능 존재 여부와 보완 기준을 안내한다.
+
+비어 있는 프로젝트 루트에 샘플을 바로 가져오는 경우:
+
+```text
+python .opencode/scripts/bootstrap_sample_project.py --list
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample weather --execute
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample legal --execute
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample design --execute
+```
 
 배포 전 로컬 환경 테스트:
 

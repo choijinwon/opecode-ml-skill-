@@ -9,6 +9,7 @@
 ```text
 Step 1  프로젝트 구조 분석
         validate_mlflow_project.py
+        bootstrap_sample_project.py
 
 Step 2  실행 환경 검증
         check_environment.py
@@ -33,6 +34,40 @@ Step 5  MLflow Run/Model 기록 확인
 ```text
 python .opencode/scripts/validate_mlflow_project.py --project <model-project-folder>
 python .opencode/scripts/validate_mlflow_project.py --project <model-project-folder> --json
+```
+
+### bootstrap_sample_project.py
+
+모델 프로젝트 폴더가 비어 있거나 `.opencode`만 있을 때, 샘플 3개 중 하나를 선택해 프로젝트 루트로 복사한다.
+
+샘플 목록:
+
+```text
+python .opencode/scripts/bootstrap_sample_project.py --list
+```
+
+복사 전 확인:
+
+```text
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample weather
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample legal
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample design
+```
+
+실제 루트 복사:
+
+```text
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample weather --execute
+```
+
+복사 대상은 소스 구조 중심이며 `.venv/`, `__pycache__/`, `model/`, `saved_model/`, `artifacts/ai_studio/`, `mlruns/`, `mlartifacts/`, `mlflow.db` 같은 생성 산출물은 제외한다.
+
+복사 후 `aiu_custom/`, `local_serving/`, `save_model/` 필수 폴더는 항상 루트에 보장한다.
+
+기존 파일이 있을 때 덮어쓰기는 사용자가 명시적으로 요청한 경우에만 사용한다.
+
+```text
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample weather --execute --force
 ```
 
 ### check_environment.py
@@ -64,7 +99,7 @@ python .opencode/scripts/check_environment.py --project <model-project-folder> -
 
 ### run_training.py
 
-기존 모델 프로젝트를 실행하거나, 모델이 없으면 표준 샘플 3개 중 하나를 작업 경로에 준비한다.
+기존 모델 프로젝트를 실행한다. 모델이 없고 샘플을 루트로 가져와야 하면 먼저 `bootstrap_sample_project.py`로 사용자가 선택한 샘플을 복사한다.
 
 기본값은 안전 모드다. 실제 실행은 `--execute`를 명시해야 한다.
 실행 전 `ai_studio.env` 필수 키가 있는지 확인한다.
@@ -74,12 +109,12 @@ python .opencode/scripts/run_training.py --project <model-project-folder>
 python .opencode/scripts/run_training.py --project <model-project-folder> --execute
 ```
 
-표준 샘플 우선순위:
+GenAI/MLflow/AI Studio 선택 샘플:
 
 ```text
-sklearn_sample
-pytorch_sample
-tensorflow_sample
+weather
+legal
+design
 ```
 
 다른 샘플은 임의로 선택하지 않는다.

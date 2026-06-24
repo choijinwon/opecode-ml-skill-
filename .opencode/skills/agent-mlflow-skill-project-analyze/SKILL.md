@@ -17,7 +17,7 @@ metadata:
 - 학습, 추론, MLflow 등록 전에 어떤 파일이 있는지 확인해야 할 때
 - 프로젝트가 sklearn, PyTorch, TensorFlow, HuggingFace, custom pyfunc 중 무엇에 가까운지 판단해야 할 때
 - `aiu_custom`, `local_serving`, `save_model`, `run_model.py`, `input_example.json` 같은 구성 요소가 필요한지 확인해야 할 때
-- 사용자가 지정한 모델 프로젝트 폴더에 모델 프로젝트가 없어서 `.opencode/samples` 아래 샘플 모델을 자동 선택해야 할 때
+- 사용자가 지정한 모델 프로젝트 폴더에 모델 프로젝트가 없어서 `.opencode/samples` 아래 샘플 3개 중 하나를 선택해 루트로 복사해야 할 때
 
 ## Guidance Checks
 
@@ -74,42 +74,91 @@ next_action: 발견된 프로젝트로 Step 2 환경 검증 후 Step 3 실행
 
 ## No Model Found Fallback
 
-사용자가 지정한 모델 프로젝트 폴더에서 학습/추론 가능한 모델 프로젝트를 찾지 못하면 실패로 끝내지 않는다. `.opencode/samples` 아래 샘플 모델 후보를 자동으로 선택해 해당 모델 프로젝트 폴더를 대상으로 모델 생성과 테스트 흐름을 진행할 수 있게 한다.
+사용자가 지정한 모델 프로젝트 폴더에서 학습/추론 가능한 모델 프로젝트를 찾지 못하면 실패로 끝내지 않는다. 프로젝트 루트가 비어 있거나 `.opencode`만 있으면 `.opencode/samples` 아래 샘플 3개 중 하나를 사용자가 선택하게 하고, 선택한 샘플을 프로젝트 루트로 복사해 모델 생성과 테스트 흐름을 진행할 수 있게 한다.
 
-### Standard Sample Priority
+### Selectable Samples
 
-샘플이 여러 개 있으면 아래 순서로 자동 선택한다.
+사용자가 선택할 수 있는 샘플은 아래 3개다.
 
 ```text
-1. sklearn_sample
-2. pytorch_sample
-3. tensorflow_sample
+1. weather
+   source: .opencode/samples/offline_weather_agent_mlflow313
+   purpose: 로컬 Qwen/폐쇄망, MLflow 3.13, Prompt/Trace/Session/Judge/Dataset 구조 확인
+
+2. legal
+   source: .opencode/samples/legal_agent_mlflow_aistudio
+   purpose: 국가법령정보 API, 법률 질의응답, GenAI/MLflow/AI Studio endpoint 연결
+
+3. design
+   source: .opencode/samples/design_agent_mlflow_aistudio
+   purpose: 소스 분석 기반 디자인 가이드 생성, GenAI/MLflow/AI Studio endpoint 연결
 ```
 
-이 3개는 ML 개발자에게 가장 일반적인 학습 흐름을 제공하는 표준 샘플 후보로 본다.
+이 3개 외의 샘플은 임의로 선택하지 않는다.
 
-표준 3개 샘플이 모두 없으면 다른 샘플을 임의로 선택하지 않는다. 이 경우 `sample_not_found`로 분류하고, `sklearn_sample`, `pytorch_sample`, `tensorflow_sample` 중 어떤 샘플을 추가해야 하는지 안내한다.
+### Empty Project Root Rule
+
+프로젝트 루트에 아래 항목만 있으면 비어 있는 프로젝트로 본다.
+
+```text
+.opencode/
+.git/
+.gitignore
+.DS_Store
+```
+
+그 외 파일이나 폴더가 있으면 기존 작업물이 있다고 보고 루트 복사를 중단한다. 사용자가 명시적으로 덮어쓰기를 요청한 경우에만 `--force`를 사용한다.
 
 ### Selected Sample Handling
 
-자동 선택된 샘플은 원본을 직접 덮어쓰지 않는다. 사용자가 지정한 모델 프로젝트 폴더에서 사용할 작업 경로를 따로 정한다.
-
-권장 작업 경로 예시는 다음과 같다.
+선택된 샘플은 원본을 직접 수정하지 않는다. 대상 프로젝트가 비어 있으면 샘플 내용을 사용자가 지정한 모델 프로젝트 루트로 복사한다.
 
 ```text
-<model-project-folder>/work/<selected-sample-name>
+<model-project-folder>/aiu_custom/
+<model-project-folder>/local_serving/
+<model-project-folder>/save_model/
+<model-project-folder>/run_model.py
+<model-project-folder>/requirements.txt
+<model-project-folder>/input_example.json
 ```
 
-이미 같은 경로가 있으면 덮어쓰기 전에 사용자 확인이 필요하다.
+루트 복사에서는 실행에 필요하지 않은 생성 산출물을 제외한다.
 
-자동 선택 결과에는 반드시 다음을 포함한다.
+```text
+model/
+saved_model/
+artifacts/ai_studio/
+.venv/
+__pycache__/
+mlruns/
+mlartifacts/
+mlflow.db
+```
+
+복사 후 아래 필수 폴더는 항상 루트에 있어야 한다. 샘플 원본에 없으면 빈 폴더로 생성한다.
+
+```text
+aiu_custom/
+local_serving/
+save_model/
+```
+
+복사는 `agent-mlflow-skill-sample-bootstrap` 스킬과 아래 스크립트를 기준으로 한다.
+
+```text
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample weather --execute
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample legal --execute
+python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample design --execute
+```
+
+샘플 선택 결과에는 반드시 다음을 포함한다.
 
 ```text
 model_found: false
 selected_sample
-selection_reason
 sample_source_path
-recommended_workspace_path
+target_project_root
+copy_mode: root
 next_action
 ```
 
@@ -118,8 +167,8 @@ next_action
 - 선택된 프로젝트 경로
 - 모델 프로젝트 발견 여부
 - 모델이 있을 때 발견된 학습/추론/model artifact 경로
-- 모델이 없을 때 자동 선택된 샘플과 선택 근거
-- 샘플 원본 경로와 권장 작업 경로
+- 모델이 없을 때 사용자가 선택할 샘플 3개
+- 선택된 샘플 원본 경로와 루트 복사 대상 경로
 - 발견된 핵심 파일 목록
 - 누락되었거나 확인 필요한 파일 목록
 - framework 후보와 판단 근거
@@ -135,6 +184,6 @@ next_action
 - 이 단계에서는 파일을 수정하지 않는다.
 - 모델 artifact를 이동하거나 복사하지 않는다.
 - 샘플 원본 디렉터리를 직접 덮어쓰지 않는다.
-- 샘플을 사용자가 지정한 모델 프로젝트 폴더 작업 경로로 복사하거나 생성해야 하면 사용자 요청 또는 후속 실행 단계에서 처리한다.
+- 샘플을 루트로 복사해야 하면 사용자 선택을 먼저 받은 뒤 `agent-mlflow-skill-sample-bootstrap` 기준으로 처리한다.
 - credential 값은 출력하지 않는다.
 - framework가 불명확하면 `unknown/custom`으로 둔다.

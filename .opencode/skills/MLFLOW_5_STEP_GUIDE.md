@@ -34,16 +34,17 @@ ML 개발자가 챗봇을 통해 다음 작업을 순서대로 수행할 수 있
   -> 사용자가 지정한 모델 프로젝트 폴더를 분석해서 그대로 실행한다.
 
 모델이 없음
-  -> .opencode/samples 아래 표준 샘플 3개 중 하나를 자동 선택한다.
-  -> 선택한 샘플을 작업 경로에 준비해서 모델을 생성하고 테스트한다.
+  -> 사용자에게 .opencode/samples 아래 샘플 3개 중 하나를 선택하게 한다.
+  -> 현재 프로젝트 루트가 비어 있으면 선택한 샘플을 루트로 복사한다.
+  -> 복사된 샘플로 모델을 생성하고 테스트한다.
 ```
 
-표준 샘플은 아래 3개만 사용한다.
+사용자 선택 샘플은 아래 3개만 사용한다.
 
 ```text
-1. sklearn_sample
-2. pytorch_sample
-3. tensorflow_sample
+1. weather - .opencode/samples/offline_weather_agent_mlflow313
+2. legal   - .opencode/samples/legal_agent_mlflow_aistudio
+3. design  - .opencode/samples/design_agent_mlflow_aistudio
 ```
 
 다른 샘플은 임의로 선택하지 않는다.
@@ -98,10 +99,14 @@ missing
 ## 전체 흐름
 
 ```text
+Step 0  Sample Bootstrap
+        프로젝트가 비어 있고 모델이 없으면 사용자에게 weather/legal/design 중 하나를 선택하게 한다.
+        선택한 샘플을 프로젝트 루트로 복사한다.
+
 Step 1  Project Analyze
         사용자가 지정한 모델 프로젝트 폴더를 분석한다.
         모델이 있으면 기존 프로젝트를 실행 대상으로 정한다.
-        모델이 없으면 표준 샘플 3개 중 하나를 선택한다.
+        모델이 없으면 Step 0 샘플 선택/복사 흐름으로 이동한다.
 
 Step 2  Environment Check
         Python, dependency, MLflow, ai_studio.env 상태를 확인한다.
@@ -203,26 +208,28 @@ next_action: Step 2 환경 검증
 
 ### 모델 없음 판단
 
-모델 프로젝트로 볼 근거가 없으면 표준 샘플을 자동 선택한다.
+모델 프로젝트로 볼 근거가 없으면 사용자에게 샘플 3개 중 하나를 선택하게 한다.
 
-우선순위:
+선택지:
 
 ```text
-1. .opencode/samples/sklearn_sample
-2. .opencode/samples/pytorch_sample
-3. .opencode/samples/tensorflow_sample
+1. weather - .opencode/samples/offline_weather_agent_mlflow313
+2. legal   - .opencode/samples/legal_agent_mlflow_aistudio
+3. design  - .opencode/samples/design_agent_mlflow_aistudio
 ```
 
-3개가 모두 없으면 `sample_not_found`로 분류한다.
+프로젝트 루트가 비어 있으면 선택한 샘플을 루트로 복사한다. 프로젝트 루트에 기존 파일이 있으면 기본적으로 복사를 중단하고 사용자 확인을 받는다.
 
 출력 예:
 
 ```text
 model_found: false
-selected_sample: sklearn_sample
-sample_source_path: .opencode/samples/sklearn_sample
-recommended_workspace_path: <model-project-folder>/work/sklearn_sample
-next_action: Step 3에서 샘플 준비 후 모델 생성
+sample_options: weather, legal, design
+selected_sample: weather
+sample_source_path: .opencode/samples/offline_weather_agent_mlflow313
+target_project_root: <model-project-folder>
+copy_mode: root
+next_action: Step 2 환경 검증 후 Step 3 모델 생성
 ```
 
 ### Step 1 출력
