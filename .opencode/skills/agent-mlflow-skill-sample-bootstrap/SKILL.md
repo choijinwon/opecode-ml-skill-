@@ -16,8 +16,29 @@ metadata:
 - 사용자가 "현재 프로젝트에 아무것도 없다", "샘플을 루트로 가져오고 싶다", "샘플 3개 중 선택해서 시작하고 싶다"고 요청할 때
 - 모델 프로젝트 폴더에 `.opencode`만 있고 실제 모델 코드가 없을 때
 - 폐쇄망 기본 모델 샘플을 빠르게 프로젝트 루트에 구성해야 할 때
+- Project Analyze 결과에서 `model_found: false`가 나온 뒤 사용자가 `sklearn`, `pytorch`, `tensorflow`, `1번`, `2번`, `3번`처럼 선택했을 때
 
 이 스킬은 `agent-mlflow-skill-project-analyze` 결과가 `model_found: false`일 때만 사용한다. 모델 파일이나 실행 entrypoint가 있으면 이 스킬을 실행하지 않는다.
+
+## Natural Language Selection
+
+사용자 선택은 고정 문구가 아니어도 된다. 아래 입력은 모두 선택으로 해석한다.
+
+```text
+1, 1번, 첫 번째, sklearn, 사이킷런
+2, 2번, 두 번째, pytorch, torch, 파이토치
+3, 3번, 세 번째, tensorflow, tf, keras, 텐서플로우, 케라스
+```
+
+선택 매핑:
+
+```text
+1 | 1번 | 첫 번째 | sklearn | 사이킷런 -> sklearn
+2 | 2번 | 두 번째 | pytorch | torch | 파이토치 -> pytorch
+3 | 3번 | 세 번째 | tensorflow | tf | keras | 텐서플로우 | 케라스 -> tensorflow
+```
+
+선택이 모호하면 복사하지 말고 다시 선택을 요청한다.
 
 ## Selectable Samples
 

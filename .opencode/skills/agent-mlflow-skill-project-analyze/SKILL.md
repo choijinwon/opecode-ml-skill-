@@ -40,6 +40,48 @@ metadata:
 - 학습 entrypoint와 추론 entrypoint를 분리해서 표시한다.
 - 누락 항목은 실패로 단정하지 않고 다음 단계에서 확인할 항목으로 분류한다.
 
+## Initial Workspace Guide
+
+사용자가 아래처럼 넓게 요청하면, 바로 샘플 선택부터 묻지 말고 먼저 워크스페이스를 분석한다.
+
+```text
+이 워크스페이스 분석해줘
+현재 프로젝트 봐줘
+MLflow 5단계로 봐줘
+모델 있으면 진행하고 없으면 샘플로 시작해줘
+```
+
+첫 응답 흐름은 아래 순서를 따른다.
+
+```text
+1. 현재 워크스페이스 경로를 확인한다.
+2. 모델 파일, 실행 entrypoint, 필수 폴더를 찾는다.
+3. model_found 값을 먼저 결정한다.
+4. model_found: true이면 기존 모델 기준 가이드를 출력한다.
+5. model_found: false이면 sklearn/pytorch/tensorflow 선택 가이드를 출력한다.
+```
+
+초기 분석 응답은 아래 구조를 사용한다. 문장은 자연스럽게 바꿔도 되지만 순서는 유지한다.
+
+```text
+워크스페이스를 먼저 분석했습니다.
+
+확인 기준:
+- run_model.py, train.py, predict.py
+- aiu_custom/
+- local_serving/
+- save_model/
+- input_example.json
+- MLmodel, python_model.pkl
+- .pkl, .joblib, .pt, .pth, .h5, .keras, .onnx, .safetensors
+
+분석 결과:
+- model_found: true | false
+- 발견 항목:
+- 누락 항목:
+- 다음 단계:
+```
+
 ## Model Found Flow
 
 사용자가 지정한 모델 프로젝트 폴더에서 학습/추론 가능한 모델 프로젝트가 발견되면 샘플을 선택하지 않는다. 발견된 프로젝트를 기준으로 분석 결과를 만들고, 이후 단계에서 해당 프로젝트를 직접 실행한다.
@@ -77,6 +119,20 @@ input_example_path
 next_action: 발견된 프로젝트로 Step 2 환경 검증 후 Step 3 실행
 ```
 
+모델이 발견된 경우 사용자에게 보여줄 가이드는 아래 방향으로 작성한다.
+
+```text
+실행 가능한 모델 구성을 찾았습니다.
+샘플은 사용하지 않고 기존 모델 프로젝트 기준으로 진행합니다.
+
+다음 단계:
+1. ai_studio.env 확인
+2. requirements.txt 또는 pyproject.toml 확인
+3. input_example.json 확인
+4. run_model.py 또는 train.py 실행 가능 여부 확인
+5. MLflow 기록 확인
+```
+
 모델이 발견되면 `.opencode/samples`는 참조하지 않는다.
 
 ## No Model Found Fallback
@@ -98,6 +154,20 @@ next_action: 발견된 프로젝트로 Step 2 환경 검증 후 Step 3 실행
 ```
 
 사용자가 선택하기 전에는 샘플을 복사하지 않는다.
+
+모델이 없는 경우 사용자에게 보여줄 가이드는 아래 방향으로 작성한다.
+
+```text
+실행 가능한 모델 구성을 찾지 못했습니다.
+기본 모델 샘플로 시작할 수 있습니다.
+
+선택 가능:
+1. sklearn
+2. pytorch
+3. tensorflow
+
+원하는 번호나 이름을 알려주면 해당 샘플을 프로젝트 루트로 복사하겠습니다.
+```
 
 ### Selectable Samples
 
