@@ -11,15 +11,15 @@ OpenCode 기본 로고 자체는 OpenCode 내장 화면이라 `.opencode` 설정
 이 프로젝트는 GenAI - MLflow - AI Studio 적용을 돕는 OpenCode 패키지입니다.
 처음 진입하면 워크스페이스를 먼저 분석해 모델 있음/없음을 확인합니다.
 
-모델이 있으면 기존 모델 기준으로 MLflow 5단계를 진행합니다.
-모델이 없으면 sklearn / pytorch / tensorflow 중 하나를 선택해 루트로 복사할 수 있습니다.
+모델이 있으면 본인 모델 경로를 기준으로 MLflow 5단계를 진행합니다.
+모델이 없으면 sklearn / pytorch / tensorflow 중 하나를 선택해 샘플 생성 가이드를 제공합니다.
 
 런치모드는 상태 확인과 방향 안내를 제공합니다.
 실제 복사/모델 생성/환경 검증 실행은 OpenCode 빌드모드에서 선택해주세요.
 
 추천 첫 요청:
 - 이 워크스페이스를 MLflow 5단계 기준으로 분석해줘.
-- 모델이 없으면 sklearn 샘플로 시작해줘.
+- 모델이 없으면 샘플 생성 가이드를 보여줘.
 
 보안 규칙: API key, password, token 값은 출력하지 않고 서버 배포 시 Secret/환경변수를 사용합니다.
 상세 가이드: .opencode/LAUNCH_GUIDE.md
@@ -104,11 +104,11 @@ OPENAI_MODELS="qwen3.6,gpt20,gamma"
 ```
 
 ```text
-모델이 없으면 sklearn 샘플로 시작해줘.
+모델이 없으면 샘플 생성 가이드를 보여줘.
 ```
 
 ```text
-모델이 있으면 기존 모델 기준으로 환경 검증부터 진행해줘.
+모델이 있으면 내 모델 경로 기준으로 환경 검증부터 진행해줘.
 ```
 
 ## 포함된 주요 자료

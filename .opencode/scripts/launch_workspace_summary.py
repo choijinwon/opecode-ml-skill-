@@ -89,13 +89,13 @@ def main() -> int:
 
     print("- 다음 단계:")
     if model_found:
-        print("  - 샘플은 사용하지 않고 기존 모델 기준으로 MLflow 5단계를 진행하세요.")
+        print("  - 샘플은 사용하지 않고 본인 모델 경로 기준으로 MLflow 5단계를 진행하세요.")
         print("  - 실제 분석/환경 검증/모델 실행은 OpenCode 빌드모드에서 선택해주세요.")
-        print("  - 추천 요청: 이 워크스페이스를 MLflow 5단계 기준으로 분석해줘.")
+        print("  - 추천 요청: 내 모델 경로 기준으로 MLflow 5단계 분석해줘.")
     else:
-        print("  - 모델이 없으면 sklearn / pytorch / tensorflow 중 하나를 선택해 루트로 복사할 수 있습니다.")
+        print("  - 모델이 없으면 sklearn / pytorch / tensorflow 샘플 생성 가이드를 제공합니다.")
         print("  - 실제 샘플 복사/모델 생성/검증 실행은 OpenCode 빌드모드에서 선택해주세요.")
-        print("  - 추천 요청: 모델이 없으니 sklearn 샘플로 시작해줘.")
+        print("  - 추천 요청: 모델이 없으니 샘플 생성 가이드를 보여줘.")
 
     return 0
 
