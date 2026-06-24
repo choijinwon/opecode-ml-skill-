@@ -29,7 +29,7 @@ mlflow_register_model_name=""
 가장 권장하는 첫 요청:
 
 ```text
-이 워크스페이스를 먼저 분석해줘. 모델이 있으면 기존 모델 기준으로 진행하고, 모델이 없으면 sklearn/pytorch/tensorflow 중 선택해서 시작할 수 있게 가이드해줘.
+이 워크스페이스를 먼저 분석해줘. 모델이 있으면 기존 모델 기준으로 진행하고, 모델이 없으면 sklearn/pytorch/tensorflow 중 선택해서 생성해줘.
 ```
 
 ```text
