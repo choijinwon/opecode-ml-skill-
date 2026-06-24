@@ -41,7 +41,7 @@ mlflow_register_model_name=""
 ```
 
 ```text
-모델이 없으면 sklearn, pytorch, tensorflow 샘플 중 하나를 선택해서 프로젝트 루트로 가져와줘.
+모델이 없으면 sklearn, pytorch, tensorflow 샘플 중 하나를 선택해서 폴더째 가져와줘.
 ```
 
 ## 5단계 흐름
@@ -60,7 +60,7 @@ Step 5 MLflow Verify
 - `mlflow_tracking_password`는 값이 아니라 `set`, `empty`, `missing` 상태만 확인합니다.
 - 처음에는 샘플 선택부터 묻지 않고 워크스페이스를 먼저 분석합니다.
 - 모델 프로젝트에 모델이 있으면 샘플을 사용하지 않습니다.
-- 모델이 없고 프로젝트 루트가 비어 있을 때만 `sklearn`, `pytorch`, `tensorflow` 중 하나를 사용자가 선택해 루트로 복사합니다.
+- 모델이 없으면 `sklearn`, `pytorch`, `tensorflow` 중 하나를 사용자가 선택해 샘플 폴더째 복사합니다.
 - 모델이 발견되면 샘플 선택 질문을 하지 않고 기존 모델 프로젝트로 진행합니다.
 - `sklearn_sample/`, `pytorch_sample/`, `tensorflow_sample/`은 폐쇄망에서 사용자가 직접 모델을 넣는 기본 폴더입니다.
 - 외부 다운로드나 원격 등록은 사용자가 명확히 요청한 경우에만 수행합니다.

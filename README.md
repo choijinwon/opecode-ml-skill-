@@ -31,7 +31,7 @@
 └── design_agent_mlflow_aistudio/
 ```
 
-`sklearn_sample/`, `pytorch_sample/`, `tensorflow_sample/`은 폐쇄망에서 사용자가 직접 모델 코드와 데이터를 넣기 위한 기본 폴더입니다. 사용자 워크스페이스에 모델이 없으면 이 3개 중 하나를 선택해 루트로 복사합니다.
+`sklearn_sample/`, `pytorch_sample/`, `tensorflow_sample/`은 폐쇄망에서 사용자가 직접 모델 코드와 데이터를 넣기 위한 기본 폴더입니다. 사용자 워크스페이스에 모델이 없으면 이 3개 중 하나를 선택해 폴더째 복사합니다.
 
 상세 요구사항은 [SKILL_REQUIREMENTS.md](SKILL_REQUIREMENTS.md)를 확인하세요.
 구성 분석은 [SKILL_ANALYSIS_REPORT.md](SKILL_ANALYSIS_REPORT.md)를 확인하세요.

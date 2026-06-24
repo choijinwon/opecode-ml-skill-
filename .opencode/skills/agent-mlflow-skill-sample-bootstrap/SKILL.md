@@ -1,6 +1,6 @@
 ---
 name: agent-mlflow-skill-sample-bootstrap
-description: 사용자가 지정한 모델 프로젝트 폴더가 비어 있을 때 OpenCode 샘플 3개 중 하나를 선택하게 하고, 선택한 샘플을 프로젝트 루트로 복사해 GenAI/MLflow/AI Studio 모델 프로젝트를 시작한다.
+description: 사용자가 지정한 워크스페이스에 실행 가능한 모델이 없을 때 OpenCode 샘플 3개 중 하나를 선택하게 하고, 선택한 샘플 폴더를 폴더째 복사해 MLflow 모델 프로젝트를 시작한다.
 license: MIT
 compatibility: opencode
 metadata:
@@ -13,9 +13,9 @@ metadata:
 
 ## When To Use
 
-- 사용자가 "현재 프로젝트에 아무것도 없다", "샘플을 루트로 가져오고 싶다", "샘플 3개 중 선택해서 시작하고 싶다"고 요청할 때
+- 사용자가 "현재 프로젝트에 아무것도 없다", "샘플을 폴더째 가져오고 싶다", "샘플 3개 중 선택해서 시작하고 싶다"고 요청할 때
 - 모델 프로젝트 폴더에 `.opencode`만 있고 실제 모델 코드가 없을 때
-- 폐쇄망 기본 모델 샘플을 빠르게 프로젝트 루트에 구성해야 할 때
+- 폐쇄망 기본 모델 샘플을 빠르게 워크스페이스 아래 별도 폴더로 구성해야 할 때
 - Project Analyze 결과에서 `model_found: false`가 나온 뒤 사용자가 `sklearn`, `pytorch`, `tensorflow`, `1번`, `2번`, `3번`처럼 선택했을 때
 
 이 스킬은 `agent-mlflow-skill-project-analyze` 결과가 `model_found: false`일 때만 사용한다. 모델 파일이나 실행 entrypoint가 있으면 이 스킬을 실행하지 않는다.
@@ -58,9 +58,19 @@ metadata:
    목적: 폐쇄망 TensorFlow/Keras 모델 프로젝트 기본 구조
 ```
 
-## Empty Project Rule
+## Workspace Rule
 
-프로젝트 루트가 아래 항목만 가지고 있으면 비어 있는 프로젝트로 본다.
+기본 복사 방식은 `copy_mode: folder`다. 이 방식은 워크스페이스 루트에 파일을 풀어놓지 않고 선택한 샘플 폴더 자체를 복사한다.
+
+```text
+<workspace-root>/sklearn_sample/
+<workspace-root>/pytorch_sample/
+<workspace-root>/tensorflow_sample/
+```
+
+워크스페이스에 기존 파일이 있어도 대상 샘플 폴더가 없으면 복사할 수 있다. 단, 같은 이름의 샘플 폴더가 이미 있으면 기본적으로 중단한다.
+
+`copy_mode: root`를 명시적으로 사용할 때만 프로젝트 루트가 아래 항목만 가지고 있는지 확인한다.
 
 ```text
 .opencode/
@@ -68,8 +78,6 @@ metadata:
 .gitignore
 .DS_Store
 ```
-
-그 외 파일이나 폴더가 있으면 기존 작업물이 있다고 보고 기본적으로 루트 복사를 중단한다. 덮어쓰기는 사용자가 명시적으로 요청했을 때만 수행한다.
 
 ## Required Sample Folder Rule
 
@@ -81,19 +89,19 @@ local_serving/
 save_model/
 ```
 
-기본 폴더가 없는 샘플은 선택형 루트 복사 대상으로 사용하지 않는다.
+기본 폴더가 없는 샘플은 선택형 폴더 복사 대상으로 사용하지 않는다.
 
 ## Copy Rule
 
-선택한 샘플의 내용을 프로젝트 루트로 복사한다.
+선택한 샘플 폴더를 워크스페이스 아래로 폴더째 복사한다.
 
 ```text
-<project-root>/aiu_custom/
-<project-root>/local_serving/
-<project-root>/save_model/
-<project-root>/run_model.py
-<project-root>/requirements.txt
-<project-root>/input_example.json
+<workspace-root>/<sample-folder>/aiu_custom/
+<workspace-root>/<sample-folder>/local_serving/
+<workspace-root>/<sample-folder>/save_model/
+<workspace-root>/<sample-folder>/run_model.py
+<workspace-root>/<sample-folder>/requirements.txt
+<workspace-root>/<sample-folder>/input_example.json
 ```
 
 복사하지 않는 항목:
@@ -110,7 +118,7 @@ saved_model/
 artifacts/ai_studio/
 ```
 
-복사 후 아래 필수 폴더는 항상 프로젝트 루트에 존재해야 한다. 샘플 원본에 없으면 빈 폴더로 생성한다.
+복사 후 아래 필수 폴더는 항상 복사된 샘플 폴더 안에 존재해야 한다. 샘플 원본에 없으면 빈 폴더로 생성한다.
 
 ```text
 aiu_custom/
@@ -134,7 +142,7 @@ python .opencode/scripts/bootstrap_sample_project.py --project <model-project-fo
 python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample tensorflow
 ```
 
-실제 루트 복사:
+실제 폴더 복사:
 
 ```text
 python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample sklearn --execute
@@ -151,7 +159,7 @@ python .opencode/scripts/bootstrap_sample_project.py --project <model-project-fo
 샘플 복사 전 사용자에게 반드시 아래 형식으로 선택지를 보여준다.
 
 ```text
-현재 모델 프로젝트가 비어 있습니다. 아래 샘플 중 하나를 선택할 수 있습니다.
+현재 워크스페이스에서 실행 가능한 모델을 찾지 못했습니다. 아래 샘플 중 하나를 폴더째 복사할 수 있습니다.
 
 1. sklearn - sklearn 모델
 2. pytorch - PyTorch 모델
@@ -164,14 +172,12 @@ python .opencode/scripts/bootstrap_sample_project.py --project <model-project-fo
 
 ```text
 model_found: false
-project_empty: true
 ```
 
 선택 질문을 출력하지 않는 조건:
 
 ```text
 model_found: true
-project_empty: false
 ```
 
 사용자가 선택하면 아래 정보를 출력한다.
@@ -179,8 +185,8 @@ project_empty: false
 ```text
 selected_sample
 sample_source_path
-target_project_root
-copy_mode: root
+target_project_path
+copy_mode: folder
 ignored_generated_files
 next_action
 ```
@@ -189,7 +195,7 @@ next_action
 
 - 사용자 선택 없이 임의로 샘플을 복사하지 않는다.
 - 모델이 발견된 워크스페이스에서는 샘플 선택을 요청하지 않는다.
-- 프로젝트 루트가 비어 있지 않으면 기본적으로 중단한다.
+- 대상 샘플 폴더가 이미 있으면 기본적으로 중단한다.
 - secret 값은 복사 후에도 출력하지 않는다.
 - `.env`, `ai_studio.env`의 실제 key/password/token 값은 출력하지 않는다.
 - 샘플 원본 폴더는 수정하지 않는다.

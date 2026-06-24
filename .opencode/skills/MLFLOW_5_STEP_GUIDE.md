@@ -35,7 +35,7 @@ ML 개발자가 챗봇을 통해 다음 작업을 순서대로 수행할 수 있
 
 모델이 없음
   -> 사용자에게 .opencode/samples 아래 샘플 3개 중 하나를 선택하게 한다.
-  -> 현재 프로젝트 루트가 비어 있으면 선택한 샘플을 루트로 복사한다.
+  -> 선택한 샘플 폴더를 워크스페이스 아래로 폴더째 복사한다.
   -> 복사된 샘플로 모델을 생성하고 테스트한다.
 ```
 
@@ -48,7 +48,7 @@ ML 개발자가 챗봇을 통해 다음 작업을 순서대로 수행할 수 있
 2. 모델 있음 / 모델 없음 판정
 3. 모델 있음이면 기존 모델 진행 가이드
 4. 모델 없음이면 sklearn/pytorch/tensorflow 선택 가이드
-5. 사용자가 선택하면 루트 복사
+5. 사용자가 선택하면 샘플 폴더째 복사
 ```
 
 사용자 선택 샘플은 아래 3개만 사용한다.
@@ -61,7 +61,7 @@ ML 개발자가 챗봇을 통해 다음 작업을 순서대로 수행할 수 있
 
 다른 샘플은 임의로 선택하지 않는다. 선택형 샘플은 `aiu_custom/`, `local_serving/`, `save_model/` 기본 폴더가 원본에 있어야 한다.
 
-아래 폴더는 폐쇄망에서 사용자가 직접 모델 코드와 데이터를 넣는 기본 모델 슬롯이며, 워크스페이스에 모델이 없을 때 선택해서 루트로 복사한다.
+아래 폴더는 폐쇄망에서 사용자가 직접 모델 코드와 데이터를 넣는 기본 모델 슬롯이며, 워크스페이스에 모델이 없을 때 선택해서 폴더째 복사한다.
 
 ```text
 sklearn_sample/
@@ -120,9 +120,9 @@ missing
 
 ```text
 Step 0  Sample Bootstrap
-        프로젝트가 비어 있고 모델이 없으면 사용자에게 sklearn/pytorch/tensorflow 중 하나를 선택하게 한다.
+        모델이 없으면 사용자에게 sklearn/pytorch/tensorflow 중 하나를 선택하게 한다.
         모델이 있으면 이 단계를 건너뛴다.
-        선택한 샘플을 프로젝트 루트로 복사한다.
+        선택한 샘플 폴더를 워크스페이스 아래로 폴더째 복사한다.
 
 Step 1  Project Analyze
         사용자가 지정한 모델 프로젝트 폴더를 분석한다.
@@ -239,7 +239,7 @@ next_action: Step 2 환경 검증
 3. tensorflow - .opencode/samples/tensorflow_sample
 ```
 
-프로젝트 루트가 비어 있으면 선택한 샘플을 루트로 복사한다. 프로젝트 루트에 기존 파일이 있으면 기본적으로 복사를 중단하고 사용자 확인을 받는다.
+선택한 샘플은 워크스페이스 아래에 샘플 폴더째 복사한다. 워크스페이스에 기존 파일이 있어도 대상 샘플 폴더가 없으면 복사할 수 있으며, 같은 이름의 샘플 폴더가 있으면 기본적으로 중단한다.
 
 출력 예:
 
@@ -248,8 +248,8 @@ model_found: false
 sample_options: sklearn, pytorch, tensorflow
 selected_sample: sklearn
 sample_source_path: .opencode/samples/sklearn_sample
-target_project_root: <model-project-folder>
-copy_mode: root
+target_project_path: <model-project-folder>/sklearn_sample
+copy_mode: folder
 next_action: Step 2 환경 검증 후 Step 3 모델 생성
 ```
 
@@ -383,7 +383,7 @@ selected_sample: sklearn | pytorch | tensorflow
 
 ```text
 1. sample_source_path를 확인한다.
-2. target_project_root가 사용자가 지정한 모델 프로젝트 루트인지 확인한다.
+2. target_project_path가 복사된 샘플 폴더인지 확인한다.
 3. 샘플 원본은 직접 수정하지 않는다.
 4. ai_studio.env 필수 키를 확인한다.
 5. prepare-only 또는 smoke test가 있으면 먼저 실행한다.

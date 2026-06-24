@@ -66,6 +66,8 @@ class BootstrapReport:
     project_path: str
     selected_sample: str | None
     sample_source_path: str | None
+    target_project_path: str | None
+    copy_mode: str
     execute: bool
     project_empty: bool
     copied: list[str] = field(default_factory=list)
@@ -120,43 +122,52 @@ def iter_sample_files(sample: Path):
         yield path
 
 
-def copy_sample(sample: Path, project: Path, force: bool, execute: bool) -> tuple[list[str], list[str]]:
+def copy_sample(sample: Path, project: Path, force: bool, execute: bool, copy_mode: str) -> tuple[Path, list[str], list[str]]:
+    target_root = project / sample.name if copy_mode == "folder" else project
     copied: list[str] = []
     skipped: list[str] = []
 
+    if target_root.exists() and copy_mode == "folder" and not force:
+        raise FileExistsError(f"target_sample_folder_exists:{target_root}")
+    if target_root.exists() and copy_mode == "folder" and force and execute:
+        shutil.rmtree(target_root)
+
     for source in iter_sample_files(sample):
         relative = source.relative_to(sample)
-        target = project / relative
+        target = target_root / relative
+        display_relative = Path(sample.name) / relative if copy_mode == "folder" else relative
 
         if source.is_dir():
             if execute:
                 target.mkdir(parents=True, exist_ok=True)
-            copied.append(str(relative) + "/")
+            copied.append(str(display_relative) + "/")
             continue
 
         if target.exists() and not force:
-            skipped.append(str(relative))
+            skipped.append(str(display_relative))
             continue
 
         if execute:
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, target)
-        copied.append(str(relative))
+        copied.append(str(display_relative))
 
     for name in REQUIRED_PROJECT_DIRS:
-        target = project / name
+        target = target_root / name
+        display_relative = Path(sample.name) / name if copy_mode == "folder" else Path(name)
         if execute:
             target.mkdir(parents=True, exist_ok=True)
-        entry = f"{name}/"
+        entry = f"{display_relative}/"
         if entry not in copied:
             copied.append(entry)
 
-    return copied, skipped
+    return target_root, copied, skipped
 
 
-def build_next_steps(sample_key: str) -> list[str]:
+def build_next_steps(sample_key: str, target_project_path: Path) -> list[str]:
     return [
-        "선택한 샘플 루트에 사용자 모델 코드, 데이터, requirements.txt, run_model.py를 추가한다.",
+        f"선택한 샘플 폴더로 이동한다: {target_project_path}",
+        "해당 폴더에 사용자 모델 코드, 데이터, requirements.txt, run_model.py를 추가한다.",
         "ai_studio.env 또는 config/ai_studio.env.example을 기준으로 MLflow/AI Studio 접속값을 설정한다.",
         "run_model.py를 추가한 뒤 python run_model.py --prepare-only 로 모델 저장 구조를 확인한다.",
         "python run_model.py 로 save_model/ 또는 MLflow artifact 생성 여부를 확인한다.",
@@ -167,11 +178,12 @@ def build_next_steps(sample_key: str) -> list[str]:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Bootstrap one bundled offline model sample into an empty project root.")
-    parser.add_argument("--project", default=".", help="target project root")
+    parser = argparse.ArgumentParser(description="Bootstrap one bundled offline model sample folder into a workspace.")
+    parser.add_argument("--project", default=".", help="target workspace root")
     parser.add_argument("--sample", choices=sorted(SAMPLES), help="sample key: sklearn, pytorch, tensorflow")
+    parser.add_argument("--copy-mode", choices=["folder", "root"], default="folder", help="copy sample as a folder by default; use root to copy contents directly")
     parser.add_argument("--list", action="store_true", help="list selectable samples")
-    parser.add_argument("--execute", action="store_true", help="copy files into the project root")
+    parser.add_argument("--execute", action="store_true", help="copy files into the workspace")
     parser.add_argument("--force", action="store_true", help="allow overwriting existing files")
     parser.add_argument("--json", action="store_true", help="print machine-readable JSON")
     args = parser.parse_args()
@@ -196,6 +208,7 @@ def main():
     failures: list[str] = []
     copied: list[str] = []
     skipped: list[str] = []
+    target_project_path: Path | None = None
 
     if not sample_source.exists():
         failures.append(f"sample_not_found:{sample_source}")
@@ -205,24 +218,35 @@ def main():
     project_empty = is_project_empty(project)
     if project.exists() and not project.is_dir():
         failures.append(f"project_is_not_directory:{project}")
-    if not project_empty and not args.force:
+    if not project_empty and not args.force and args.copy_mode == "root":
         failures.append("project_not_empty")
 
     if not failures:
         if args.execute:
             project.mkdir(parents=True, exist_ok=True)
-        copied, skipped = copy_sample(sample_source, project, force=args.force, execute=args.execute)
+        try:
+            target_project_path, copied, skipped = copy_sample(
+                sample_source,
+                project,
+                force=args.force,
+                execute=args.execute,
+                copy_mode=args.copy_mode,
+            )
+        except Exception as exc:
+            failures.append(str(exc))
 
     report = BootstrapReport(
         project_path=str(project),
         selected_sample=args.sample,
         sample_source_path=str(sample_source),
+        target_project_path=str(target_project_path) if target_project_path else None,
+        copy_mode=args.copy_mode,
         execute=args.execute,
         project_empty=project_empty,
         copied=copied,
         skipped=skipped,
         failures=failures,
-        next_steps=build_next_steps(args.sample) if not failures else [],
+        next_steps=build_next_steps(args.sample, target_project_path) if not failures and target_project_path else [],
     )
 
     if args.json:
@@ -231,6 +255,8 @@ def main():
         print(f"Project: {report.project_path}")
         print(f"Selected sample: {report.selected_sample}")
         print(f"Sample source: {report.sample_source_path}")
+        print(f"Target project path: {report.target_project_path or 'not prepared'}")
+        print(f"Copy mode: {report.copy_mode}")
         print(f"Project empty: {report.project_empty}")
         print(f"Execute: {report.execute}")
         print(f"Copied entries: {len(report.copied)}")

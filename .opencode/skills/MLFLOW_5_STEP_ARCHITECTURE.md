@@ -68,7 +68,7 @@ tensorflow -> .opencode/samples/tensorflow_sample
 
 다른 샘플은 임의로 선택하지 않는다.
 
-아래 폴더는 사용자가 폐쇄망에서 직접 모델 코드와 데이터를 넣는 기본 슬롯이며, 워크스페이스에 모델이 없을 때 선택해서 루트로 복사한다.
+아래 폴더는 사용자가 폐쇄망에서 직접 모델 코드와 데이터를 넣는 기본 슬롯이며, 워크스페이스에 모델이 없을 때 선택해서 폴더째 복사한다.
 
 ```text
 sklearn_sample/
@@ -189,7 +189,7 @@ Step 1 Project Analyze
   |-- model_found=false
         -> bootstrap_sample_project.py
         -> sklearn / pytorch / tensorflow 중 사용자 선택
-        -> 비어 있는 프로젝트 루트로 복사
+        -> 선택한 샘플 폴더를 워크스페이스 아래로 복사
 
 Step 2 Environment Check
   |

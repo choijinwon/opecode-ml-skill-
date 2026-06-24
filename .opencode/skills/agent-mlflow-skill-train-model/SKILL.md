@@ -17,14 +17,14 @@ metadata:
 - 학습 결과로 모델 artifact가 생성되는지 확인해야 할 때
 - `train.py`, notebook, `run_model.py --prepare-only`, custom training script 중 실제 학습 entrypoint를 판단해야 할 때
 - 학습 산출물이 MLflow 등록이나 추론 테스트에 충분한지 확인해야 할 때
-- Step 0에서 사용자가 선택한 샘플이 프로젝트 루트로 복사된 뒤 모델을 생성해야 할 때
+- Step 0에서 사용자가 선택한 샘플 폴더가 워크스페이스로 복사된 뒤 모델을 생성해야 할 때
 
 ## Guidance Checks
 
 - Step 1에서 `model_found: true`이면 발견된 기존 프로젝트를 그대로 실행 대상으로 사용한다.
 - 기존 프로젝트가 있으면 샘플을 준비하거나 복사하지 않는다.
-- Step 1에서 `model_found: false`이면 먼저 `agent-mlflow-skill-sample-bootstrap`으로 샘플을 루트에 복사해야 한다.
-- Step 0에서 복사된 샘플 프로젝트 루트를 실행 대상으로 사용한다.
+- Step 1에서 `model_found: false`이면 먼저 `agent-mlflow-skill-sample-bootstrap`으로 샘플 폴더를 워크스페이스에 복사해야 한다.
+- Step 0에서 복사된 샘플 폴더를 실행 대상으로 사용한다.
 - 이 단계에서는 샘플 원본을 복사하지 않는다.
 - 학습 entrypoint 후보를 확인한다.
   - `train.py`
@@ -79,14 +79,14 @@ metadata:
 
 ## Sample-Based Model Creation
 
-사용자가 지정한 모델 프로젝트 폴더에 모델이 없어 Step 0에서 선택형 샘플이 루트로 복사된 경우, 이 단계의 책임은 복사된 프로젝트 루트에서 모델 artifact를 생성하는 것이다.
+사용자가 지정한 모델 프로젝트 폴더에 모델이 없어 Step 0에서 선택형 샘플 폴더가 복사된 경우, 이 단계의 책임은 복사된 샘플 폴더에서 모델 artifact를 생성하는 것이다.
 
 ### Required Behavior
 
 ```text
 1. selected_sample 값을 확인한다. 허용값은 sklearn, pytorch, tensorflow이다.
-2. target_project_root를 확인한다.
-3. 루트에 aiu_custom/, local_serving/, save_model/이 있는지 확인한다.
+2. target_project_path를 확인한다.
+3. 복사된 샘플 폴더에 aiu_custom/, local_serving/, save_model/이 있는지 확인한다.
 4. requirements/config/input_example을 확인한다.
 5. `ai_studio.env` 필수 키가 모두 준비되었는지 확인한다.
 6. prepare-only 또는 smoke test가 있으면 먼저 실행 가능성을 검증한다.
@@ -105,7 +105,7 @@ pytorch    -> .opencode/samples/pytorch_sample
 tensorflow -> .opencode/samples/tensorflow_sample
 ```
 
-선택형 샘플이 루트에 복사되지 않았으면 이 단계에서 임의로 복사하지 않는다. `sample_bootstrap_required`로 분류하고 Step 0으로 돌아가 사용자의 샘플 선택을 받는다.
+선택형 샘플 폴더가 복사되지 않았으면 이 단계에서 임의로 복사하지 않는다. `sample_bootstrap_required`로 분류하고 Step 0으로 돌아가 사용자의 샘플 선택을 받는다.
 
 ### Expected Outputs From Sample
 
@@ -141,7 +141,7 @@ input_example.json
 
 - `missing_train_entrypoint`: 학습 스크립트를 찾을 수 없음
 - `sample_not_found`: 선택된 샘플 원본을 찾을 수 없음
-- `sample_bootstrap_required`: 샘플이 아직 프로젝트 루트로 복사되지 않음
+- `sample_bootstrap_required`: 샘플 폴더가 아직 워크스페이스로 복사되지 않음
 - `missing_dataset`: 학습 데이터 또는 입력 파일이 없음
 - `missing_config`: 학습 설정 파일이 없음
 - `missing_env`: `ai_studio.env` 또는 필수 키가 없음
@@ -153,5 +153,5 @@ input_example.json
 
 - 오래 걸리는 학습은 사용자에게 예상 비용과 시간을 먼저 설명한다.
 - 기존 artifact를 덮어쓸 수 있으면 실행 전 경로를 명확히 확인한다.
-- 샘플 원본을 직접 수정하지 않고 사용자가 지정한 프로젝트 루트에서 실행한다.
+- 샘플 원본을 직접 수정하지 않고 복사된 샘플 폴더에서 실행한다.
 - 원격 학습이나 외부 데이터 다운로드는 기본 동작으로 가정하지 않는다.

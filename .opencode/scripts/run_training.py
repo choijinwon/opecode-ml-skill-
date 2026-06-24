@@ -112,7 +112,7 @@ def main():
     parser.add_argument("--project", default=".", help="user-specified model project folder")
     parser.add_argument("--python", default=sys.executable, help="Python interpreter to use")
     parser.add_argument("--execute", action="store_true", help="actually run the selected command")
-    parser.add_argument("--force-sample", action="store_true", help="deprecated; use bootstrap_sample_project.py for sample root copy")
+    parser.add_argument("--force-sample", action="store_true", help="deprecated; use bootstrap_sample_project.py for sample folder copy")
     parser.add_argument("--prepare-only", action="store_true", help="prefer prepare-only mode when supported")
     parser.add_argument("--json", action="store_true", help="print machine-readable JSON")
     args = parser.parse_args()
@@ -129,7 +129,7 @@ def main():
 
     if not model_found:
         failures.append("model_not_found")
-        failures.append("sample_bootstrap_required: choose one of sklearn, pytorch, tensorflow and copy it to the project root first")
+        failures.append("sample_bootstrap_required: choose one of sklearn, pytorch, tensorflow and copy the sample folder first")
         next_steps.append("python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample sklearn --execute")
 
     entrypoint = find_entrypoint(work_path)

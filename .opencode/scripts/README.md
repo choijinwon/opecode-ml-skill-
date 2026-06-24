@@ -38,7 +38,7 @@ python .opencode/scripts/validate_mlflow_project.py --project <model-project-fol
 
 ### bootstrap_sample_project.py
 
-모델 프로젝트 폴더가 비어 있거나 `.opencode`만 있을 때, 샘플 3개 중 하나를 선택해 프로젝트 루트로 복사한다.
+모델 프로젝트 폴더에 실행 가능한 모델이 없을 때, 샘플 3개 중 하나를 선택해 워크스페이스 아래로 샘플 폴더째 복사한다.
 
 선택 가능한 샘플은 원본에 `aiu_custom/`, `local_serving/`, `save_model/` 기본 폴더가 있어야 한다.
 
@@ -56,7 +56,7 @@ python .opencode/scripts/bootstrap_sample_project.py --project <model-project-fo
 python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample tensorflow
 ```
 
-실제 루트 복사:
+실제 폴더 복사:
 
 ```text
 python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample sklearn --execute
@@ -64,7 +64,7 @@ python .opencode/scripts/bootstrap_sample_project.py --project <model-project-fo
 
 복사 대상은 소스 구조 중심이며 `.venv/`, `__pycache__/`, `model/`, `saved_model/`, `artifacts/ai_studio/`, `mlruns/`, `mlartifacts/`, `mlflow.db` 같은 생성 산출물은 제외한다.
 
-복사 후 `aiu_custom/`, `local_serving/`, `save_model/` 필수 폴더는 항상 루트에 보장한다.
+복사 후 `aiu_custom/`, `local_serving/`, `save_model/` 필수 폴더는 항상 복사된 샘플 폴더 안에 보장한다.
 
 기존 파일이 있을 때 덮어쓰기는 사용자가 명시적으로 요청한 경우에만 사용한다.
 
