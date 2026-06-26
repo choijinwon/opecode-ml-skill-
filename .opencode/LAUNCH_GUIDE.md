@@ -15,7 +15,8 @@ OpenCode 기본 로고 자체는 OpenCode 내장 화면이라 `.opencode` 설정
 처음 진입하면 워크스페이스를 먼저 분석해 모델 있음/없음을 확인합니다.
 
 모델이 있으면 본인 모델 경로를 기준으로 MLflow 5단계를 진행합니다.
-모델이 없으면 sklearn / pytorch / tensorflow 중 하나를 선택해 샘플을 생성합니다.
+현재 경로에 모델이 없지만 폐쇄망 프로젝트에 모델이 있다면 실제 모델 프로젝트 경로를 지정하거나 `<model-project-folder>/data/**` 아래로 반입한 뒤 다시 분석합니다.
+샘플 생성은 기존 모델을 반입하지 못할 때만 sklearn / pytorch / tensorflow 중 하나를 선택합니다.
 
 실제 복사/모델 생성/환경 검증 실행은 OpenCode 빌드모드에서 선택해주세요.
 

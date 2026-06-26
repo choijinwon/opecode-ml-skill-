@@ -22,8 +22,10 @@ metadata:
 ## Guidance Checks
 
 - 현재 작업 경로와 사용자가 지정한 프로젝트 경로를 확인한다.
-- 사용자가 가져온 모델 파일은 프로젝트 루트의 `data/` 폴더 안에 두는 것이 기본 계약임을 안내한다.
-- 사용자가 루트 경로를 지정했으면, 루트의 `data/` 폴더 안에 모델 형식 파일이 있는지 먼저 찾는다.
+- 사용자가 가져온 모델 파일은 프로젝트 루트의 `data/` 하위 트리 안에 두는 것이 기본 계약임을 안내한다.
+- 폐쇄망에 모델이 있다고 사용자가 말하면, 현재 워크스페이스에서 보이지 않는 모델을 `model_found: true`로 추정하지 않는다.
+- 이 경우 실제 모델 프로젝트 경로를 지정하게 하거나, 폐쇄망 모델 파일을 `<model-project-folder>/data/**` 아래로 반입한 뒤 재분석하도록 안내한다.
+- 사용자가 루트 경로를 지정했으면, 루트의 `data/**` 트리 안에 모델 형식 파일이 있는지 먼저 찾는다.
   - 예: `<root>/data/model.pkl`, `<root>/data/model.pt`, `<root>/data/model.onnx`, `<root>/data/model.gguf`
 - 핵심 파일 존재 여부를 확인한다.
   - `requirements.txt`, `pyproject.toml`, `environment.yml`
@@ -42,6 +44,8 @@ metadata:
   - HuggingFace: `transformers`, tokenizer files, `model.safetensors`
   - Custom pyfunc: `mlflow.pyfunc.PythonModel`, `aiu_custom`, `ModelWrapper`
 - `data/` 안의 모델 파일 후보와 생성 위치를 확인한다.
+- `aiu_studio/` 폴더는 폐쇄망 AI Studio 반입 대상이므로 존재 여부를 명확히 표시한다.
+- `aiu_studio/`가 이미 있으면 이후 실행 단계에서 삭제하지 않고 보존/병합 복사해야 한다.
 - 학습 entrypoint와 추론 entrypoint를 분리해서 표시한다.
 - 누락 항목은 실패로 단정하지 않고 다음 단계에서 확인할 항목으로 분류한다.
 
@@ -60,13 +64,15 @@ MLflow 5단계로 봐줘
 
 ```text
 1. 현재 워크스페이스 경로를 확인한다.
-2. 루트 및 하위 프로젝트의 `data/` 폴더에서 모델 형식 파일을 찾고, 실행 entrypoint와 필수 폴더를 확인한다.
+2. 루트 및 하위 프로젝트의 `data/**` 트리에서 모델 형식 파일을 찾고, 실행 entrypoint와 필수 폴더를 확인한다.
 3. model_found 값을 먼저 결정한다.
 4. model_found: true이면 `model_artifact_paths` 목록을 먼저 보여주고 사용자가 모델을 선택하게 한다.
    - 모델이 1개뿐이면 기본 선택값으로 제안하되, 다음 실행 단계는 `agent-mlflow-skill-selected-run-test`로 이어진다고 안내한다.
    - 모델이 여러 개이면 번호 또는 경로 선택을 요청한다.
    - 사용자가 번호나 경로를 선택하면 프로젝트 분석을 반복하지 않고 `agent-mlflow-skill-selected-run-test`로 진행한다.
-5. model_found: false이면 sklearn/pytorch/tensorflow 선택 가이드를 출력한다.
+5. model_found: false이면 먼저 현재 분석 경로에 `data/**` 모델이 없음을 설명한다.
+   - 사용자가 폐쇄망에 모델이 있다고 말한 상황이면 샘플 선택보다 실제 모델 프로젝트 경로 지정 또는 `data/**` 반입을 우선 안내한다.
+   - 사용자가 샘플로 시작하겠다고 선택한 경우에만 sklearn/pytorch/tensorflow 선택 가이드를 출력한다.
 ```
 
 `data_model_files`가 1개 이상이면 `model_found`는 반드시 true로 판단한다.
@@ -160,7 +166,7 @@ next_action: model_artifact_paths 중 사용할 모델 선택
 
 다음 단계:
 1. 사용할 모델 번호 또는 경로 선택
-2. `agent-mlflow-skill-selected-run-test`로 선택 모델 기준 aiu_studio/ 복사
+2. `agent-mlflow-skill-selected-run-test`로 선택 모델 기준 aiu_studio/ 보존 및 data 파일 병합 복사
 3. 선택 모델 형식에 맞는 runtest_2.py 생성
 4. `agent-mlflow-skill-environment-check`로 dependency 확인
 5. `agent-mlflow-skill-inference-test`로 추론 테스트
@@ -173,7 +179,17 @@ next_action: model_artifact_paths 중 사용할 모델 선택
 
 사용자가 지정한 모델 프로젝트 폴더에서 학습/추론 가능한 모델 프로젝트를 찾지 못하면 실패로 끝내지 않는다. `.opencode/samples` 아래 샘플 3개 중 하나를 사용자가 선택하게 하고, 선택한 샘플 폴더를 워크스페이스 아래로 폴더째 복사해 모델 생성과 테스트 흐름을 진행할 수 있게 한다.
 
-모델이 없는 경우 사용자에게 반드시 아래처럼 선택을 요청한다.
+현재 분석 경로에 모델이 없는 경우, 폐쇄망 모델 존재 여부를 먼저 분리한다.
+
+사용자가 폐쇄망에 모델이 있다고 말했거나 실제 모델 프로젝트가 따로 있다고 말한 경우:
+
+```text
+현재 분석 경로에서는 data/ 모델 파일을 찾지 못했습니다.
+폐쇄망에 모델이 있다면 실제 모델 프로젝트 경로를 지정하거나, 모델 파일을 <model-project-folder>/data/** 아래로 반입한 뒤 다시 분석해야 합니다.
+샘플 생성은 기존 모델을 반입하지 못할 때만 진행합니다.
+```
+
+사용자가 샘플로 시작하겠다고 하거나 폐쇄망 모델을 반입할 수 없는 경우에는 아래처럼 선택을 요청한다.
 
 ```text
 현재 워크스페이스에서 실행 가능한 모델을 찾지 못했습니다.

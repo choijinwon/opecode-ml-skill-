@@ -106,8 +106,9 @@ def main():
 
     if not model_found:
         failures.append("model_not_found")
-        failures.append("sample_bootstrap_required: choose one of sklearn, pytorch, tensorflow and copy the sample folder first")
-        next_steps.append("python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample sklearn --execute")
+        failures.append("data_tree_model_not_found: provide a model under <model-project-folder>/data/** or choose a sample only when no closed-network model can be mounted")
+        next_steps.append("Copy or mount the closed-network model under <model-project-folder>/data/** and rerun analysis.")
+        next_steps.append("If no closed-network model can be mounted, choose a sample: python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample sklearn --execute")
 
     entrypoint = find_entrypoint(work_path)
     generated_entrypoints: list[str] = []

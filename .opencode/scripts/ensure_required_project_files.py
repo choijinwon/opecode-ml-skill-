@@ -40,6 +40,8 @@ class RequiredFilesReport:
     project_path: str
     data_model_file: str | None
     model_kind: str | None
+    aiu_studio_path: str | None = None
+    aiu_studio_preexisting: bool = False
     ensured: list[EnsuredFile] = field(default_factory=list)
     failures: list[str] = field(default_factory=list)
 
@@ -292,7 +294,13 @@ def copy_data_files_to_aiu_studio(project: Path, report: RequiredFilesReport, fo
 
 def ensure_required_files(project: Path, force: bool = False, execute: bool = True) -> RequiredFilesReport:
     project = normalize_project_root(project)
-    report = RequiredFilesReport(project_path=str(project), data_model_file=None, model_kind=None)
+    report = RequiredFilesReport(
+        project_path=str(project),
+        data_model_file=None,
+        model_kind=None,
+        aiu_studio_path=str(project / "aiu_studio"),
+        aiu_studio_preexisting=(project / "aiu_studio").is_dir(),
+    )
 
     if not project.exists() or not project.is_dir():
         report.failures.append(f"project_not_found:{project}")
@@ -353,6 +361,9 @@ def main():
         print(f"Project: {report.project_path}")
         print(f"Data model file: {report.data_model_file or 'not found'}")
         print(f"Model kind: {report.model_kind or 'unknown'}")
+        if report.aiu_studio_path:
+            state = "preexisting" if report.aiu_studio_preexisting else "created_or_pending"
+            print(f"AIU Studio folder: {report.aiu_studio_path} ({state})")
         for item in report.ensured:
             status = "created" if item.created else f"skipped:{item.skipped_reason}"
             print(f"- {status} {item.path}")

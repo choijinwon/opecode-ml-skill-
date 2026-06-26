@@ -134,8 +134,9 @@ python .opencode/scripts/check_environment.py --project <model-project-folder> -
 
 기본값은 안전 모드다. 실제 실행은 `--execute`를 명시해야 한다.
 실행 전 필요한 환경변수 또는 config/mlflow_config.json 값을 확인한다.
-`data/` 폴더 안에 모델 형식 파일이 있으면 `data/` 안의 파일 전체를
-프로젝트 루트의 `aiu_studio/` 폴더로 복사한다. 필수 구조나 실행 파일이 없으면
+`data/` 폴더 안에 모델 형식 파일이 있으면 폐쇄망 반입 대상인 프로젝트 루트의
+`aiu_studio/` 폴더를 보존한다. `aiu_studio/`가 없으면 생성하고, 있으면 삭제하지 않는다.
+그 다음 `data/` 안의 파일 전체를 `aiu_studio/` 폴더로 병합 복사한다. 필수 구조나 실행 파일이 없으면
 `aiu_custom/`, `local_serving/`, `save_model/`, `aiu_studio/`, `run_test.py`, `run_test2.py`
 계열 파일을 자동 생성한다.
 
@@ -154,7 +155,8 @@ python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project
 ```
 
 대상 모델을 직접 선택해서 별도 실행 파일을 만들 수도 있다.
-이 경우 먼저 `data/` 안의 파일 전체를 프로젝트 루트의 `aiu_studio/` 폴더로 복사한다.
+이 경우 먼저 폐쇄망 반입 대상인 `aiu_studio/` 폴더를 보존하고,
+`data/` 안의 파일 전체를 프로젝트 루트의 `aiu_studio/` 폴더로 병합 복사한다.
 그 다음 기존 `runtest.py` 또는 `run_test.py`를 템플릿으로 참고해서 선택 모델 형식에 맞는 `runtest_2.py`를 생성한다.
 
 ```text
@@ -188,7 +190,8 @@ Portable/LLM:   .pmml, .mlmodel, .gguf, .ggml, .mar, .nemo, .engine, .plan, .npz
 ### ensure_required_project_files.py
 
 `data/` 폴더 안에 모델 형식 파일이 있을 때 AI Studio 연동에 필요한 기본 파일을 생성한다.
-`data/` 안의 파일 전체는 프로젝트 루트의 `aiu_studio/` 폴더로 복사한다.
+폐쇄망 반입 대상인 `aiu_studio/` 폴더는 보존하고, `data/` 안의 파일 전체는 프로젝트 루트의
+`aiu_studio/` 폴더로 병합 복사한다.
 
 ```text
 python .opencode/scripts/ensure_required_project_files.py --project <model-project-folder>

@@ -743,9 +743,9 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
         next_steps.append("Add or confirm mlflow dependency in the project environment.")
     if not artifacts:
         if data_dirs:
-            next_steps.append("data/ exists, but no supported model artifact was found. Add one of the supported model suffixes under data/.")
+            next_steps.append("data/ exists in the current analysis path, but no supported model artifact was found under data/**. If the model exists in a closed-network location, copy or mount it anywhere under this project's data/ tree and rerun analysis.")
         else:
-            next_steps.append("Create data/ and provide a supported model artifact under it.")
+            next_steps.append("No data/** model artifact was found in the current analysis path. If the model exists in a closed-network project, run analysis with that model project path or copy/mount the model under <model-project-folder>/data/**.")
     if not prepare_found:
         next_steps.append("Confirm a prepare-only or preflight behavior before registration.")
     if not local_remote_evidence:

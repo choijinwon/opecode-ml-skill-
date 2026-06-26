@@ -66,6 +66,8 @@ class GeneratedRunTest:
 @dataclass
 class RunTestReport:
     project_path: str
+    aiu_studio_path: str | None = None
+    aiu_studio_preexisting: bool = False
     generated: list[GeneratedRunTest] = field(default_factory=list)
     copied_to_aiu_studio: list[str] = field(default_factory=list)
     failures: list[str] = field(default_factory=list)
@@ -492,7 +494,11 @@ def render_selected_run_test(project: Path, artifact: Path, model_kind: str, tem
 
 def ensure_run_tests(project: Path, force: bool = False, execute: bool = True) -> RunTestReport:
     project = normalize_project_root(project)
-    report = RunTestReport(project_path=str(project))
+    report = RunTestReport(
+        project_path=str(project),
+        aiu_studio_path=str(project / "aiu_studio"),
+        aiu_studio_preexisting=(project / "aiu_studio").is_dir(),
+    )
 
     if not project.exists() or not project.is_dir():
         report.failures.append(f"project_not_found:{project}")
@@ -543,7 +549,11 @@ def ensure_selected_run_test(
     execute: bool = True,
 ) -> RunTestReport:
     project = normalize_project_root(project)
-    report = RunTestReport(project_path=str(project))
+    report = RunTestReport(
+        project_path=str(project),
+        aiu_studio_path=str(project / "aiu_studio"),
+        aiu_studio_preexisting=(project / "aiu_studio").is_dir(),
+    )
 
     if not project.exists() or not project.is_dir():
         report.failures.append(f"project_not_found:{project}")
@@ -616,11 +626,14 @@ def main():
         print(json.dumps(asdict(report), ensure_ascii=False, indent=2))
     else:
         print(f"Project: {report.project_path}")
+        if report.aiu_studio_path:
+            state = "preexisting" if report.aiu_studio_preexisting else "created_or_pending"
+            print(f"AIU Studio folder: {report.aiu_studio_path} ({state})")
         for item in report.generated:
             status = "created" if item.created else f"skipped:{item.skipped_reason}"
             print(f"- {status} {item.entrypoint_path} for {item.model_kind}: {item.data_model_file}")
         if report.copied_to_aiu_studio:
-            print("Copied to aiu_studio:")
+            print("Merged data files into aiu_studio:")
             for copied in report.copied_to_aiu_studio:
                 print(f"- {copied}")
         if report.failures:
