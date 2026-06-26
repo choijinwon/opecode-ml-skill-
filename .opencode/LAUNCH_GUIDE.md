@@ -30,7 +30,7 @@ OpenCode 기본 로고 자체는 OpenCode 내장 화면이라 `.opencode` 설정
 
 ## 첫 채팅 응답 규칙
 
-`.opencode/opencode.json`은 `default_agent`를 `launch`로 지정한다. `launch` agent는 현재 채팅 세션의 첫 assistant 응답에서 사용자 입력과 무관하게 짧은 Launch Guide를 먼저 출력한다.
+초기 Launch Guide는 `.opencode/bin/opencode` 또는 `.opencode/start` 런처가 터미널에서 한 번만 출력한다. 채팅 첫 응답에서는 자동으로 다시 출력하지 않는다.
 
 ```text
 사용자: 하이
@@ -42,7 +42,7 @@ assistant: [Launch Guide] ... 무엇부터 볼까요?
 assistant: [Launch Guide] ... 이어서 sklearn 샘플 생성을 진행합니다.
 ```
 
-두 번째 메시지부터는 반복 출력하지 않는다. 다시 보려면 `/launch`를 입력한다.
+다시 보려면 `/launch`를 입력한다.
 
 ## 권장 실행 방식
 

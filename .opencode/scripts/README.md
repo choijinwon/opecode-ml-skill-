@@ -9,6 +9,7 @@
 ```text
 Step 1  프로젝트 구조 분석
         validate_mlflow_project.py
+        scan_data_models.py
         bootstrap_sample_project.py
 
 Step 2  실행 환경 검증
@@ -37,6 +38,23 @@ python .opencode/scripts/validate_mlflow_project.py --project <model-project-fol
 python .opencode/scripts/validate_mlflow_project.py --project <model-project-folder> --json
 python .opencode/scripts/validate_mlflow_project.py --project <model-project-folder>/data --json
 python .opencode/scripts/validate_mlflow_project.py --project <model-project-folder>/data/nested --json
+```
+
+### scan_data_models.py
+
+`data/` 폴더와 모델 파일만 별도로 스캔한다. 프로젝트 구조, 필수 폴더, MLflow 설정은 판단하지 않는다.
+
+기본 스캔은 `.git`, `.venv*`, `node_modules`, 숨김 폴더를 제외한다. `mlartifacts/` 아래 `data/` 모델은 포함한다.
+
+```text
+python .opencode/scripts/scan_data_models.py --project <model-project-folder>
+python .opencode/scripts/scan_data_models.py --project <model-project-folder> --json
+```
+
+`.opencode` 샘플 폴더까지 포함해서 전체 확인이 필요하면 아래 옵션을 사용한다.
+
+```text
+python .opencode/scripts/scan_data_models.py --project <model-project-folder> --include-opencode
 ```
 
 ### bootstrap_sample_project.py

@@ -110,7 +110,6 @@ SKIP_DIR_NAMES = {
     "__pycache__",
     "node_modules",
     "outputs",
-    "mlartifacts",
 }
 
 
@@ -274,7 +273,7 @@ def select_project(explicit: str | None) -> tuple[Path, str]:
     raise FileNotFoundError("No model project candidate found. Provide --project.")
 
 
-def iter_files(path: Path, max_depth: int = 4):
+def iter_files(path: Path, max_depth: int = 8):
     # Limit traversal depth and skip heavy/generated directories so this script
     # remains safe to run in large Windows workspaces.
     base_depth = len(path.parts)
@@ -288,7 +287,7 @@ def iter_files(path: Path, max_depth: int = 4):
             yield root_path / file_name
 
 
-def find_data_dirs(path: Path, max_depth: int = 5) -> list[Path]:
+def find_data_dirs(path: Path, max_depth: int = 8) -> list[Path]:
     path = path.expanduser().resolve()
     if not path.exists() or not path.is_dir():
         return []
@@ -314,7 +313,7 @@ def find_data_dirs(path: Path, max_depth: int = 5) -> list[Path]:
     return sorted(set(found), key=lambda item: str(item))
 
 
-def find_artifacts(path: Path, max_depth: int = 4) -> list[Path]:
+def find_artifacts(path: Path, max_depth: int = 8) -> list[Path]:
     artifacts: list[Path] = []
     path = normalize_project_root(path)
     for data_dir in find_data_dirs(path, max_depth=max_depth):
@@ -324,7 +323,7 @@ def find_artifacts(path: Path, max_depth: int = 4) -> list[Path]:
     return sorted(set(artifacts))
 
 
-def find_data_files(path: Path, max_depth: int = 4) -> list[Path]:
+def find_data_files(path: Path, max_depth: int = 8) -> list[Path]:
     files: list[Path] = []
     path = normalize_project_root(path)
     for data_dir in find_data_dirs(path, max_depth=max_depth):

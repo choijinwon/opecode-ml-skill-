@@ -66,7 +66,7 @@ cp -R .opencode /path/to/user-project/
 opencode .
 ```
 
-OpenCode 기본 로고 자체는 OpenCode 내장 화면이라 `.opencode` 설정으로 교체하지 않습니다. 대신 `.opencode/bin/opencode` launcher를 PATH에 등록하면 평소처럼 `opencode .`를 입력했을 때 Launch Guide가 터미널에 처음 한 번만 표시된 뒤 OpenCode가 실행됩니다.
+OpenCode 기본 로고 자체는 OpenCode 내장 화면이라 `.opencode` 설정으로 교체하지 않습니다. 대신 `.opencode/bin/opencode` launcher를 PATH에 등록하면 평소처럼 `opencode .`를 입력했을 때 Launch Guide가 터미널에 처음 한 번만 표시된 뒤 OpenCode가 실행됩니다. 채팅 첫 응답에서는 같은 가이드를 다시 출력하지 않습니다.
 
 launcher 설치:
 
@@ -93,7 +93,7 @@ OpenCode 실행 직전에 Launch Guide를 한 번만 보여주고 싶으면 `.op
 ./.opencode/start --reset-launch
 ```
 
-상세 시작 가이드는 `.opencode/START_GUIDE.md`에 있습니다. 초기 진입 안내는 플러그인이 아니라 `.opencode/bin/opencode` 런처와 `.opencode/start` 스크립트가 담당합니다.
+상세 시작 가이드는 `.opencode/START_GUIDE.md`에 있습니다. 초기 진입 안내는 플러그인이나 default agent가 아니라 `.opencode/bin/opencode` 런처와 `.opencode/start` 스크립트가 담당합니다.
 
 OpenCode provider API 키를 환경변수로 관리하려면 `.env.example`을 복사해 `.env`를 만들고 필요한 값만 채웁니다. 실제 `.env`는 Git에 올리지 않습니다.
 

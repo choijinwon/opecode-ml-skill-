@@ -50,7 +50,6 @@ SKIP_DIR_NAMES = {
     "__pycache__",
     "node_modules",
     "outputs",
-    "mlartifacts",
 }
 
 
@@ -118,7 +117,7 @@ def find_data_dirs(project: Path) -> list[Path]:
     for root, dirs, _files in os.walk(project):
         root_path = Path(root)
         depth = len(root_path.parts) - base_depth
-        if depth >= 6:
+        if depth >= 8:
             dirs[:] = []
         dirs[:] = [d for d in dirs if not should_skip_dir(d)]
         for dirname in list(dirs):
