@@ -148,13 +148,16 @@ aiu_custom 폴더, 프로젝트 진입점, ModelWrapper, input_example, config, 
 로컬 환경까지 테스트하려면 아래 스크립트를 사용할 수 있습니다.
 
 ```bash
-python .opencode/scripts/test_local_sample.py --sample all --python /path/to/python3.12
+python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/sklearn_sample
+python .opencode/scripts/run_training.py --project .opencode/samples/sklearn_sample --python /path/to/python3.12
 ```
 
 특정 샘플만 테스트할 수도 있습니다.
 
 ```bash
-python .opencode/scripts/test_local_sample.py --sample sklearn --python /path/to/python3.12
+python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/sklearn_sample
+python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/pytorch_sample
+python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/tensorflow_sample
 ```
 
 `kserve==0.15.0` 제약 때문에 로컬 테스트에는 Python 3.9~3.12가 필요합니다.

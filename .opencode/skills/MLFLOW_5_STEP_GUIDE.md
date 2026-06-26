@@ -491,7 +491,7 @@ schema_error
 serialization_error
 ```
 
-## Step 5. MLflow Run 및 Model 확인
+## Step 5. MLflow Run 및 Model 분석 결과 리포트
 
 Skill:
 
@@ -501,7 +501,7 @@ agent-mlflow-skill-mlflow-verify
 
 ### 목적
 
-학습 또는 export 결과가 MLflow에 기록되었는지 확인한다.
+학습 또는 export 결과가 MLflow에 기록되었는지 확인하고, 운영자가 바로 판단할 수 있는 분석 결과 리포트를 만든다.
 
 ### 확인 항목
 
@@ -524,6 +524,9 @@ tracking target 요약
 experiment 정보
 최근 run 생성 여부
 params/metrics/artifacts 기록 상태
+pass / warn / block 상태
+요약 문구
+후속 조치
 model artifact 기록 상태
 registered model/version 생성 여부
 MLflow UI에서 확인할 위치
@@ -553,10 +556,9 @@ Step 2  실행 환경 검증
 
 Step 3  로컬 학습 실행 및 모델 생성 확인
         .opencode/scripts/run_training.py
-        .opencode/scripts/test_local_sample.py
 
 Step 4  추론 테스트
-        .opencode/scripts/test_inference.py
+        .opencode/scripts/run_training.py --prepare-only
 
 Step 5  MLflow Run/Model 기록 확인
         .opencode/scripts/verify_mlflow.py

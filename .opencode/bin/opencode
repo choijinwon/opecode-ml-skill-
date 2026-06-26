@@ -57,8 +57,8 @@ if PROJECT_DIR="$(find_project_dir)"; then
     printf '\n'
     sed -n '/^\[Launch Guide\]/,/^```$/p' "$GUIDE_FILE" | sed '1d;$d'
     printf '\n'
-    if [[ -f "$PROJECT_DIR/.opencode/scripts/launch_workspace_summary.py" ]]; then
-      python3 "$PROJECT_DIR/.opencode/scripts/launch_workspace_summary.py" "$PROJECT_DIR" || true
+    if [[ -f "$PROJECT_DIR/.opencode/scripts/validate_mlflow_project.py" ]]; then
+      python3 "$PROJECT_DIR/.opencode/scripts/validate_mlflow_project.py" --project "$PROJECT_DIR" || true
       printf '\n'
     fi
     printf '이 안내는 이 프로젝트에서 한 번만 표시됩니다. 다시 보려면 opencode --reset-launch 를 실행하세요.\n'

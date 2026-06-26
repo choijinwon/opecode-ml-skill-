@@ -734,9 +734,15 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
 
     next_steps = []
     if artifacts:
-        next_steps.append("Select one model_artifact_path by number or path.")
-        next_steps.append("Continue with agent-mlflow-skill-selected-run-test; copy the aiu_studio template folder, keep the model file in data/**, and create runtest_2.py for the selected model.")
-        next_steps.append("After runtest_2.py is created, run environment check, inference test, and MLflow verify in order.")
+        next_steps.append("1. Select one model_artifact_path by number or path.")
+        next_steps.append("2. Confirm the selected model is under data/**.")
+        next_steps.append("3. Detect the selected model format from its suffix.")
+        next_steps.append("4. Prepare selected-run-test conversion from runtest.py or run_test.py.")
+        next_steps.append("5. Automatically copy only the aiu_studio/ template folder; do not copy model files.")
+        next_steps.append("6. Automatically set MODEL_PATH to read the selected data/** model directly.")
+        next_steps.append("7. Automatically reference runtest.py first, falling back to run_test.py.")
+        next_steps.append("8. Automatically create runtest_2.py for the selected model format.")
+        next_steps.append("9. After runtest_2.py is created, run environment check, inference test, and MLflow verify in order.")
     if any(check.status == "block" for check in checks):
         next_steps.append("Resolve blocked checks before MLflow registration.")
     if not has_mlflow_dep:

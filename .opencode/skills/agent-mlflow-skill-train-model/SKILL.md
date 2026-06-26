@@ -91,15 +91,15 @@ metadata:
 ### Missing Required Files With Existing Data Model
 
 `data/` 폴더 안에 모델 파일은 있는데 `aiu_custom/`, `local_serving/`, `save_model/`, `aiu_studio/`, 실행 파일이 없으면 실패로만 끝내지 않는다.
-먼저 `data/` 안의 모든 파일을 프로젝트 루트의 `aiu_studio/` 폴더로 복사한다.
+모델 파일은 `aiu_studio/`로 복사하지 않고 `data/**` 원본 경로에서 직접 읽는다.
 아래 스크립트로 필수 구조와 모델 형식에 맞는 smoke test entrypoint를 생성한다.
 
 ```text
-python .opencode/scripts/ensure_required_project_files.py --project <model-project-folder> --execute
+python .opencode/scripts/run_training.py --project <model-project-folder>
 ```
 
 ```text
-python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --execute
+python .opencode/scripts/run_training.py --project <model-project-folder>
 ```
 
 생성 규칙:
@@ -124,18 +124,18 @@ Portable/LLM:   .pmml, .mlmodel, .gguf, .ggml, .mar, .nemo, .engine, .plan, .npz
 ### Selected Data Model Run Test
 
 사용자가 특정 대상 모델을 선택하면 전체 자동 생성 순서와 별개로 선택 모델 전용 실행 파일을 만든다.
-이때 `data/` 안의 파일 전체를 프로젝트 루트의 `aiu_studio/`로 복사하고, 기존 `runtest.py` 또는 `run_test.py`를 참고해 `runtest_2.py`를 생성한다.
+이때 `aiu_studio/` 실행 템플릿 폴더만 복사하고, 기존 `runtest.py` 또는 `run_test.py`를 참고해 `runtest_2.py`를 생성한다.
 기존 `runtest.py`는 수정하지 않는다. 선택 모델의 경로와 모델 형식으로 변환된 결과는 반드시 새 파일 `runtest_2.py`로 생성한다.
 이미 `runtest_2.py`가 있고 사용자가 재생성을 요청하면 `--force`를 사용한다.
 
 ```text
-python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-model data/<model-file> --output runtest_2.py --execute
+python .opencode/scripts/run_training.py --project <model-project-folder> --target-model data/<model-file> --output runtest_2.py --force
 ```
 
 예시:
 
 ```text
-python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-model data/model.onnx --template runtest.py --output runtest_2.py --execute
+python .opencode/scripts/run_training.py --project <model-project-folder> --target-model data/model.onnx --template runtest.py --output runtest_2.py --force
 ```
 
 이 흐름은 `agent-mlflow-skill-selected-run-test`를 우선 사용한다.

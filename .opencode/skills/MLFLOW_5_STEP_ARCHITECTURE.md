@@ -164,9 +164,7 @@ secret 값은 로그, 응답, trace에 출력하지 않는다.
 ├── bootstrap_sample_project.py
 ├── check_environment.py
 ├── run_training.py
-├── test_inference.py
-├── verify_mlflow.py
-└── test_local_sample.py
+└── verify_mlflow.py
 ```
 
 각 Script는 Skill의 판단을 로컬에서 검증할 수 있는 실행 보조 도구다.
@@ -203,7 +201,7 @@ Step 3 Train Model
 
 Step 4 Inference Test
   |
-  |-- test_inference.py
+  |-- run_training.py --prepare-only
   |
   |-- aiu_custom 또는 local_serving 기반 추론
   |-- input_example.json 기반 predict 검증
@@ -367,7 +365,7 @@ save_model/ 산출물 확인
 선택 MLflow 설정 확인
 ```
 
-### test_inference.py
+### run_training.py
 
 담당 단계:
 

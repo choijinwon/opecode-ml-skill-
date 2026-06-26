@@ -36,12 +36,11 @@ python .opencode/scripts/bootstrap_sample_project.py --project <model-project-fo
 
 배포 전 로컬 환경 테스트:
 
-- 전체 샘플 테스트: `python .opencode/scripts/test_local_sample.py --sample all --python /path/to/python3.12`
-- 특정 샘플 테스트: `python .opencode/scripts/test_local_sample.py --sample sklearn --python /path/to/python3.12`
-- 의존성 재설치 없이 재검증: `python .opencode/scripts/test_local_sample.py --sample pytorch --skip-install --python /path/to/python3.12`
-- 가상환경 재생성: `python .opencode/scripts/test_local_sample.py --sample tensorflow --rebuild-venv --python /path/to/python3.12`
+- 샘플 구조 검증: `python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/sklearn_sample`
+- 샘플 실행 준비: `python .opencode/scripts/run_training.py --project .opencode/samples/sklearn_sample --python /path/to/python3.12`
+- 다른 샘플 검증: `python .opencode/scripts/validate_mlflow_project.py --project .opencode/samples/pytorch_sample`
 
-테스트 스크립트의 내부 동작:
+테스트 흐름:
 
 1. 샘플 폴더 안에 `.venv`를 만든다.
 2. `requirements.txt`를 설치한다.

@@ -1,261 +1,80 @@
 # OpenCode MLflow Scripts
 
-이 폴더는 `.opencode/skills`의 MLflow 5단계 흐름을 보조하는 로컬 스크립트를 포함한다.
-
-대상은 사용자가 지정한 모델 프로젝트 폴더다.
-
-## Script Mapping
+이 폴더의 실행 스크립트는 유지보수를 위해 5개만 둔다.
 
 ```text
-Step 1  프로젝트 구조 분석
-        validate_mlflow_project.py
-        scan_data_models.py
-        bootstrap_sample_project.py
-
-Step 2  실행 환경 검증
-        check_environment.py
-
-Step 3  로컬 학습 실행 및 모델 생성 확인
-        run_training.py
-        test_local_sample.py
-
-Step 4  추론 테스트
-        test_inference.py
-
-Step 5  MLflow Run/Model 기록 확인
-        verify_mlflow.py
+bootstrap_sample_project.py
+check_environment.py
+run_training.py
+validate_mlflow_project.py
+verify_mlflow.py
 ```
 
-## Scripts
+## validate_mlflow_project.py
 
-### validate_mlflow_project.py
-
-모델 프로젝트 폴더를 분석한다.
-`--project`에 프로젝트 루트가 아니라 `<model-project-folder>/data` 또는 `data/` 하위 폴더를 직접 넘겨도 부모 폴더를 프로젝트 루트로 보정하고 `data/` 전체를 재귀 검색한다.
+모델 프로젝트 구조, `data/**` 모델 파일, 필수 폴더, 다음 단계를 분석한다.
 
 ```text
 python .opencode/scripts/validate_mlflow_project.py --project <model-project-folder>
 python .opencode/scripts/validate_mlflow_project.py --project <model-project-folder> --json
-python .opencode/scripts/validate_mlflow_project.py --project <model-project-folder>/data --json
-python .opencode/scripts/validate_mlflow_project.py --project <model-project-folder>/data/nested --json
 ```
 
-### scan_data_models.py
+## bootstrap_sample_project.py
 
-`data/` 폴더와 모델 파일만 별도로 스캔한다. 프로젝트 구조, 필수 폴더, MLflow 설정은 판단하지 않는다.
-
-기본 스캔은 `.git`, `.venv*`, `node_modules`, 숨김 폴더, `mlartifacts/`를 제외한다.
-`model_found`는 `data/` 폴더 안에서 모델 확장자가 발견될 때만 `true`가 된다.
-모델 파일이 `data/` 밖에 있으면 `outside_data_model_paths`에 후보로 표시된다.
-
-```text
-python .opencode/scripts/scan_data_models.py --project <model-project-folder>
-python .opencode/scripts/scan_data_models.py --project <model-project-folder> --json
-```
-
-`.opencode` 샘플 폴더까지 포함해서 전체 확인이 필요하면 아래 옵션을 사용한다.
-
-```text
-python .opencode/scripts/scan_data_models.py --project <model-project-folder> --include-opencode
-```
-
-생성 산출물인 `mlartifacts/`까지 확인해야 할 때만 아래 옵션을 사용한다.
-
-```text
-python .opencode/scripts/scan_data_models.py --project <model-project-folder> --include-mlartifacts
-```
-
-### bootstrap_sample_project.py
-
-모델 프로젝트 폴더에 실행 가능한 모델이 없을 때, 샘플 3개 중 하나를 선택해 워크스페이스 아래로 샘플 폴더째 복사한다.
-
-선택 가능한 샘플은 원본에 `aiu_custom/`, `local_serving/`, `save_model/` 기본 폴더가 있어야 한다.
-
-샘플 목록:
+모델이 없을 때 `sklearn_sample`, `pytorch_sample`, `tensorflow_sample` 중 하나를 워크스페이스로 복사한다.
 
 ```text
 python .opencode/scripts/bootstrap_sample_project.py --list
-```
-
-복사 전 확인:
-
-```text
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample sklearn
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample pytorch
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample tensorflow
-```
-
-실제 폴더 복사:
-
-```text
 python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample sklearn --execute
 ```
 
-복사 대상은 소스 구조 중심이며 `.venv/`, `__pycache__/`, `model/`, `saved_model/`, `artifacts/ai_studio/`, `MLflow 로컬 실행 산출물`, `mlartifacts/`, `mlflow.db` 같은 생성 산출물은 제외한다.
+## check_environment.py
 
-복사 후 `aiu_custom/`, `local_serving/`, `save_model/` 필수 폴더는 항상 복사된 샘플 폴더 안에 보장한다.
-
-기존 파일이 있을 때 덮어쓰기는 사용자가 명시적으로 요청한 경우에만 사용한다.
-
-```text
-python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample sklearn --execute --force
-```
-
-### check_environment.py
-
-Python, dependency, MLflow 상태를 확인한다.
-
-Secret 값은 출력하지 않고 `set`, `empty`, `missing` 상태만 출력한다.
-
-학습 모델 생성 필수 파일:
-
-```text
-```
-
-필수 키:
-
-```text
-mlflow_tracking_url
-mlflow_tracking_username
-mlflow_tracking_password
-mlflow_experiment_name
-mlflow_register_model_name
-```
+Python, MLflow, 필수 폴더, `ai_studio.env` 상태를 확인한다. secret 값은 출력하지 않는다.
+`--install-requirements`를 명시하면 `requirements.txt` 기준으로 패키지를 설치한다.
+배포 오류 로그가 있으면 `--error-log`로 원인/조치 가이드를 출력한다.
+`--qwen-diagnose`를 명시하면 `OPENAI_BASE_URL`, `OPENAI_API_KEY`, `OPENAI_MODEL` 기준으로 Qwen 추가 진단을 수행한다.
 
 ```text
 python .opencode/scripts/check_environment.py --project <model-project-folder>
 python .opencode/scripts/check_environment.py --project <model-project-folder> --json
+python .opencode/scripts/check_environment.py --project <model-project-folder> --install-requirements
+python .opencode/scripts/check_environment.py --project <model-project-folder> --error-log deploy.log
+python .opencode/scripts/check_environment.py --project <model-project-folder> --error-log deploy.log --qwen-diagnose
 ```
 
-### run_training.py
+## run_training.py
 
-기존 모델 프로젝트를 실행한다. 모델이 없고 샘플을 가져와야 하면 먼저 `bootstrap_sample_project.py`로 사용자가 선택한 샘플 폴더를 복사한다.
-`--project`에 `<model-project-folder>/data` 또는 `data/` 하위 폴더를 넘기면 부모 프로젝트 루트로 보정한 뒤 `data/` 전체를 검색해 실행한다.
+모델 준비와 실행을 담당한다.
 
-기본값은 안전 모드다. 실제 실행은 `--execute`를 명시해야 한다.
-실행 전 필요한 환경변수 또는 config/mlflow_config.json 값을 확인한다.
-`data/` 폴더 안에 모델 형식 파일이 있으면 폐쇄망 반입 대상인 프로젝트 루트의
-`aiu_studio/` 폴더를 보존한다. `aiu_studio/`가 없으면 생성하고, 있으면 삭제하지 않는다.
-그 다음 `aiu_studio/` 실행 템플릿 폴더만 복사한다. 모델 파일은 `data/**` 원본 경로에서 직접 읽는다. 필수 구조나 실행 파일이 없으면
-`aiu_custom/`, `local_serving/`, `save_model/`, `aiu_studio/`, `run_test.py`, `run_test2.py`
-계열 파일을 자동 생성한다.
+- 필수 폴더와 기본 파일 생성
+- `aiu_studio/` 실행 템플릿 폴더 복사
+- 모델 파일은 `aiu_studio/`로 복사하지 않고 `data/**`에서 직접 읽음
+- `runtest.py`를 우선 참조해서 선택 모델 기준 `runtest_2.py` 생성
+- 일반 `run_test.py`, `run_test2.py` 생성
+- 필요 시 생성된 entrypoint 실행
+
+`--target-index` 또는 `--target-model`을 사용하면 선택 모델 기준으로 아래 항목을 자동 처리한다.
+
+```text
+6. MODEL_PATH = DATA_MODEL_PATH
+7. runtest.py 우선 참조, 없으면 run_test.py 참조
+8. 선택 모델 형식에 맞는 runtest_2.py 생성
+```
 
 ```text
 python .opencode/scripts/run_training.py --project <model-project-folder>
 python .opencode/scripts/run_training.py --project <model-project-folder> --execute
+python .opencode/scripts/run_training.py --project <model-project-folder> --target-index 1 --output runtest_2.py --force
+python .opencode/scripts/run_training.py --project <model-project-folder> --target-model data/model.pkl --template runtest.py --output runtest_2.py --force
 ```
 
-### ensure_run_test_entrypoints.py
+## verify_mlflow.py
 
-`data/` 폴더 안에 모델 형식 파일은 있는데 실행 파일이 없을 때 제공 실행 파일을 생성한다.
-
-```text
-python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder>
-python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --execute
-```
-
-대상 모델을 직접 선택해서 별도 실행 파일을 만들 수도 있다.
-이 경우 기존 `runtest.py`를 먼저 템플릿으로 참고하고, 없으면 `run_test.py`를 참고해서 선택 모델 형식에 맞는 `runtest_2.py`를 생성한다.
-이때 `aiu_studio/`는 실행 템플릿 폴더만 프로젝트 루트로 복사한다.
-선택된 모델 파일은 `aiu_studio/`로 복사하지 않고 원래 위치인 `data/**`에서 직접 읽는다.
-
-```text
-python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-index 1 --output runtest_2.py --execute
-python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-model data/model.pkl --output runtest_2.py --execute
-python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-model model.pkl --output runtest_2.py --execute
-python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-model data/model.pkl --template runtest.py --output runtest_2.py --execute
-```
-
-이 모드는 선택한 `data/**` 모델 파일의 확장자를 기준으로 로더를 결정하고, 템플릿 파일의 모델 경로와 모델 형식 상수만 새 대상 모델 기준으로 변환한다.
-템플릿을 찾지 못하면 내장 실행 템플릿으로 생성한다.
-
-생성 규칙:
-
-```text
-data/ 안의 첫 번째 모델 파일 -> run_test.py
-data/ 안의 두 번째 모델 파일 -> run_test2.py
-data/ 안의 세 번째 모델 파일 -> run_test3.py
-```
-
-지원 모델 확장자:
-
-```text
-sklearn/python: .pkl, .pickle, .sav, .joblib, .dill, .cloudpickle
-PyTorch/HF:     .pt, .pth, .ckpt, .bin, .safetensors
-ONNX:           .onnx, .ort
-TensorFlow:     .h5, .hdf5, .keras, .pb, .tflite
-Boosting:       .bst, .ubj, .xgb, .cbm, .lgb
-Portable/LLM:   .pmml, .mlmodel, .gguf, .ggml, .mar, .nemo, .engine, .plan, .npz
-```
-
-### ensure_required_project_files.py
-
-`data/` 폴더 안에 모델 형식 파일이 있을 때 AI Studio 연동에 필요한 기본 파일을 생성한다.
-폐쇄망 반입 대상인 `aiu_studio/` 폴더는 보존하고, 실행 템플릿 폴더만 프로젝트 루트의
-`aiu_studio/`로 복사한다. 모델 파일은 복사하지 않고 `data/**` 원본 경로에서 직접 읽는다.
-
-```text
-python .opencode/scripts/ensure_required_project_files.py --project <model-project-folder>
-python .opencode/scripts/ensure_required_project_files.py --project <model-project-folder> --execute
-```
-
-생성 대상:
-
-```text
-aiu_custom/
-local_serving/
-save_model/
-aiu_studio/
-requirements.txt
-input_example.json
-aiu_custom/predict.py
-local_serving/serving_app.py
-```
-
-`aiu_custom/predict.py`는 원본 `data/` 모델 파일을 직접 로드한다.
-
-폐쇄망 모델 선택 샘플:
-
-```text
-sklearn
-pytorch
-tensorflow
-```
-
-다른 샘플은 임의로 선택하지 않는다.
-
-### test_local_sample.py
-
-선택형 샘플 자체를 테스트한다.
-
-```text
-python .opencode/scripts/test_local_sample.py --sample sklearn
-python .opencode/scripts/test_local_sample.py --sample all
-```
-
-### test_inference.py
-
-모델 로드와 input example 기반 predict를 테스트한다.
-
-기본값은 안전 모드다. 실제 추론은 `--execute`를 명시해야 한다.
-
-```text
-python .opencode/scripts/test_inference.py --project <model-project-folder>
-python .opencode/scripts/test_inference.py --project <model-project-folder> --execute
-```
-
-### verify_mlflow.py
-
-MLflow experiment, run, artifact, registered model 상태를 확인한다.
+MLflow experiment run, artifact, model registry를 확인하고 분석 결과 리포트를 출력한다.
+리포트에는 `status`, `summary`, run/artifact/model/registry 상태, 후속 조치가 포함된다.
 
 ```text
 python .opencode/scripts/verify_mlflow.py --tracking-uri http://127.0.0.1:5000 --experiment-name <name>
 python .opencode/scripts/verify_mlflow.py --tracking-uri http://127.0.0.1:5000 --experiment-id <id> --registered-model <model-name>
 ```
-
-## Safety
-
-- 실제 학습/추론 실행은 `--execute`가 있을 때만 수행한다.
-- secret 값은 출력하지 않는다.
-- 샘플 원본은 직접 수정하지 않는다.
-- 모델 프로젝트 폴더에 기존 작업 경로가 있으면 기본적으로 덮어쓰지 않는다.

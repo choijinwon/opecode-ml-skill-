@@ -9,7 +9,7 @@ metadata:
   step: 5
 ---
 
-# MLflow Run And Model Verification
+# MLflow Run And Model Analysis Report
 
 ## When To Use
 
@@ -59,6 +59,9 @@ metadata:
 - params/metrics/artifacts 기록 상태
 - model artifact 기록 상태
 - registered model/version 생성 여부
+- MLflow 분석 결과 리포트
+- `pass` / `warn` / `block` 상태
+- 요약 문구
 - MLflow UI에서 확인할 위치
 - 남은 차단 항목 또는 후속 작업
 
