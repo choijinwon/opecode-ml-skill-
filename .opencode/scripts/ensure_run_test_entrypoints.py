@@ -256,9 +256,25 @@ def load_model():
             return cloudpickle.load(handle)
 
     if MODEL_KIND == "pytorch":
-        import torch
+        try:
+            import torch
+        except ModuleNotFoundError:
+            return {{
+                "model_path": str(MODEL_PATH),
+                "model_kind": MODEL_KIND,
+                "dependency_required": "torch",
+                "message": "torch is not installed in this Python environment; install/activate a PyTorch runtime before real inference",
+            }}
 
-        return torch.load(MODEL_PATH, map_location="cpu")
+        try:
+            return torch.load(MODEL_PATH, map_location="cpu")
+        except Exception as exc:
+            return {{
+                "model_path": str(MODEL_PATH),
+                "model_kind": MODEL_KIND,
+                "load_error": f"{{type(exc).__name__}}: {{exc}}",
+                "message": "torch was imported but the model file could not be loaded; verify that the selected file is a valid PyTorch artifact",
+            }}
 
     if MODEL_KIND == "onnx":
         import onnxruntime as ort
@@ -297,7 +313,15 @@ def load_model():
         return lgb.Booster(model_file=str(MODEL_PATH))
 
     if MODEL_KIND == "safetensors":
-        from safetensors.torch import load_file
+        try:
+            from safetensors.torch import load_file
+        except ModuleNotFoundError:
+            return {{
+                "model_path": str(MODEL_PATH),
+                "model_kind": MODEL_KIND,
+                "dependency_required": "safetensors, torch",
+                "message": "safetensors/torch is not installed in this Python environment; install/activate the runtime before real inference",
+            }}
 
         return load_file(str(MODEL_PATH))
 
@@ -386,6 +410,28 @@ def replace_assignment(text: str, name: str, value: str) -> tuple[str, bool]:
     return updated, count > 0
 
 
+def has_assignment(text: str, name: str) -> bool:
+    return bool(re.search(rf"^{name}\s*=", text, flags=re.MULTILINE))
+
+
+def insert_support_block(text: str, support_block: str) -> str:
+    if not support_block:
+        return text
+    pattern = re.compile(r"^(PROJECT_DIR\s*=.*)$", re.MULTILINE)
+    updated, count = pattern.subn(rf"\1\n{support_block}", text, count=1)
+    if count:
+        return updated
+    return "from pathlib import Path\n\nPROJECT_DIR = Path(__file__).resolve().parent\n" + support_block + text
+
+
+def replace_first_available_assignment(text: str, names: list[str], value: str) -> tuple[str, bool]:
+    changed = False
+    for name in names:
+        text, did_change = replace_assignment(text, name, value)
+        changed = changed or did_change
+    return text, changed
+
+
 def render_selected_run_test(project: Path, artifact: Path, model_kind: str, template: Path | None) -> str:
     if template is None:
         return render_run_test(project, artifact, model_kind)
@@ -395,21 +441,51 @@ def render_selected_run_test(project: Path, artifact: Path, model_kind: str, tem
     model_var = safe_name(artifact)
     text = template.read_text(encoding="utf-8")
 
-    replacements = {
-        "DATA_MODEL_PATH": f"PROJECT_DIR / {rel_artifact!r}",
-        "AIU_STUDIO_MODEL_PATH": f'PROJECT_DIR / "aiu_studio" / {rel_data_artifact!r}',
-        "MODEL_PATH": "AIU_STUDIO_MODEL_PATH if AIU_STUDIO_MODEL_PATH.exists() else DATA_MODEL_PATH",
-        "MODEL_KIND": repr(model_kind),
-        "MODEL_NAME": repr(model_var),
-    }
+    path_value = "AIU_STUDIO_MODEL_PATH if AIU_STUDIO_MODEL_PATH.exists() else DATA_MODEL_PATH"
+    replacement_groups = [
+        (["DATA_MODEL_PATH", "SOURCE_MODEL_PATH"], f"PROJECT_DIR / {rel_artifact!r}"),
+        (["AIU_STUDIO_MODEL_PATH", "AI_STUDIO_MODEL_PATH"], f'PROJECT_DIR / "aiu_studio" / {rel_data_artifact!r}'),
+        (
+            [
+                "MODEL_PATH",
+                "MODEL_FILE",
+                "MODEL_FILE_PATH",
+                "MODEL_ARTIFACT_PATH",
+                "ARTIFACT_PATH",
+                "TARGET_MODEL_PATH",
+                "SELECTED_MODEL_PATH",
+            ],
+            path_value,
+        ),
+        (["MODEL_KIND", "MODEL_TYPE", "MODEL_FORMAT", "FRAMEWORK"], repr(model_kind)),
+        (["MODEL_NAME", "MODEL_ID"], repr(model_var)),
+    ]
 
     changed = False
-    for name, value in replacements.items():
-        text, did_change = replace_assignment(text, name, value)
+    for names, value in replacement_groups:
+        text, did_change = replace_first_available_assignment(text, names, value)
         changed = changed or did_change
 
     if not changed:
         return render_run_test(project, artifact, model_kind)
+
+    header = f'''# Converted by OpenCode MLflow skill.
+# Selected data model: {rel_artifact}
+# Selected model kind: {model_kind}
+
+'''
+    support_lines = []
+    if not has_assignment(text, "DATA_MODEL_PATH"):
+        support_lines.append(f"DATA_MODEL_PATH = PROJECT_DIR / {rel_artifact!r}")
+    if not has_assignment(text, "AIU_STUDIO_MODEL_PATH"):
+        support_lines.append(f'AIU_STUDIO_MODEL_PATH = PROJECT_DIR / "aiu_studio" / {rel_data_artifact!r}')
+    support_block = "\n".join(support_lines)
+    if support_block:
+        support_block = support_block + "\n"
+        text = insert_support_block(text, support_block)
+
+    if not text.startswith("# Converted by OpenCode MLflow skill."):
+        text = header + text
 
     return text
 

@@ -125,6 +125,8 @@ Portable/LLM:   .pmml, .mlmodel, .gguf, .ggml, .mar, .nemo, .engine, .plan, .npz
 
 사용자가 특정 대상 모델을 선택하면 전체 자동 생성 순서와 별개로 선택 모델 전용 실행 파일을 만든다.
 이때 `data/` 안의 파일 전체를 프로젝트 루트의 `aiu_studio/`로 복사하고, 기존 `runtest.py` 또는 `run_test.py`를 참고해 `runtest_2.py`를 생성한다.
+기존 `runtest.py`는 수정하지 않는다. 선택 모델의 경로와 모델 형식으로 변환된 결과는 반드시 새 파일 `runtest_2.py`로 생성한다.
+이미 `runtest_2.py`가 있고 사용자가 재생성을 요청하면 `--force`를 사용한다.
 
 ```text
 python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-model data/<model-file> --output runtest_2.py --execute

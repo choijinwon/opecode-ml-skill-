@@ -17,6 +17,7 @@ metadata:
 - `data/model.pkl` 같은 대상 모델 파일을 지정하고 `runtest_2.py`를 생성해 달라고 할 때
 - 기존 `runtest.py` 또는 `run_test.py`와 같은 템플릿 구조를 유지하면서 다른 모델 형식용 실행 파일이 필요할 때
 - 여러 모델 중 하나를 선택해 smoke test entrypoint를 분리해야 할 때
+- 사용자가 "선택된 모델 양식으로 변환", "`runtest.py` 참고", "`runtest_2.py` 새로 생성"처럼 요청할 때
 
 ## Required Behavior
 
@@ -26,10 +27,46 @@ metadata:
 4. 대상 모델 파일이 반드시 `<model-project-folder>/data/` 아래에 있는지 확인한다.
 5. 대상 모델 확장자를 기준으로 모델 형식을 판별한다.
 6. 기존 `runtest.py`를 먼저 템플릿으로 사용하고, 없으면 `run_test.py`를 템플릿으로 사용한다.
-7. 템플릿의 모델 경로와 모델 형식 상수를 대상 모델 기준으로 바꿔 `runtest_2.py`를 생성한다.
-8. 출력 파일명은 사용자가 지정하면 그 값을 사용하고, 없으면 `runtest_2.py`를 기본값으로 사용한다.
-9. 기존 출력 파일이 있으면 기본적으로 덮어쓰지 않는다.
-10. 덮어쓰기를 사용자가 명시하면 `--force`를 사용한다.
+7. 템플릿의 모델 경로와 모델 형식 상수를 대상 모델 기준으로 바꾼다.
+8. 반드시 기존 템플릿 파일은 수정하지 않고 새 파일 `runtest_2.py`를 생성한다.
+9. 출력 파일명은 사용자가 지정하면 그 값을 사용하고, 없으면 `runtest_2.py`를 기본값으로 사용한다.
+10. 기존 출력 파일이 있으면 기본적으로 덮어쓰지 않는다.
+11. 사용자가 "새로 생성", "다시 생성", "변환 안됨", "덮어써"처럼 재생성을 요청하면 `--force`를 사용한다.
+
+## Template Conversion Rules
+
+`runtest.py` 또는 `run_test.py`에서 아래 상수명이 있으면 선택 모델 기준으로 치환한다.
+
+```text
+모델 원본 경로:
+- DATA_MODEL_PATH
+- SOURCE_MODEL_PATH
+
+aiu_studio 복사 경로:
+- AIU_STUDIO_MODEL_PATH
+- AI_STUDIO_MODEL_PATH
+
+실제 로드 경로:
+- MODEL_PATH
+- MODEL_FILE
+- MODEL_FILE_PATH
+- MODEL_ARTIFACT_PATH
+- ARTIFACT_PATH
+- TARGET_MODEL_PATH
+- SELECTED_MODEL_PATH
+
+모델 형식:
+- MODEL_KIND
+- MODEL_TYPE
+- MODEL_FORMAT
+- FRAMEWORK
+
+모델 이름:
+- MODEL_NAME
+- MODEL_ID
+```
+
+템플릿에서 위 상수명을 찾지 못하면 템플릿을 억지로 수정하지 않고, 선택 모델 형식에 맞는 표준 `runtest_2.py`를 생성한다.
 
 ## Command
 
@@ -55,6 +92,12 @@ python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project
 
 ```text
 python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-model data/<model-file> --output runtest_2.py --execute --force
+```
+
+재생성 요청이 있으면 아래 명령을 우선 사용한다.
+
+```text
+python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-model data/<model-file> --template runtest.py --output runtest_2.py --execute --force
 ```
 
 ## Supported Model Suffixes
@@ -83,4 +126,7 @@ Portable/LLM:   .pmml, .mlmodel, .gguf, .ggml, .mar, .nemo, .engine, .plan, .npz
 - `data/` 밖의 모델 파일은 대상 모델로 사용하지 않는다.
 - 기존 `runtest.py`와 `run_test.py`는 수정하지 않는다.
 - 기존 `runtest_2.py`가 있으면 사용자가 명시적으로 덮어쓰기를 요청하기 전까지 보존한다.
+- `.pt`, `.pth`, `.ckpt`, `.bin`, `.safetensors` 모델은 실제 로드에 `torch` 또는 `safetensors`가 필요하다.
+- 해당 dependency가 없는 폐쇄망 환경에서는 `runtest_2.py --load-only`가 dependency 필요 메시지를 출력하게 하고, 스킬 응답에서는 런타임 설치/활성화가 필요하다고 안내한다.
+- `torch`가 설치되어 있어도 선택한 파일이 빈 파일, placeholder, 다른 형식이면 `load_error` 메시지로 안내하고 스크립트 자체는 종료되지 않게 한다.
 - secret 값은 출력하지 않는다.

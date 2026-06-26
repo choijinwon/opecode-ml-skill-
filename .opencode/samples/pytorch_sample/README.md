@@ -16,6 +16,9 @@ input_example.json
 requirements.txt
 ```
 
+PyTorch 모델 파일(`.pt`, `.pth`, `.ckpt`, `.bin`, `.safetensors`)을 실제 로드하려면 실행 환경에 `torch`가 필요합니다.
+폐쇄망에서는 내부 패키지 저장소나 사전 설치된 Python 환경을 사용하세요.
+
 주의:
 
 - 실제 API key, password, token 값은 넣지 않습니다.

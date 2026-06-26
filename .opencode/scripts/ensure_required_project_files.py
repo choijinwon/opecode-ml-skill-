@@ -135,9 +135,25 @@ def load_model():
             return cloudpickle.load(handle)
 
     if MODEL_KIND == "pytorch":
-        import torch
+        try:
+            import torch
+        except ModuleNotFoundError:
+            return {{
+                "model_path": str(MODEL_PATH),
+                "model_kind": MODEL_KIND,
+                "dependency_required": "torch",
+                "message": "torch is not installed in this Python environment; install/activate a PyTorch runtime before real inference",
+            }}
 
-        return torch.load(MODEL_PATH, map_location="cpu")
+        try:
+            return torch.load(MODEL_PATH, map_location="cpu")
+        except Exception as exc:
+            return {{
+                "model_path": str(MODEL_PATH),
+                "model_kind": MODEL_KIND,
+                "load_error": f"{{type(exc).__name__}}: {{exc}}",
+                "message": "torch was imported but the model file could not be loaded; verify that the selected file is a valid PyTorch artifact",
+            }}
 
     if MODEL_KIND == "onnx":
         import onnxruntime as ort
@@ -176,7 +192,15 @@ def load_model():
         return lgb.Booster(model_file=str(MODEL_PATH))
 
     if MODEL_KIND == "safetensors":
-        from safetensors.torch import load_file
+        try:
+            from safetensors.torch import load_file
+        except ModuleNotFoundError:
+            return {{
+                "model_path": str(MODEL_PATH),
+                "model_kind": MODEL_KIND,
+                "dependency_required": "safetensors, torch",
+                "message": "safetensors/torch is not installed in this Python environment; install/activate the runtime before real inference",
+            }}
 
         return load_file(str(MODEL_PATH))
 
