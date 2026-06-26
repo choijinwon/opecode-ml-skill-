@@ -87,7 +87,6 @@ def main():
     parser.add_argument("--project", default=".", help="user-specified model project folder")
     parser.add_argument("--python", default=sys.executable, help="Python interpreter to use")
     parser.add_argument("--execute", action="store_true", help="actually run the selected command")
-    parser.add_argument("--force-sample", action="store_true", help="deprecated; use bootstrap_sample_project.py for sample folder copy")
     parser.add_argument("--no-create-run-test", action="store_true", help="do not create run_test.py when data model files are found")
     parser.add_argument("--no-ensure-required-files", action="store_true", help="do not create required project files when data model files are found")
     parser.add_argument("--prepare-only", action="store_true", help="prefer prepare-only mode when supported")

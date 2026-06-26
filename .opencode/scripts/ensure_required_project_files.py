@@ -271,7 +271,7 @@ def predict(request: PredictRequest):
 def copy_aiu_studio_template_files(project: Path, report: RequiredFilesReport, model_kind: str, force: bool = False, execute: bool = True):
     source_dir = default_aiu_studio_template_source(model_kind)
     if source_dir is None:
-        report.failures.append("aiu_studio_template_not_found:.opencode/sample/aiu_studio")
+        report.failures.append("aiu_studio_template_not_found:.opencode/sample/aiu_studio or .opencode/samples/*_sample/aiu_studio")
         return
 
     if not execute:

@@ -72,7 +72,7 @@ class RunTestReport:
     aiu_studio_preexisting: bool = False
     aiu_studio_template_source: str | None = None
     generated: list[GeneratedRunTest] = field(default_factory=list)
-    copied_to_aiu_studio: list[str] = field(default_factory=list)
+    copied_aiu_studio_template_files: list[str] = field(default_factory=list)
     failures: list[str] = field(default_factory=list)
 
 
@@ -609,12 +609,12 @@ def ensure_selected_run_test(
     template_file = find_template_file(project, template)
     aiu_studio_source = default_aiu_studio_template_source(model_kind)
     if aiu_studio_source is None:
-        report.failures.append("aiu_studio_template_not_found:.opencode/sample/aiu_studio")
+        report.failures.append("aiu_studio_template_not_found:.opencode/sample/aiu_studio or .opencode/samples/*_sample/aiu_studio")
         return report
     report.aiu_studio_template_source = str(aiu_studio_source)
 
     if execute:
-        report.copied_to_aiu_studio = copy_aiu_studio_template(project, aiu_studio_source, force=force)
+        report.copied_aiu_studio_template_files = copy_aiu_studio_template(project, aiu_studio_source, force=force)
 
     if target.exists() and not force:
         report.generated.append(
@@ -685,7 +685,6 @@ def main():
     parser.add_argument("--target-index", type=int, help="1-based selected model number from model_artifact_paths")
     parser.add_argument("--output", default="runtest_2.py", help="output run test filename for --target-model")
     parser.add_argument("--template", help="template run test file; defaults to runtest.py then run_test.py")
-    parser.add_argument("--copy-aiu-studio", action="store_true", help="deprecated: selected model mode always copies the aiu_studio template folder, never model files")
     parser.add_argument("--execute", action="store_true", help="write run_test files")
     parser.add_argument("--force", action="store_true", help="overwrite existing run_test files")
     parser.add_argument("--json", action="store_true", help="print machine-readable JSON")
@@ -735,9 +734,9 @@ def main():
             if item.template_path:
                 print(f"  template: {item.template_path}")
                 print(f"  converted_from_template: {str(item.converted_from_template).lower()}")
-        if report.copied_to_aiu_studio:
+        if report.copied_aiu_studio_template_files:
             print("Copied aiu_studio template files:")
-            for copied in report.copied_to_aiu_studio:
+            for copied in report.copied_aiu_studio_template_files:
                 print(f"- {copied}")
         if report.failures:
             print("Failures:")
