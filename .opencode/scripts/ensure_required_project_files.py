@@ -1,10 +1,11 @@
 import argparse
 import json
-import shutil
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 from ensure_run_test_entrypoints import ARTIFACT_SUFFIX_TO_KIND
+from ensure_run_test_entrypoints import copy_aiu_studio_template
+from ensure_run_test_entrypoints import default_aiu_studio_template_source
 from ensure_run_test_entrypoints import find_model_artifacts
 from ensure_run_test_entrypoints import normalize_project_root
 
@@ -77,7 +78,6 @@ def render_input_example(model_kind: str) -> str:
 
 def render_predict(project: Path, artifact: Path, model_kind: str) -> str:
     rel_artifact = artifact.relative_to(project).as_posix()
-    rel_data_artifact = artifact.relative_to(project / "data").as_posix()
     return f'''"""AI Studio compatible MLflow pyfunc wrapper.
 
 이 파일은 data/ 폴더에 모델 파일은 있지만 필수 실행 파일이 없을 때 자동 생성됩니다.
@@ -91,8 +91,8 @@ import mlflow.pyfunc
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 DATA_MODEL_PATH = PROJECT_DIR / {rel_artifact!r}
-AIU_STUDIO_MODEL_PATH = PROJECT_DIR / "aiu_studio" / {rel_data_artifact!r}
-MODEL_PATH = AIU_STUDIO_MODEL_PATH if AIU_STUDIO_MODEL_PATH.exists() else DATA_MODEL_PATH
+AIU_STUDIO_DIR = PROJECT_DIR / "aiu_studio"
+MODEL_PATH = DATA_MODEL_PATH
 MODEL_KIND = {model_kind!r}
 
 
@@ -268,28 +268,18 @@ def predict(request: PredictRequest):
 '''
 
 
-def copy_data_files_to_aiu_studio(project: Path, report: RequiredFilesReport, force: bool = False, execute: bool = True):
-    data_dir = project / "data"
-    target_root = project / "aiu_studio"
-    if not data_dir.is_dir():
-        report.failures.append("data_folder_not_found")
+def copy_aiu_studio_template_files(project: Path, report: RequiredFilesReport, model_kind: str, force: bool = False, execute: bool = True):
+    source_dir = default_aiu_studio_template_source(model_kind)
+    if source_dir is None:
+        report.failures.append("aiu_studio_template_not_found:.opencode/sample/aiu_studio")
         return
 
-    for source in sorted(path for path in data_dir.rglob("*") if path.is_file()):
-        relative_path = source.relative_to(data_dir)
-        target = target_root / relative_path
+    if not execute:
+        report.ensured.append(EnsuredFile(str(project / "aiu_studio"), created=False, skipped_reason=f"dry_run:{source_dir}"))
+        return
 
-        if not execute:
-            report.ensured.append(EnsuredFile(str(target), created=False, skipped_reason="dry_run"))
-            continue
-
-        if target.exists() and not force:
-            report.ensured.append(EnsuredFile(str(target), created=False, skipped_reason="exists"))
-            continue
-
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, target)
-        report.ensured.append(EnsuredFile(str(target), created=True))
+    for copied in copy_aiu_studio_template(project, source_dir, force=force):
+        report.ensured.append(EnsuredFile(copied, created=True))
 
 
 def ensure_required_files(project: Path, force: bool = False, execute: bool = True) -> RequiredFilesReport:
@@ -325,7 +315,7 @@ def ensure_required_files(project: Path, force: bool = False, execute: bool = Tr
                 gitkeep.write_text("", encoding="utf-8")
             report.ensured.append(EnsuredFile(str(target_dir), created=True))
 
-        copy_data_files_to_aiu_studio(project, report, force=force, execute=True)
+        copy_aiu_studio_template_files(project, report, model_kind, force=force, execute=True)
         write_if_missing(project / "requirements.txt", render_requirements(model_kind), report, force=force)
         write_if_missing(project / "input_example.json", render_input_example(model_kind), report, force=force)
         write_if_missing(project / "aiu_custom" / "__init__.py", "", report, force=force)
@@ -340,7 +330,7 @@ def ensure_required_files(project: Path, force: bool = False, execute: bool = Tr
             project / "local_serving" / "serving_app.py",
         ]:
             report.ensured.append(EnsuredFile(str(target), created=False, skipped_reason="dry_run"))
-        copy_data_files_to_aiu_studio(project, report, force=force, execute=False)
+        copy_aiu_studio_template_files(project, report, model_kind, force=force, execute=False)
 
     return report
 

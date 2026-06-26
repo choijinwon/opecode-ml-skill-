@@ -45,7 +45,7 @@ metadata:
   - Custom pyfunc: `mlflow.pyfunc.PythonModel`, `aiu_custom`, `ModelWrapper`
 - `data/` 안의 모델 파일 후보와 생성 위치를 확인한다.
 - `aiu_studio/` 폴더는 폐쇄망 AI Studio 반입 대상이므로 존재 여부를 명확히 표시한다.
-- `aiu_studio/`가 이미 있으면 이후 실행 단계에서 삭제하지 않고 보존/병합 복사해야 한다.
+- `aiu_studio/`가 이미 있으면 이후 실행 단계에서 삭제하지 않고 보존한다. 모델 파일은 `aiu_studio/`로 복사하지 않고 `data/**`에서 직접 읽는다.
 - 학습 entrypoint와 추론 entrypoint를 분리해서 표시한다.
 - 누락 항목은 실패로 단정하지 않고 다음 단계에서 확인할 항목으로 분류한다.
 
@@ -166,12 +166,13 @@ next_action: model_artifact_paths 중 사용할 모델 선택
 
 다음 단계:
 1. 사용할 모델 번호 또는 경로 선택
-2. 프로젝트 루트에 `aiu_studio/` 폴더 생성 또는 기존 폴더 보존
-3. 선택 모델 기준 `data/**` 파일을 루트 `aiu_studio/` 폴더로 병합 복사
-4. 선택 모델 형식에 맞는 `runtest_2.py` 생성
-5. `agent-mlflow-skill-environment-check`로 dependency 확인
-6. `agent-mlflow-skill-inference-test`로 추론 테스트
-7. `agent-mlflow-skill-mlflow-verify`로 MLflow 기록 확인
+2. `aiu_studio/` 실행 템플릿 폴더를 프로젝트 루트로 복사
+3. 모델 파일은 복사하지 않고 선택된 `data/**` 모델 파일을 직접 읽음
+4. 기존 `runtest.py` 우선 참조, 없으면 `run_test.py` 참조
+5. 선택 모델 경로와 형식 기준으로 `runtest_2.py` 변환 생성
+6. `agent-mlflow-skill-environment-check`로 dependency 확인
+7. `agent-mlflow-skill-inference-test`로 추론 테스트
+8. `agent-mlflow-skill-mlflow-verify`로 MLflow 기록 확인
 ```
 
 모델이 발견되면 `.opencode/samples`는 참조하지 않는다.

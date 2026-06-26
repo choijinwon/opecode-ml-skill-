@@ -1,6 +1,6 @@
 ---
 name: agent-mlflow-skill-selected-run-test
-description: Use when the user selects a target data model file and asks to copy data files to aiu_studio, reference runtest.py or run_test.py, and create runtest_2.py or another model-format-specific run test file.
+description: Use when the user selects a target data model file and asks to copy the aiu_studio template folder, keep model files in data/**, reference runtest.py or run_test.py, then create runtest_2.py or another model-format-specific run test file.
 license: MIT
 compatibility: opencode
 metadata:
@@ -25,19 +25,17 @@ metadata:
 1. 사용자가 지정한 모델 프로젝트 폴더를 확인한다.
 2. 직전 분석 결과의 `model_artifact_paths`가 있으면 사용자의 번호 선택을 해당 경로로 해석한다.
 3. `<model-project-folder>/data/` 아래에 지원 모델 형식 파일이 있는지 확인한다.
-4. 프로젝트 루트의 `aiu_studio/` 폴더는 폐쇄망 AI Studio 반입 대상이므로 반드시 루트에 둔다.
-5. 루트 `aiu_studio/`가 이미 있으면 삭제하거나 초기화하지 않고 그대로 보존한다.
-6. 루트 `aiu_studio/`가 없으면 생성한다.
-7. 모델이 있으면 `data/**` 안의 파일 전체를 프로젝트 루트의 `aiu_studio/` 폴더로 병합 복사한다.
-8. 동일 파일이 이미 있으면 기본적으로 덮어쓰지 않는다. 사용자가 재생성/덮어쓰기를 요청한 경우에만 `--force`를 사용한다.
-9. 대상 모델 파일이 반드시 `<model-project-folder>/data/` 아래에 있는지 확인한다.
-10. 대상 모델 확장자를 기준으로 모델 형식을 판별한다.
-11. 기존 `runtest.py`를 먼저 템플릿으로 사용하고, 없으면 `run_test.py`를 템플릿으로 사용한다.
-12. 템플릿의 모델 경로와 모델 형식 상수를 대상 모델 기준으로 바꾼다.
-13. 반드시 기존 템플릿 파일은 수정하지 않고 새 파일 `runtest_2.py`를 생성한다.
-14. 출력 파일명은 사용자가 지정하면 그 값을 사용하고, 없으면 `runtest_2.py`를 기본값으로 사용한다.
-15. 기존 출력 파일이 있으면 기본적으로 덮어쓰지 않는다.
-16. 사용자가 "새로 생성", "다시 생성", "변환 안됨", "덮어써"처럼 재생성을 요청하면 `--force`를 사용한다.
+4. `aiu_studio/` 실행 템플릿 폴더를 프로젝트 루트의 `aiu_studio/`로 복사한다.
+5. 선택된 모델 파일은 `aiu_studio/`로 복사하지 않고 원래 위치인 `data/**`에서 직접 읽는다.
+6. 동일 템플릿 파일이 이미 있으면 기본적으로 덮어쓰지 않는다. 사용자가 재생성/덮어쓰기를 요청한 경우에만 `--force`를 사용한다.
+7. 대상 모델 파일이 반드시 `<model-project-folder>/data/` 아래에 있는지 확인한다.
+8. 대상 모델 확장자를 기준으로 모델 형식을 판별한다.
+9. 기존 `runtest.py`를 먼저 템플릿으로 사용하고, 없으면 `run_test.py`를 템플릿으로 사용한다.
+10. 템플릿의 모델 경로와 모델 형식 상수를 대상 모델 기준으로 바꾼다.
+11. 반드시 기존 템플릿 파일은 수정하지 않고 새 파일 `runtest_2.py`를 생성한다.
+12. 출력 파일명은 사용자가 지정하면 그 값을 사용하고, 없으면 `runtest_2.py`를 기본값으로 사용한다.
+13. 기존 출력 파일이 있으면 기본적으로 덮어쓰지 않는다.
+14. 사용자가 "새로 생성", "다시 생성", "변환 안됨", "덮어써"처럼 재생성을 요청하면 `--force`를 사용한다.
 
 ## Template Conversion Rules
 
@@ -48,9 +46,9 @@ metadata:
 - DATA_MODEL_PATH
 - SOURCE_MODEL_PATH
 
-aiu_studio 복사 경로:
-- AIU_STUDIO_MODEL_PATH
-- AI_STUDIO_MODEL_PATH
+aiu_studio 실행 템플릿 폴더:
+- AIU_STUDIO_DIR
+- AI_STUDIO_DIR
 
 실제 로드 경로:
 - MODEL_PATH
@@ -72,7 +70,7 @@ aiu_studio 복사 경로:
 - MODEL_ID
 ```
 
-템플릿에서 일부 상수만 찾으면 찾은 상수는 치환하고, 없는 `DATA_MODEL_PATH`, `AIU_STUDIO_MODEL_PATH`, `MODEL_PATH`, `MODEL_KIND`, `MODEL_NAME`은 새 `runtest_2.py`에 보강한다.
+템플릿에서 일부 상수만 찾으면 찾은 상수는 치환하고, 없는 `DATA_MODEL_PATH`, `AIU_STUDIO_DIR`, `MODEL_PATH`, `MODEL_KIND`, `MODEL_NAME`은 새 `runtest_2.py`에 보강한다.
 템플릿에서 위 상수명을 전혀 찾지 못하면 템플릿을 억지로 수정하지 않고, 선택 모델 형식에 맞는 표준 `runtest_2.py`를 생성한다.
 
 ## Command
@@ -84,7 +82,8 @@ python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project
 ```
 
 Project Analyze에서 표시된 모델 번호를 그대로 사용할 수도 있다.
-이 명령은 선택 번호에 해당하는 모델을 찾고, `data/**` 전체를 `aiu_studio/`로 병합 복사한 뒤, 선택 모델 형식에 맞게 `runtest_2.py`를 생성한다.
+이 명령은 선택 번호에 해당하는 모델을 찾고, 기존 `runtest.py` 또는 `run_test.py`를 참조해서 선택 모델 형식에 맞게 `runtest_2.py`를 생성한다.
+또한 `aiu_studio/` 실행 템플릿 폴더를 프로젝트 루트로 복사한다. 모델 파일은 복사하지 않는다.
 
 ```text
 python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-index 1 --output runtest_2.py --execute
@@ -129,8 +128,9 @@ Portable/LLM:   .pmml, .mlmodel, .gguf, .ggml, .mar, .nemo, .engine, .plan, .npz
 
 - 선택된 프로젝트 경로
 - 선택된 data 모델 파일 경로
-- 폐쇄망 반입 대상 `aiu_studio/` 폴더 경로
-- `aiu_studio/`로 병합 복사된 파일 목록
+- 복사된 `aiu_studio/` 실행 템플릿 폴더 경로
+- `aiu_studio/`로 복사된 템플릿 파일 목록
+- 모델 파일은 복사하지 않고 `data/**`에서 직접 읽는다는 안내
 - 판별된 모델 형식
 - 생성된 실행 파일 경로
 - 생성 여부 또는 skip 사유

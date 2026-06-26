@@ -70,6 +70,7 @@ class RunTestReport:
     project_path: str
     aiu_studio_path: str | None = None
     aiu_studio_preexisting: bool = False
+    aiu_studio_template_source: str | None = None
     generated: list[GeneratedRunTest] = field(default_factory=list)
     copied_to_aiu_studio: list[str] = field(default_factory=list)
     failures: list[str] = field(default_factory=list)
@@ -159,17 +160,36 @@ def nearest_data_dir(project: Path, artifact: Path) -> Path:
     raise ValueError(f"target_model_must_be_under_data:{artifact}")
 
 
-def copy_data_files_to_aiu_studio(project: Path, data_dir: Path, force: bool = False) -> list[str]:
+def default_aiu_studio_template_source(model_kind: str) -> Path | None:
+    opencode_dir = Path(__file__).resolve().parents[1]
+    preferred = opencode_dir / "sample" / "aiu_studio"
+    if preferred.is_dir():
+        return preferred
+
+    if model_kind in {"pytorch", "safetensors", "torchserve_mar", "nemo"}:
+        sample_name = "pytorch_sample"
+    elif model_kind in {"tensorflow", "tensorflow_pb", "tensorflow_lite"}:
+        sample_name = "tensorflow_sample"
+    else:
+        sample_name = "sklearn_sample"
+
+    fallback = opencode_dir / "samples" / sample_name / "aiu_studio"
+    return fallback if fallback.is_dir() else None
+
+
+def copy_aiu_studio_template(project: Path, source_dir: Path, force: bool = False) -> list[str]:
     project = normalize_project_root(project)
     target_root = project / "aiu_studio"
     copied: list[str] = []
 
-    if not data_dir.is_dir():
+    if not source_dir.is_dir():
         return copied
 
     target_root.mkdir(parents=True, exist_ok=True)
-    for source in sorted(path for path in data_dir.rglob("*") if path.is_file()):
-        relative_path = source.relative_to(data_dir)
+    for source in sorted(path for path in source_dir.rglob("*") if path.is_file()):
+        if source.suffix.lower() in ARTIFACT_SUFFIX_TO_KIND:
+            continue
+        relative_path = source.relative_to(source_dir)
         target = target_root / relative_path
         if target.exists() and not force:
             continue
@@ -214,7 +234,6 @@ def validate_data_model_file(project: Path, model_file: Path) -> str:
 
 def render_run_test(project: Path, artifact: Path, model_kind: str) -> str:
     rel_artifact = artifact.relative_to(project).as_posix()
-    rel_data_artifact = artifact.relative_to(nearest_data_dir(project, artifact)).as_posix()
     model_var = safe_name(artifact)
     return f'''"""Auto-generated model smoke test entrypoint.
 
@@ -230,8 +249,8 @@ from pathlib import Path
 
 PROJECT_DIR = Path(__file__).resolve().parent
 DATA_MODEL_PATH = PROJECT_DIR / {rel_artifact!r}
-AIU_STUDIO_MODEL_PATH = PROJECT_DIR / "aiu_studio" / {rel_data_artifact!r}
-MODEL_PATH = AIU_STUDIO_MODEL_PATH if AIU_STUDIO_MODEL_PATH.exists() else DATA_MODEL_PATH
+AIU_STUDIO_DIR = PROJECT_DIR / "aiu_studio"
+MODEL_PATH = DATA_MODEL_PATH
 MODEL_KIND = {model_kind!r}
 MODEL_NAME = {model_var!r}
 
@@ -453,14 +472,14 @@ def render_selected_run_test(project: Path, artifact: Path, model_kind: str, tem
         return render_run_test(project, artifact, model_kind)
 
     rel_artifact = artifact.relative_to(project).as_posix()
-    rel_data_artifact = artifact.relative_to(nearest_data_dir(project, artifact)).as_posix()
     model_var = safe_name(artifact)
     text = template.read_text(encoding="utf-8")
 
-    path_value = "AIU_STUDIO_MODEL_PATH if AIU_STUDIO_MODEL_PATH.exists() else DATA_MODEL_PATH"
+    path_value = "DATA_MODEL_PATH"
     replacement_groups = [
         (["DATA_MODEL_PATH", "SOURCE_MODEL_PATH"], f"PROJECT_DIR / {rel_artifact!r}"),
-        (["AIU_STUDIO_MODEL_PATH", "AI_STUDIO_MODEL_PATH"], f'PROJECT_DIR / "aiu_studio" / {rel_data_artifact!r}'),
+        (["AIU_STUDIO_DIR", "AI_STUDIO_DIR"], 'PROJECT_DIR / "aiu_studio"'),
+        (["AIU_STUDIO_MODEL_PATH", "AI_STUDIO_MODEL_PATH"], 'PROJECT_DIR / "aiu_studio"'),
         (
             [
                 "MODEL_PATH",
@@ -493,10 +512,10 @@ def render_selected_run_test(project: Path, artifact: Path, model_kind: str, tem
     support_lines = []
     if not has_assignment(text, "DATA_MODEL_PATH"):
         support_lines.append(f"DATA_MODEL_PATH = PROJECT_DIR / {rel_artifact!r}")
-    if not has_assignment(text, "AIU_STUDIO_MODEL_PATH"):
-        support_lines.append(f'AIU_STUDIO_MODEL_PATH = PROJECT_DIR / "aiu_studio" / {rel_data_artifact!r}')
+    if not has_assignment(text, "AIU_STUDIO_DIR"):
+        support_lines.append('AIU_STUDIO_DIR = PROJECT_DIR / "aiu_studio"')
     if not has_assignment(text, "MODEL_PATH"):
-        support_lines.append("MODEL_PATH = AIU_STUDIO_MODEL_PATH if AIU_STUDIO_MODEL_PATH.exists() else DATA_MODEL_PATH")
+        support_lines.append("MODEL_PATH = DATA_MODEL_PATH")
     if not has_assignment(text, "MODEL_KIND"):
         support_lines.append(f"MODEL_KIND = {model_kind!r}")
     if not has_assignment(text, "MODEL_NAME"):
@@ -588,9 +607,14 @@ def ensure_selected_run_test(
 
     target = project / output
     template_file = find_template_file(project, template)
+    aiu_studio_source = default_aiu_studio_template_source(model_kind)
+    if aiu_studio_source is None:
+        report.failures.append("aiu_studio_template_not_found:.opencode/sample/aiu_studio")
+        return report
+    report.aiu_studio_template_source = str(aiu_studio_source)
 
     if execute:
-        report.copied_to_aiu_studio = copy_data_files_to_aiu_studio(project, nearest_data_dir(project, artifact), force=force)
+        report.copied_to_aiu_studio = copy_aiu_studio_template(project, aiu_studio_source, force=force)
 
     if target.exists() and not force:
         report.generated.append(
@@ -661,6 +685,7 @@ def main():
     parser.add_argument("--target-index", type=int, help="1-based selected model number from model_artifact_paths")
     parser.add_argument("--output", default="runtest_2.py", help="output run test filename for --target-model")
     parser.add_argument("--template", help="template run test file; defaults to runtest.py then run_test.py")
+    parser.add_argument("--copy-aiu-studio", action="store_true", help="deprecated: selected model mode always copies the aiu_studio template folder, never model files")
     parser.add_argument("--execute", action="store_true", help="write run_test files")
     parser.add_argument("--force", action="store_true", help="overwrite existing run_test files")
     parser.add_argument("--json", action="store_true", help="print machine-readable JSON")
@@ -695,8 +720,15 @@ def main():
     else:
         print(f"Project: {report.project_path}")
         if report.aiu_studio_path:
-            state = "preexisting" if report.aiu_studio_preexisting else "created_or_pending"
+            if report.aiu_studio_preexisting:
+                state = "preexisting"
+            elif report.aiu_studio_template_source:
+                state = "created_or_pending"
+            else:
+                state = "not_created"
             print(f"AIU Studio folder: {report.aiu_studio_path} ({state})")
+            if report.aiu_studio_template_source:
+                print(f"AIU Studio template: {report.aiu_studio_template_source}")
         for item in report.generated:
             status = "created" if item.created else f"skipped:{item.skipped_reason}"
             print(f"- {status} {item.entrypoint_path} for {item.model_kind}: {item.data_model_file}")
@@ -704,7 +736,7 @@ def main():
                 print(f"  template: {item.template_path}")
                 print(f"  converted_from_template: {str(item.converted_from_template).lower()}")
         if report.copied_to_aiu_studio:
-            print("Merged data files into aiu_studio:")
+            print("Copied aiu_studio template files:")
             for copied in report.copied_to_aiu_studio:
                 print(f"- {copied}")
         if report.failures:
