@@ -22,6 +22,8 @@ metadata:
 ## Guidance Checks
 
 - 현재 작업 경로와 사용자가 지정한 프로젝트 경로를 확인한다.
+- 사용자가 루트 경로를 지정했는데 루트 자체에 모델 신호가 없으면, 루트 바로 아래의 모델 후보 폴더를 먼저 찾는다.
+  - 예: `<root>/sklearn_sample/`, `<root>/pytorch_sample/`, `<root>/tensorflow_sample/`, `<root>/model/`
 - 핵심 파일 존재 여부를 확인한다.
   - `requirements.txt`, `pyproject.toml`, `environment.yml`
   - `train.py`, `app.py`, `main.py`, `run_model.py`
@@ -55,7 +57,7 @@ MLflow 5단계로 봐줘
 
 ```text
 1. 현재 워크스페이스 경로를 확인한다.
-2. 모델 파일, 실행 entrypoint, 필수 폴더를 찾는다.
+2. 루트 자체와 루트 바로 아래 후보 폴더에서 모델 파일, 실행 entrypoint, 필수 폴더를 찾는다.
 3. model_found 값을 먼저 결정한다.
 4. model_found: true이면 기존 모델 기준 가이드를 출력한다.
 5. model_found: false이면 sklearn/pytorch/tensorflow 선택 가이드를 출력한다.
@@ -104,6 +106,15 @@ MLflow 5단계로 봐줘
 모델 artifact 존재: save_model/, model/, artifacts/, saved_model/, .pkl, .joblib, .pt, .pth, .h5, .keras
 MLflow model 존재: MLmodel, python_model.pkl
 input example 존재: input_example.json
+```
+
+사용자가 지정한 경로가 상위 루트이고, 모델 폴더가 하위에 있으면 하위 모델 폴더를 `selected_project_path`로 선택한다.
+
+```text
+<root>/sklearn_sample/
+<root>/pytorch_sample/
+<root>/tensorflow_sample/
+<root>/model/
 ```
 
 모델이 발견된 경우 출력에는 반드시 다음을 포함한다.

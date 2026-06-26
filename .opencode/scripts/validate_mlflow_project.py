@@ -16,6 +16,14 @@ SAMPLES_DIR = ROOT / "samples"
 # this order. They match the bootstrap choices exposed to users.
 SAMPLE_PRIORITY = ["sklearn_sample", "pytorch_sample", "tensorflow_sample"]
 
+PROJECT_CHILD_PRIORITY = [
+    "sklearn_sample",
+    "pytorch_sample",
+    "tensorflow_sample",
+    "model",
+    "models",
+]
+
 # The skill pack does not require a fixed file name. These common names are
 # used only as hints when detecting a registration or inference entrypoint.
 ENTRYPOINT_NAMES = [
@@ -72,6 +80,19 @@ REQUIRED_DIRS = [
     "save_model",
 ]
 
+SKIP_DIR_NAMES = {
+    ".git",
+    ".opencode",
+    ".agents",
+    ".codex",
+    ".venv",
+    "__pycache__",
+    "node_modules",
+    "outputs",
+    "mlruns",
+    "mlartifacts",
+}
+
 AI_STUDIO_ENV_KEYS = [
     "mlflow_tracking_url",
     "mlflow_tracking_username",
@@ -117,6 +138,8 @@ def has_project_markers(path: Path) -> bool:
     # Treat the current directory as a model project only when it has clear
     # ML project markers. This prevents the repository root from being selected
     # just because it contains the skill pack itself.
+    if not path.exists() or not path.is_dir():
+        return False
     marker_names = {
         "requirements.txt",
         "pyproject.toml",
@@ -155,18 +178,53 @@ def score_project(path: Path) -> int:
     return score
 
 
+def iter_child_project_candidates(root: Path) -> list[Path]:
+    if not root.exists() or not root.is_dir():
+        return []
+    candidates: list[Path] = []
+    for child in root.iterdir():
+        if not child.is_dir() or child.name in SKIP_DIR_NAMES or child.name.startswith("."):
+            continue
+        if has_project_markers(child) or score_project(child) > 0:
+            candidates.append(child)
+    return candidates
+
+
+def select_best_child_project(root: Path) -> tuple[Path, str] | None:
+    candidates = iter_child_project_candidates(root)
+    if not candidates:
+        return None
+
+    def rank(path: Path) -> tuple[int, int, str]:
+        priority = PROJECT_CHILD_PRIORITY.index(path.name) if path.name in PROJECT_CHILD_PRIORITY else len(PROJECT_CHILD_PRIORITY)
+        return (-score_project(path), priority, path.name)
+
+    selected = sorted(candidates, key=rank)[0].resolve()
+    return selected, f"child model project under root: {selected.name}"
+
+
 def select_project(explicit: str | None) -> tuple[Path, str]:
     # Priority:
     # 1. explicit user path
-    # 2. current directory when it looks like a model project
-    # 3. bundled samples, using SAMPLE_PRIORITY as a tie breaker
+    # 2. child project folder under the explicit/current root
+    # 3. current directory when it looks like a model project
+    # 4. bundled samples, using SAMPLE_PRIORITY as a tie breaker
     if explicit:
         project = Path(explicit).expanduser().resolve()
-        return project, "explicit path"
+        if has_project_markers(project):
+            return project, "explicit path"
+        child = select_best_child_project(project)
+        if child:
+            return child
+        return project, "explicit path without detected child project"
 
     cwd = Path.cwd().resolve()
     if has_project_markers(cwd):
         return cwd, "current directory has model project markers"
+
+    child = select_best_child_project(cwd)
+    if child:
+        return child
 
     for name in SAMPLE_PRIORITY:
         candidate = SAMPLES_DIR / name
@@ -185,7 +243,7 @@ def iter_files(path: Path, max_depth: int = 4):
         depth = len(root_path.parts) - base_depth
         if depth >= max_depth:
             dirs[:] = []
-        dirs[:] = [d for d in dirs if d not in {".git", ".venv", "__pycache__", "mlruns"}]
+        dirs[:] = [d for d in dirs if d not in SKIP_DIR_NAMES]
         for file_name in files:
             yield root_path / file_name
 
@@ -303,9 +361,12 @@ def find_first_existing(project: Path, names: list[str]) -> Path | None:
 
 def find_entrypoints(project: Path) -> list[Path]:
     found = [project / name for name in ENTRYPOINT_NAMES if (project / name).exists()]
-    if found:
-        return found
-    return [path for path in iter_files(project, max_depth=2) if path.suffix == ".py"]
+    recursive = [
+        path
+        for path in iter_files(project, max_depth=3)
+        if path.suffix == ".py" and path.name in ENTRYPOINT_NAMES
+    ]
+    return sorted(set(found + recursive))
 
 
 def check_aiu_custom(project: Path, entrypoints: list[Path]) -> Check:
