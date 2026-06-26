@@ -99,7 +99,8 @@ def main() -> int:
         else:
             print("  - 판단 결과: ready_for_selected_run_test")
         print("  - 먼저 위 모델 목록에서 사용할 모델 번호 또는 경로를 선택하세요.")
-        print("  - 선택한 모델 기준으로 aiu_studio/ 복사와 runtest_2.py 생성을 진행하세요.")
+        print("  - 선택 후 프로젝트 루트에 aiu_studio/ 폴더를 생성/보존하고 data/** 파일을 병합 복사하세요.")
+        print("  - 그 다음 선택 모델 형식에 맞게 runtest_2.py 생성을 진행하세요.")
         print("  - 이후 환경 검증, 추론 테스트, MLflow 등록 검증 순서로 진행하세요.")
         print("  - 실제 모델 선택/파일 생성/환경 검증 실행은 OpenCode 빌드모드에서 선택해주세요.")
         print("  - 추천 요청: 1번 모델로 runtest_2.py 만들어줘.")

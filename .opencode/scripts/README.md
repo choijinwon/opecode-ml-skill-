@@ -155,9 +155,9 @@ python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project
 ```
 
 대상 모델을 직접 선택해서 별도 실행 파일을 만들 수도 있다.
-이 경우 먼저 폐쇄망 반입 대상인 `aiu_studio/` 폴더를 보존하고,
-`data/` 안의 파일 전체를 프로젝트 루트의 `aiu_studio/` 폴더로 병합 복사한다.
-그 다음 기존 `runtest.py` 또는 `run_test.py`를 템플릿으로 참고해서 선택 모델 형식에 맞는 `runtest_2.py`를 생성한다.
+이 경우 먼저 폐쇄망 반입 대상인 프로젝트 루트 `aiu_studio/` 폴더를 생성하거나 기존 폴더를 보존한다.
+그 다음 선택 모델 기준으로 `data/**` 안의 파일 전체를 루트 `aiu_studio/` 폴더로 병합 복사한다.
+마지막으로 기존 `runtest.py` 또는 `run_test.py`를 템플릿으로 참고해서 선택 모델 형식에 맞는 `runtest_2.py`를 생성한다.
 
 ```text
 python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-index 1 --output runtest_2.py --execute

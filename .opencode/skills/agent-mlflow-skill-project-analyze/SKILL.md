@@ -166,11 +166,12 @@ next_action: model_artifact_paths 중 사용할 모델 선택
 
 다음 단계:
 1. 사용할 모델 번호 또는 경로 선택
-2. `agent-mlflow-skill-selected-run-test`로 선택 모델 기준 aiu_studio/ 보존 및 data 파일 병합 복사
-3. 선택 모델 형식에 맞는 runtest_2.py 생성
-4. `agent-mlflow-skill-environment-check`로 dependency 확인
-5. `agent-mlflow-skill-inference-test`로 추론 테스트
-6. `agent-mlflow-skill-mlflow-verify`로 MLflow 기록 확인
+2. 프로젝트 루트에 `aiu_studio/` 폴더 생성 또는 기존 폴더 보존
+3. 선택 모델 기준 `data/**` 파일을 루트 `aiu_studio/` 폴더로 병합 복사
+4. 선택 모델 형식에 맞는 `runtest_2.py` 생성
+5. `agent-mlflow-skill-environment-check`로 dependency 확인
+6. `agent-mlflow-skill-inference-test`로 추론 테스트
+7. `agent-mlflow-skill-mlflow-verify`로 MLflow 기록 확인
 ```
 
 모델이 발견되면 `.opencode/samples`는 참조하지 않는다.
