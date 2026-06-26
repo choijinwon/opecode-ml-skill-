@@ -67,7 +67,7 @@ MLflow 5단계로 봐줘
 ```
 
 `data_model_files`가 1개 이상이면 `model_found`는 반드시 true로 판단한다.
-필수 폴더나 `ai_studio.env`가 누락되어도 모델 없음으로 바꾸지 않는다.
+필수 폴더나 선택 MLflow 설정이 누락되어도 모델 없음으로 바꾸지 않는다.
 누락 항목은 별도 block/warn 항목으로만 분류한다.
 
 초기 분석 응답은 아래 구조를 사용한다. 문장은 자연스럽게 바꿔도 되지만 순서는 유지한다.
@@ -157,7 +157,7 @@ next_action: model_artifact_paths 중 사용할 모델 선택
 1. 사용할 모델 번호 또는 경로 선택
 2. 선택 모델 기준 aiu_studio/ 복사
 3. 선택 모델 형식에 맞는 runtest_2.py 생성
-4. ai_studio.env 및 dependency 확인
+4. dependency 확인
 5. 추론 테스트 후 MLflow 기록 확인
 ```
 

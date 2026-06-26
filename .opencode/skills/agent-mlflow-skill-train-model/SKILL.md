@@ -45,10 +45,10 @@ metadata:
 - 학습 전에 필요한 입력 파일을 확인한다.
   - dataset 경로
   - config 파일
-  - `ai_studio.env`
+  - 환경변수 또는 `config/mlflow_config.json`
   - pretrained/model base 경로
   - output directory
-- 학습 모델 생성 필수 설정을 확인한다.
+- 필요한 환경변수 또는 선택 MLflow 설정을 확인한다.
   - `mlflow_tracking_url`
   - `mlflow_tracking_username`
   - `mlflow_tracking_password`
@@ -79,7 +79,7 @@ metadata:
 2. train_entrypoint, 프로젝트 진입점, run_test.py 계열 파일을 확인한다.
 3. 필요한 config/input/dataset/model path를 확인한다.
 4. prepare-only, dry run, smoke test가 있으면 먼저 실행한다.
-5. `ai_studio.env` 필수 키가 모두 준비되었는지 확인한다.
+5. 필요한 환경변수 또는 선택 MLflow 설정이 준비되었는지 확인한다.
 6. 실제 학습 또는 모델 export를 실행한다.
 7. 기존 모델 파일을 덮어쓸 가능성이 있으면 사용자 확인을 받는다.
 8. 생성 또는 갱신된 data/ 또는 save_model/ 경로를 확인한다.
@@ -149,7 +149,7 @@ python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project
 2. target_project_path를 확인한다.
 3. 복사된 샘플 폴더에 aiu_custom/, local_serving/, save_model/이 있는지 확인한다.
 4. requirements/config/input_example을 확인한다.
-5. `ai_studio.env` 필수 키가 모두 준비되었는지 확인한다.
+5. 필요한 환경변수 또는 선택 MLflow 설정이 준비되었는지 확인한다.
 6. prepare-only 또는 smoke test가 있으면 먼저 실행 가능성을 검증한다.
 7. 로컬 학습 또는 로컬 모델 export를 실행한다.
 8. 생성된 data/ 또는 save_model/ 경로를 확인한다.
@@ -208,7 +208,7 @@ input_example.json
 - `sample_bootstrap_required`: 샘플 폴더가 아직 워크스페이스로 복사되지 않음
 - `missing_dataset`: 학습 데이터 또는 입력 파일이 없음
 - `missing_config`: 학습 설정 파일이 없음
-- `missing_env`: `ai_studio.env` 또는 필수 키가 없음
+- `optional_config_missing`: 선택 MLflow 설정이 없음. 필수 실패로 보지 않는다.
 - `runtime_error`: 학습 실행 중 예외 발생
 - `data_model_file_not_created`: 학습은 끝났지만 모델 파일이 생성되지 않음
 - `data_model_file_invalid`: 생성 파일이 비어 있거나 로드 불가함

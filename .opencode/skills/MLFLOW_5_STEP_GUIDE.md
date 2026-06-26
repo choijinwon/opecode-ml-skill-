@@ -86,14 +86,13 @@ offline_weather_agent_core/
 registry/
 ```
 
-## ai_studio.env 필수 값
+## 선택 MLflow 설정
 
-학습 모델 생성 전 `ai_studio.env`가 필요하다.
+MLflow 연결값은 환경변수 또는 `config/mlflow_config.json`으로 선택 설정할 수 있다.
 
 파일:
 
 ```text
-ai_studio.env
 ```
 
 필수 키:
@@ -130,7 +129,7 @@ Step 1  Project Analyze
         모델이 없으면 Step 0 샘플 선택/복사 흐름으로 이동한다.
 
 Step 2  Environment Check
-        Python, dependency, MLflow, ai_studio.env 상태를 확인한다.
+        Python, dependency, MLflow, MLflow 설정 상태를 확인한다.
 
 Step 3  Train Model
         기존 모델을 실행하거나 선택된 샘플로 모델을 생성한다.
@@ -167,7 +166,6 @@ scripts/train.py
 프로젝트 진입점
 predict.py
 input_example.json
-ai_studio.env
 aiu_custom/
 aiu_custom/model_wrapper.py
 aiu_custom/predict.py
@@ -263,7 +261,7 @@ framework 후보와 근거
 추론 entrypoint 후보
 필수 폴더 존재 여부
 input_example 존재 여부
-ai_studio.env 존재 여부
+선택 MLflow 설정 존재 여부
 모델이 없을 때 선택된 샘플 정보
 다음 단계
 ```
@@ -290,10 +288,10 @@ requirements.txt / pyproject.toml / environment.yml
 mlflow 설치 여부
 mlflow version
 framework dependency 설치 여부
-ai_studio.env 필수 키 상태
+선택 MLflow 설정 상태
 ```
 
-### ai_studio.env 검증
+### 선택 MLflow 설정 확인
 
 아래 키를 확인한다.
 
@@ -320,7 +318,7 @@ Python 환경 요약
 dependency 파일 존재 여부
 설치된 핵심 dependency와 version
 MLflow 설치/version 상태
-ai_studio.env 필수 키 상태
+선택 MLflow 설정 상태
 로컬/원격 tracking target 판단
 실행 전 차단 항목
 다음 단계
@@ -331,7 +329,7 @@ ai_studio.env 필수 키 상태
 ```text
 missing_dependency
 version_mismatch
-missing_env
+optional_config_missing
 config_error
 tracking_unreachable
 ```
@@ -361,7 +359,7 @@ model_found: true
 ```text
 1. selected_project_path를 실행 기준 경로로 사용한다.
 2. train_entrypoint 또는 프로젝트 진입점를 확인한다.
-3. ai_studio.env 필수 키를 확인한다.
+3. 선택 MLflow 설정를 확인한다.
 4. prepare-only, dry run, smoke test가 있으면 먼저 실행한다.
 5. 실제 학습 또는 모델 export를 실행한다.
 6. save_model/에 모델 산출물이 생성되는지 확인한다.
@@ -385,7 +383,7 @@ selected_sample: sklearn | pytorch | tensorflow
 1. sample_source_path를 확인한다.
 2. target_project_path가 복사된 샘플 폴더인지 확인한다.
 3. 샘플 원본은 직접 수정하지 않는다.
-4. ai_studio.env 필수 키를 확인한다.
+4. 선택 MLflow 설정를 확인한다.
 5. prepare-only 또는 smoke test가 있으면 먼저 실행한다.
 6. 로컬 학습 또는 모델 export를 실행한다.
 7. save_model/에 모델 산출물이 생성되는지 확인한다.
@@ -425,7 +423,7 @@ sample_not_found
 sample_bootstrap_required
 missing_dataset
 missing_config
-missing_env
+optional_config_missing
 artifact_not_created
 artifact_invalid
 runtime_error
@@ -571,7 +569,7 @@ Step 5  MLflow Run/Model 기록 확인
 - 모델이 없고 프로젝트 루트가 비어 있을 때만 sklearn, pytorch, tensorflow 중 하나를 사용자가 선택한다.
 - 선택형 샘플 외 다른 샘플은 임의 선택하지 않는다.
 - `offline_weather_agent_core/`, `registry/`는 필수 폴더가 아니다.
-- `ai_studio.env` 값은 출력하지 않는다.
+- 환경변수 또는 `config/mlflow_config.json` 값은 출력하지 않는다.
 - `mlflow_tracking_password` 값은 절대 출력하지 않는다.
 - 실제 학습/추론 실행은 사용자가 명확히 요청한 경우에만 수행한다.
 - 샘플 원본은 직접 수정하지 않는다.
@@ -584,7 +582,7 @@ Step 5  MLflow Run/Model 기록 확인
 ```text
 이 모델 프로젝트 폴더는 어떤 ML 프로젝트인가?
 필수 폴더 aiu_custom/local_serving/save_model이 있는가?
-ai_studio.env 필수 키가 준비되었는가?
+선택 MLflow 설정가 준비되었는가?
 현재 환경에서 실행 가능한가?
 학습 또는 export 후 save_model/에 모델이 생성되는가?
 생성된 모델은 실제로 추론 가능한가?

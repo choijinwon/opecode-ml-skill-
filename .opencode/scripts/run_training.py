@@ -18,14 +18,6 @@ SAMPLE_OPTIONS = ["sklearn", "pytorch", "tensorflow"]
 ENTRYPOINTS = ["train.py", "scripts/train.py", "run_test.py"]
 REQUIRED_DIRS = ["aiu_custom", "local_serving", "save_model", "aiu_studio"]
 ARTIFACT_SUFFIXES = set(ARTIFACT_SUFFIX_TO_KIND)
-AI_STUDIO_ENV_KEYS = [
-    "mlflow_tracking_url",
-    "mlflow_tracking_username",
-    "mlflow_tracking_password",
-    "mlflow_experiment_name",
-    "mlflow_register_model_name",
-]
-
 
 @dataclass
 class TrainingReport:
@@ -85,38 +77,13 @@ def missing_required_dirs(project: Path) -> list[str]:
     return [name for name in REQUIRED_DIRS if not (project / name).is_dir()]
 
 
-def parse_env_file(path: Path) -> dict[str, str]:
-    values: dict[str, str] = {}
-    if not path.exists():
-        return values
-    for raw_line in path.read_text(encoding="utf-8", errors="ignore").splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        values[key.strip()] = value.strip().strip('"').strip("'")
-    return values
-
-
-def missing_ai_studio_env(project: Path) -> list[str]:
-    path = project / "ai_studio.env"
-    values = parse_env_file(path)
-    missing = []
-    if not path.exists():
-        missing.append("ai_studio.env")
-    for key in AI_STUDIO_ENV_KEYS:
-        if key not in values or values[key] == "":
-            missing.append(key)
-    return missing
-
-
 def run_command(cmd: list[str], cwd: Path) -> int:
     result = subprocess.run(cmd, cwd=cwd)
     return result.returncode
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run local training for an existing project after ai_studio.env checks.")
+    parser = argparse.ArgumentParser(description="Run local training for an existing model project.")
     parser.add_argument("--project", default=".", help="user-specified model project folder")
     parser.add_argument("--python", default=sys.executable, help="Python interpreter to use")
     parser.add_argument("--execute", action="store_true", help="actually run the selected command")
@@ -186,9 +153,6 @@ def main():
     missing_dirs = missing_required_dirs(work_path)
     if missing_dirs:
         failures.extend(f"missing_required_dir:{name}" for name in missing_dirs)
-    missing_env = missing_ai_studio_env(work_path)
-    if missing_env:
-        failures.extend(f"missing_env:{name}" for name in missing_env)
     if args.execute and not artifacts:
         failures.append("data_model_file_not_created")
 

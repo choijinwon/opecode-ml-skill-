@@ -9,31 +9,7 @@ ROOT = Path(__file__).resolve().parent.parent
 CONFIG_DIR = ROOT / "config"
 ARTIFACTS_DIR = ROOT / "artifacts"
 SAVE_MODEL_DIR = ROOT / "save_model"
-AI_STUDIO_ENV_PATH = CONFIG_DIR / "ai_studio.env"
 AGENT_CONFIG_PATH = CONFIG_DIR / "agent_config.json"
-
-
-def load_env_file(path: Path = AI_STUDIO_ENV_PATH) -> dict[str, str]:
-    """config/ai_studio.env가 있으면 읽어서 os.environ에 반영한다.
-
-    비밀값은 반환만 하고 출력하지 않는다. Git에는 ai_studio.env.example만 올리고
-    실제 ai_studio.env는 로컬/서버 Secret로 관리한다.
-    """
-    values: dict[str, str] = {}
-    if not path.exists():
-        return values
-
-    for raw_line in path.read_text(encoding="utf-8").splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        key = key.strip()
-        value = value.strip().strip('"').strip("'")
-        if key:
-            values[key] = value
-            os.environ.setdefault(key, value)
-    return values
 
 
 def read_agent_config() -> dict:
@@ -43,7 +19,6 @@ def read_agent_config() -> dict:
 
 
 def ai_studio_settings() -> dict:
-    load_env_file()
     return {
         "api_key": os.getenv("OPENAI_API_KEY", ""),
         "base_url": os.getenv("OPENAI_BASE_URL", "").rstrip("/"),
@@ -64,7 +39,6 @@ def configure_mlflow() -> dict:
     """
     import mlflow
 
-    load_env_file()
     ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
     SAVE_MODEL_DIR.mkdir(parents=True, exist_ok=True)
 

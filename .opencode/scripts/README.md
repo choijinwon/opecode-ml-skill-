@@ -77,14 +77,13 @@ python .opencode/scripts/bootstrap_sample_project.py --project <model-project-fo
 
 ### check_environment.py
 
-Python, dependency, MLflow, `ai_studio.env` 상태를 확인한다.
+Python, dependency, MLflow 상태를 확인한다.
 
 Secret 값은 출력하지 않고 `set`, `empty`, `missing` 상태만 출력한다.
 
 학습 모델 생성 필수 파일:
 
 ```text
-ai_studio.env
 ```
 
 필수 키:
@@ -108,10 +107,10 @@ python .opencode/scripts/check_environment.py --project <model-project-folder> -
 `--project`에 `<model-project-folder>/data` 또는 `data/` 하위 폴더를 넘기면 부모 프로젝트 루트로 보정한 뒤 `data/` 전체를 검색해 실행한다.
 
 기본값은 안전 모드다. 실제 실행은 `--execute`를 명시해야 한다.
-실행 전 `ai_studio.env` 필수 키가 있는지 확인한다.
+실행 전 필요한 환경변수 또는 config/mlflow_config.json 값을 확인한다.
 `data/` 폴더 안에 모델 형식 파일이 있으면 `data/` 안의 파일 전체를
 프로젝트 루트의 `aiu_studio/` 폴더로 복사한다. 필수 구조나 실행 파일이 없으면
-`aiu_custom/`, `local_serving/`, `save_model/`, `aiu_studio/`, `ai_studio.env`, `run_test.py`, `run_test2.py`
+`aiu_custom/`, `local_serving/`, `save_model/`, `aiu_studio/`, `run_test.py`, `run_test2.py`
 계열 파일을 자동 생성한다.
 
 ```text
@@ -179,8 +178,6 @@ save_model/
 aiu_studio/
 requirements.txt
 input_example.json
-ai_studio.env
-ai_studio.env.example
 aiu_custom/predict.py
 local_serving/serving_app.py
 ```

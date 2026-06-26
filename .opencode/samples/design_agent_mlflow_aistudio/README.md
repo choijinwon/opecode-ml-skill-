@@ -54,22 +54,20 @@ design_agent_mlflow_aistudio/
 
 ## Endpoint 설정
 
+env 파일은 필수가 아닙니다. 로컬 실행이나 서버 배포 환경에서 환경변수로 주입합니다.
+
 ```bash
-cp config/ai_studio.env.example config/ai_studio.env
+export OPENAI_API_KEY="your-internal-key"
+export OPENAI_BASE_URL="http://ai-studio-endpoint:port/v1"
+export OPENAI_MODEL="qwen3.6"
+export OPENAI_MODELS="qwen3.6,gpt20,gamma"
+
+export MLFLOW_TRACKING_URI="http://127.0.0.1:5001"
+export MLFLOW_EXPERIMENT_NAME="design-agent-ai-studio"
+export MLFLOW_REGISTER_MODEL_NAME="design-agent-ai-studio"
 ```
 
-```env
-OPENAI_API_KEY="your-internal-key"
-OPENAI_BASE_URL="http://ai-studio-endpoint:port/v1"
-OPENAI_MODEL="qwen3.6"
-OPENAI_MODELS="qwen3.6,gpt20,gamma"
-
-MLFLOW_TRACKING_URI="http://127.0.0.1:5001"
-MLFLOW_EXPERIMENT_NAME="design-agent-ai-studio"
-MLFLOW_REGISTER_MODEL_NAME="design-agent-ai-studio"
-```
-
-실제 API key, password, token 값은 Git에 올리지 않습니다.
+실제 API key, password, token 값은 Git에 올리지 않습니다. 서버에서는 Secret 또는 배포 환경변수로 주입합니다.
 
 ## 실행 순서
 

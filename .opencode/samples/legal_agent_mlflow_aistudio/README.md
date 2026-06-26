@@ -55,28 +55,24 @@ legal_agent_mlflow_aistudio/
 
 ## AI Studio endpoint 설정
 
-`config/ai_studio.env.example`을 복사해 실제 값만 채웁니다.
+env 파일은 필수가 아닙니다. 로컬 실행이나 서버 배포 환경에서 환경변수로 주입합니다.
 
 ```bash
-cp config/ai_studio.env.example config/ai_studio.env
+export OPENAI_API_KEY="your-internal-key"
+export OPENAI_BASE_URL="http://ai-studio-endpoint:port/v1"
+export OPENAI_MODEL="qwen3.6"
+export OPENAI_MODELS="qwen3.6,gpt20,gamma"
+
+export MLFLOW_TRACKING_URI="http://127.0.0.1:5001"
+export MLFLOW_EXPERIMENT_NAME="legal-agent-ai-studio"
+export MLFLOW_REGISTER_MODEL_NAME="legal-agent-ai-studio"
+
+export LAW_API_OC="your-law-api-oc"
+export LAW_API_BASE_URL="http://www.law.go.kr/DRF/lawSearch.do"
+export LAW_API_TARGET="eflaw"
 ```
 
-```env
-OPENAI_API_KEY="your-internal-key"
-OPENAI_BASE_URL="http://ai-studio-endpoint:port/v1"
-OPENAI_MODEL="qwen3.6"
-OPENAI_MODELS="qwen3.6,gpt20,gamma"
-
-MLFLOW_TRACKING_URI="http://127.0.0.1:5001"
-MLFLOW_EXPERIMENT_NAME="legal-agent-ai-studio"
-MLFLOW_REGISTER_MODEL_NAME="legal-agent-ai-studio"
-
-LAW_API_OC="your-law-api-oc"
-LAW_API_BASE_URL="http://www.law.go.kr/DRF/lawSearch.do"
-LAW_API_TARGET="eflaw"
-```
-
-실제 API key, password, token 값은 Git에 올리지 않습니다.
+실제 API key, password, token 값은 Git에 올리지 않습니다. 서버에서는 Secret 또는 배포 환경변수로 주입합니다.
 
 ## 실행 순서
 
@@ -193,7 +189,7 @@ Dataset
 - `legal_agent_core/retrieval.py`는 샘플 검색입니다. 실제 적용 시 사내 법률 문서 검색 API, RAG API, vector DB endpoint로 교체합니다.
 - `LAW_API_OC`가 있으면 `http://www.law.go.kr/DRF/lawSearch.do` 목록조회 API를 먼저 조회합니다. 인증값이 없거나 실패하면 로컬 샘플 법률 가이드로 fallback합니다.
 - `legal_agent_core/llm.py`는 `OPENAI_BASE_URL/chat/completions`를 호출합니다. AI Studio endpoint가 OpenAI 호환이면 그대로 연결됩니다.
-- API key, token, password는 `config/ai_studio.env` 또는 서버 Secret으로 주입합니다. 코드와 Git에는 실제 값을 넣지 않습니다.
+- API key, token, password는 환경변수 또는 서버 Secret으로 주입합니다. 코드와 Git에는 실제 값을 넣지 않습니다.
 - `aiu_custom/predict.py`는 AI Studio/MLflow pyfunc 등록용 wrapper입니다. 입력 컬럼은 `question`, `user_id`, `session_id`입니다.
 - 법률 도메인은 오답 리스크가 크므로 Judge는 최소한 면책 문구, 근거/출처, 금지 표현, 응답 일관성 기준을 포함해야 합니다.
 

@@ -197,5 +197,5 @@ next_action
 - 모델이 발견된 워크스페이스에서는 샘플 선택을 요청하지 않는다.
 - 대상 샘플 폴더가 이미 있으면 기본적으로 중단한다.
 - secret 값은 복사 후에도 출력하지 않는다.
-- `.env`, `ai_studio.env`의 실제 key/password/token 값은 출력하지 않는다.
+- `.env`의 실제 key/password/token 값은 출력하지 않는다.
 - 샘플 원본 폴더는 수정하지 않는다.

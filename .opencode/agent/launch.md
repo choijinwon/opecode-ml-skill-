@@ -96,7 +96,7 @@ agent-mlflow-skill-sample-bootstrap
   - copying the selected sample folder into the workspace
 
 agent-mlflow-skill-environment-check
-  - Python, dependency, MLflow, ai_studio.env, environment variable checks
+  - Python, dependency, MLflow, optional config/mlflow_config.json, environment variable checks
 
 agent-mlflow-skill-train-model
   - local training, 프로젝트 진입점, data model file checks, aiu_studio copy, save_model checks

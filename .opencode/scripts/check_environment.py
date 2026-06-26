@@ -14,14 +14,6 @@ ENV_KEYS = [
     "MLFLOW_EXPERIMENT_ID",
 ]
 
-AI_STUDIO_ENV_KEYS = [
-    "mlflow_tracking_url",
-    "mlflow_tracking_username",
-    "mlflow_tracking_password",
-    "mlflow_experiment_name",
-    "mlflow_register_model_name",
-]
-
 CORE_PACKAGES = [
     "mlflow",
     "scikit-learn",
@@ -60,7 +52,7 @@ class EnvironmentReport:
     dependency_files: list[str]
     packages: list[PackageStatus] = field(default_factory=list)
     env_vars: list[EnvVarStatus] = field(default_factory=list)
-    ai_studio_env: EnvFileStatus | None = None
+    optional_config: EnvFileStatus | None = None
     failures: list[str] = field(default_factory=list)
     next_steps: list[str] = field(default_factory=list)
 
@@ -99,19 +91,11 @@ def parse_env_file(path: Path) -> dict[str, str]:
     return values
 
 
-def ai_studio_env_status(project: Path) -> EnvFileStatus:
-    path = project / "ai_studio.env"
-    values = parse_env_file(path)
-    statuses = []
-    for key in AI_STUDIO_ENV_KEYS:
-        if key not in values:
-            status = "missing"
-        elif values[key] == "":
-            status = "empty"
-        else:
-            status = "set"
-        statuses.append(EnvVarStatus(key, status))
-    return EnvFileStatus(str(path), statuses)
+def optional_config_status(project: Path) -> EnvFileStatus:
+    path = project / "config" / "mlflow_config.json"
+    if path.exists():
+        return EnvFileStatus(str(path), [EnvVarStatus("config/mlflow_config.json", "set")])
+    return EnvFileStatus(str(path), [EnvVarStatus("config/mlflow_config.json", "missing")])
 
 
 def build_report(project: Path) -> EnvironmentReport:
@@ -122,7 +106,7 @@ def build_report(project: Path) -> EnvironmentReport:
         packages.append(PackageStatus(package, "set" if version else "missing", version))
 
     env_vars = [EnvVarStatus(key, env_status(key)) for key in ENV_KEYS]
-    ai_env = ai_studio_env_status(project)
+    optional_config = optional_config_status(project)
     failures: list[str] = []
     next_steps: list[str] = []
 
@@ -134,12 +118,6 @@ def build_report(project: Path) -> EnvironmentReport:
         next_steps.append("Install or activate an environment that includes mlflow.")
     if env_status("MLFLOW_TRACKING_URI") == "missing":
         next_steps.append("Confirm local or remote MLFLOW_TRACKING_URI before MLflow verification.")
-    if not (project / "ai_studio.env").exists():
-        failures.append("missing_env_file:ai_studio.env")
-        next_steps.append("Create ai_studio.env with required MLflow settings.")
-    for item in ai_env.key_status:
-        if item.status in {"missing", "empty"}:
-            failures.append(f"missing_env:{item.name}")
 
     virtual_env = os.environ.get("VIRTUAL_ENV") or os.environ.get("CONDA_PREFIX") or "not detected"
     return EnvironmentReport(
@@ -151,7 +129,7 @@ def build_report(project: Path) -> EnvironmentReport:
         dependency_files=deps,
         packages=packages,
         env_vars=env_vars,
-        ai_studio_env=ai_env,
+        optional_config=optional_config,
         failures=failures,
         next_steps=next_steps,
     )
@@ -170,9 +148,9 @@ def print_text(report: EnvironmentReport):
     print("\nEnvironment variables:")
     for item in report.env_vars:
         print(f"- {item.name}: {item.status}")
-    if report.ai_studio_env:
-        print(f"\nai_studio.env: {report.ai_studio_env.path}")
-        for item in report.ai_studio_env.key_status:
+    if report.optional_config:
+        print(f"\nOptional MLflow config: {report.optional_config.path}")
+        for item in report.optional_config.key_status:
             print(f"- {item.name}: {item.status}")
     if report.failures:
         print("\nFailures:")
@@ -185,7 +163,7 @@ def print_text(report: EnvironmentReport):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Check local ML project execution environment and ai_studio.env settings.")
+    parser = argparse.ArgumentParser(description="Check local ML project execution environment and optional MLflow settings.")
     parser.add_argument("--project", default=".", help="model project folder")
     parser.add_argument("--json", action="store_true", help="print machine-readable JSON")
     args = parser.parse_args()

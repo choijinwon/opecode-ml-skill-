@@ -9,25 +9,7 @@ ROOT = Path(__file__).resolve().parent.parent
 CONFIG_DIR = ROOT / "config"
 ARTIFACTS_DIR = ROOT / "artifacts"
 SAVE_MODEL_DIR = ROOT / "save_model"
-AI_STUDIO_ENV_PATH = CONFIG_DIR / "ai_studio.env"
 AGENT_CONFIG_PATH = CONFIG_DIR / "agent_config.json"
-
-
-def load_env_file(path: Path = AI_STUDIO_ENV_PATH) -> dict[str, str]:
-    values: dict[str, str] = {}
-    if not path.exists():
-        return values
-    for raw_line in path.read_text(encoding="utf-8").splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        key = key.strip()
-        value = value.strip().strip('"').strip("'")
-        if key:
-            values[key] = value
-            os.environ.setdefault(key, value)
-    return values
 
 
 def read_agent_config() -> dict:
@@ -37,7 +19,6 @@ def read_agent_config() -> dict:
 
 
 def ai_studio_settings() -> dict:
-    load_env_file()
     return {
         "api_key": os.getenv("OPENAI_API_KEY", ""),
         "base_url": os.getenv("OPENAI_BASE_URL", "").rstrip("/"),
@@ -53,7 +34,6 @@ def ai_studio_settings() -> dict:
 def configure_mlflow() -> dict:
     import mlflow
 
-    load_env_file()
     ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
     SAVE_MODEL_DIR.mkdir(parents=True, exist_ok=True)
 

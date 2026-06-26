@@ -14,11 +14,10 @@ aiu_studio/
 프로젝트 진입점
 input_example.json
 requirements.txt
-ai_studio.env.example
 ```
 
 주의:
 
 - 실제 API key, password, token 값은 넣지 않습니다.
-- Git에는 `.env`, `ai_studio.env`, 대용량 모델 artifact를 올리지 않습니다.
+- Git에는 `.env`, 대용량 모델 artifact를 올리지 않습니다.
 - 사용자 워크스페이스에 모델이 없으면 `sklearn`, `pytorch`, `tensorflow` 중 하나로 이 폴더를 루트에 복사할 수 있습니다.

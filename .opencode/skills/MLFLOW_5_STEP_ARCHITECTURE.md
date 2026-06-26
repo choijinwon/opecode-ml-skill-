@@ -34,8 +34,7 @@ OpenCode Chatbot
   v
 사용자가 지정한 모델 프로젝트 폴더
   |
-  +-- ai_studio.env
-  +-- aiu_custom/
+  +--   +-- aiu_custom/
   +-- local_serving/
   +-- save_model/
   +-- input_example.json
@@ -82,8 +81,7 @@ tensorflow_sample/
 
 ```text
 <model-project-folder>/
-├── ai_studio.env
-├── aiu_custom/
+├── ├── aiu_custom/
 ├── local_serving/
 ├── save_model/
 ├── input_example.json
@@ -101,17 +99,16 @@ save_model/
 필수 파일:
 
 ```text
-ai_studio.env
 input_example.json
 ```
 
 `offline_weather_agent_core/`, `registry/`는 필수 폴더가 아니다.
 
-## ai_studio.env 계약
+## 선택 MLflow 설정
 
-`ai_studio.env`는 학습 모델 생성과 MLflow 등록에 필요한 설정을 담는다.
+MLflow 연결값은 환경변수 또는 `config/mlflow_config.json`으로 설정할 수 있다. 파일은 필수가 아니다.
 
-필수 키:
+선택 설정 예시:
 
 ```env
 mlflow_tracking_url=""
@@ -125,14 +122,12 @@ mlflow_register_model_name=""
 
 ```text
 파일 없음
-  -> missing_env_file:ai_studio.env
-
+  -> warn: optional_config_missing
 키 없음
-  -> missing_env:<key>
+  -> warn: optional_config_missing:<key>
 
 키 값이 빈 문자열
-  -> empty
-  -> 학습 모델 생성 기준에서는 missing_env:<key>
+  -> warn: empty
 
 값 존재
   -> set
@@ -196,7 +191,7 @@ Step 2 Environment Check
   |-- check_environment.py
   |
   |-- Python / dependency / MLflow 확인
-  |-- ai_studio.env 필수 키 확인
+  |-- 선택 MLflow 설정 확인
 
 Step 3 Train Model
   |
@@ -244,7 +239,7 @@ Step 1 구조 분석
 Step 2 환경 검증
   |
   v
-Python / dependency / ai_studio.env / MLflow 설정 확인
+Python / dependency / MLflow 설정 확인
   |
   v
 Step 3 학습 또는 export
@@ -329,7 +324,7 @@ Step 1 Project Analyze
 ```text
 모델 프로젝트 폴더 구조 분석
 필수 폴더 확인
-ai_studio.env 확인
+MLflow 설정 확인
 framework 후보 판단
 entrypoint 후보 판단
 모델 있음/없음 판단
@@ -350,7 +345,7 @@ Python version 확인
 venv/conda 확인
 dependency 확인
 MLflow 설치 확인
-ai_studio.env 필수 키 확인
+선택 MLflow 설정 확인
 secret 값 비노출
 ```
 
@@ -369,7 +364,7 @@ Step 3 Train Model
 샘플 기반 모델 생성 준비
 --execute 명시 시 실제 실행
 save_model/ 산출물 확인
-ai_studio.env 필수 키 확인
+선택 MLflow 설정 확인
 ```
 
 ### test_inference.py
@@ -415,8 +410,7 @@ registered model/version 확인
 
 ```text
 missing_required_dir:<name>
-missing_env_file:ai_studio.env
-missing_env:<key>
+optional_config_missing
 missing_dependency
 missing_train_entrypoint
 sample_not_found
@@ -458,7 +452,7 @@ AI Studio에서는 이 구조를 다음 화면으로 옮길 수 있다.
   -> 사용자가 모델 프로젝트 폴더 지정
 
 프로젝트 분석 화면
-  -> 필수 폴더, ai_studio.env, entrypoint 확인
+  -> 필수 폴더, entrypoint 확인
 
 환경 검증 화면
   -> Python, dependency, MLflow 설정 확인
@@ -480,7 +474,7 @@ MLflow 기록 화면
 ```text
 모델 프로젝트 폴더가 유효한가?
 필수 폴더가 있는가?
-ai_studio.env 필수 키가 있는가?
+선택 MLflow 설정가 있는가?
 학습 또는 export가 가능한가?
 save_model/에 모델 산출물이 생성되는가?
 input_example 기반 추론이 가능한가?

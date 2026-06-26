@@ -11,18 +11,9 @@
 aiu_custom/
 local_serving/
 save_model/
-ai_studio.env
 ```
 
-3. `ai_studio.env`에 MLflow 연결 값을 준비합니다.
-
-```env
-mlflow_tracking_url=""
-mlflow_tracking_username=""
-mlflow_tracking_password=""
-mlflow_experiment_name=""
-mlflow_register_model_name=""
-```
+3. 필요하면 환경변수 또는 `config/mlflow_config.json`으로 MLflow 연결 값을 준비합니다.
 
 ## OpenCode에 이렇게 요청하세요
 

@@ -1,6 +1,6 @@
 ---
 name: agent-mlflow-skill-environment-check
-description: Use when the user asks "환경 검증", "dependency 확인", "MLflow 설치", "ai_studio.env", "API key 위치", or environment check; verifies Python, dependencies, MLflow, env vars, and required AI Studio settings.
+description: Use when the user asks "환경 검증", "dependency 확인", "MLflow 설치", "API key 위치", or environment check; verifies Python, dependencies, MLflow, env vars, and optional MLflow settings.
 license: MIT
 compatibility: opencode
 metadata:
@@ -17,7 +17,7 @@ metadata:
 - Python, virtualenv, dependency, MLflow version을 확인해야 할 때
 - 폐쇄망 또는 로컬 환경에서 외부 다운로드 없이 실행 준비 상태를 판단해야 할 때
 - MLflow tracking URI, experiment 설정 위치를 확인해야 할 때
-- 학습 모델 생성 전에 `ai_studio.env` 필수 설정이 준비되었는지 확인해야 할 때
+- 학습 모델 생성 전에 Python, dependency, MLflow 설치 상태를 확인해야 할 때
 
 ## Guidance Checks
 
@@ -35,12 +35,7 @@ metadata:
   - `MLFLOW_TRACKING_URI`
   - `MLFLOW_EXPERIMENT_NAME`
   - `MLFLOW_EXPERIMENT_ID`
-- `ai_studio.env` 파일과 필수 키를 확인한다.
-  - `mlflow_tracking_url`
-  - `mlflow_tracking_username`
-  - `mlflow_tracking_password`
-  - `mlflow_experiment_name`
-  - `mlflow_register_model_name`
+- 환경변수와 선택 설정 파일 `config/mlflow_config.json` 상태를 확인한다.
 - secret 값은 출력하지 않고 `set`, `empty`, `missing` 상태만 표시한다.
 - 로컬/원격 MLflow 중 어떤 tracking target을 쓰는지 확인한다.
 
@@ -51,7 +46,7 @@ metadata:
 - 설치된 핵심 dependency와 version
 - MLflow 설치/version 상태
 - 환경 변수 설정 상태
-- `ai_studio.env` 필수 키 상태
+- 선택 MLflow 설정 상태
 - 로컬/원격 tracking target 판단
 - 실행 전 차단 항목
 - 다음 단계: `agent-mlflow-skill-train-model`
@@ -60,7 +55,7 @@ metadata:
 
 - `missing_dependency`: 필요한 패키지가 없음
 - `version_mismatch`: 설치 버전이 기대 범위와 다름
-- `missing_env`: 필수 환경 변수가 없음
+- `optional_config_missing`: 선택 MLflow 설정이 없음. 필수 실패로 보지 않는다.
 - `config_error`: 설정 파일은 있으나 읽거나 해석할 수 없음
 - `tracking_unreachable`: MLflow tracking server에 접근할 수 없음
 

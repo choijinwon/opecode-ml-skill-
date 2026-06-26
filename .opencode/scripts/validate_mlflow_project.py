@@ -38,7 +38,6 @@ ENTRYPOINT_NAMES = [
 ]
 
 CONFIG_NAMES = [
-    "ai_studio.env",
     "config.json",
     "model_config.json",
     "mlflow_config.json",
@@ -113,14 +112,6 @@ SKIP_DIR_NAMES = {
     "outputs",
     "mlartifacts",
 }
-
-AI_STUDIO_ENV_KEYS = [
-    "mlflow_tracking_url",
-    "mlflow_tracking_username",
-    "mlflow_tracking_password",
-    "mlflow_experiment_name",
-    "mlflow_register_model_name",
-]
 
 
 @dataclass
@@ -398,32 +389,20 @@ def parse_env_file(path: Path) -> dict[str, str]:
     return values
 
 
-def check_ai_studio_env(project: Path) -> Check:
-    path = project / "ai_studio.env"
-    values = parse_env_file(path)
-    evidence = []
-    missing = []
+def check_optional_mlflow_config(project: Path) -> Check:
+    path = project / "config" / "mlflow_config.json"
     if path.exists():
-        evidence.append("ai_studio.env")
-    else:
-        missing.append("ai_studio.env")
-    for key in AI_STUDIO_ENV_KEYS:
-        if key not in values or values[key] == "":
-            missing.append(key)
-        else:
-            evidence.append(f"{key}: set")
-    if missing:
         return Check(
-            "ai_studio.env required settings",
-            "block",
-            "required ai_studio.env settings are missing or empty",
-            [f"missing_or_empty: {', '.join(missing)}"] + evidence,
+            "optional MLflow config",
+            "pass",
+            "optional config/mlflow_config.json is available",
+            ["config/mlflow_config.json"],
         )
     return Check(
-        "ai_studio.env required settings",
-        "pass",
-        "required ai_studio.env settings are available",
-        evidence,
+        "optional MLflow config",
+        "warn",
+        "optional MLflow config is not provided; environment variables or UI settings can be used",
+        [],
     )
 
 
@@ -685,7 +664,7 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
             ],
         )
     )
-    checks.append(check_ai_studio_env(project))
+    checks.append(check_optional_mlflow_config(project))
 
     register_found, register_evidence = has_register_flow(entrypoints)
     checks.append(

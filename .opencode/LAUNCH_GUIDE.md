@@ -143,10 +143,10 @@ OPENAI_MODELS="qwen3.6,gpt20,gamma"
 
 ```text
 Local 개발자 PC
-  -> .env 또는 ai_studio.env 사용
+  -> 환경변수 또는 config/mlflow_config.json 사용
 
 Git
-  -> .env.example, ai_studio.env.example만 관리
+  -> 예시 파일에는 실제 secret 값을 넣지 않음
 
 Server
   -> Docker/Kubernetes/CI Secret/환경변수로 주입

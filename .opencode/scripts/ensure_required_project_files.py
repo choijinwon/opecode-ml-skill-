@@ -10,14 +10,6 @@ from ensure_run_test_entrypoints import normalize_project_root
 
 
 REQUIRED_DIRS = ["aiu_custom", "local_serving", "save_model", "aiu_studio"]
-AI_STUDIO_ENV_KEYS = [
-    "mlflow_tracking_url",
-    "mlflow_tracking_username",
-    "mlflow_tracking_password",
-    "mlflow_experiment_name",
-    "mlflow_register_model_name",
-]
-
 KIND_REQUIREMENTS = {
     "sklearn_pickle": ["mlflow", "scikit-learn"],
     "sklearn_joblib": ["mlflow", "joblib", "scikit-learn"],
@@ -69,10 +61,6 @@ def touch_dir(path: Path, report: RequiredFilesReport):
 def render_requirements(model_kind: str) -> str:
     packages = KIND_REQUIREMENTS.get(model_kind, ["mlflow"])
     return "\n".join(packages) + "\n"
-
-
-def render_ai_studio_env() -> str:
-    return "\n".join(f'{key}=""' for key in AI_STUDIO_ENV_KEYS) + "\n"
 
 
 def render_input_example(model_kind: str) -> str:
@@ -308,8 +296,6 @@ def ensure_required_files(project: Path, force: bool = False, execute: bool = Tr
         copy_data_files_to_aiu_studio(project, report, force=force, execute=True)
         write_if_missing(project / "requirements.txt", render_requirements(model_kind), report, force=force)
         write_if_missing(project / "input_example.json", render_input_example(model_kind), report, force=force)
-        write_if_missing(project / "ai_studio.env", render_ai_studio_env(), report, force=force)
-        write_if_missing(project / "ai_studio.env.example", render_ai_studio_env(), report, force=force)
         write_if_missing(project / "aiu_custom" / "__init__.py", "", report, force=force)
         write_if_missing(project / "aiu_custom" / "predict.py", render_predict(project, artifact, model_kind), report, force=force)
         write_if_missing(project / "local_serving" / "serving_app.py", render_serving_app(), report, force=force)
@@ -317,8 +303,6 @@ def ensure_required_files(project: Path, force: bool = False, execute: bool = Tr
         for target in [
             project / "requirements.txt",
             project / "input_example.json",
-            project / "ai_studio.env",
-            project / "ai_studio.env.example",
             project / "aiu_custom" / "__init__.py",
             project / "aiu_custom" / "predict.py",
             project / "local_serving" / "serving_app.py",
