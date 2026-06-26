@@ -154,9 +154,17 @@ def has_project_markers(path: Path) -> bool:
     }
     if any((path / name).exists() for name in marker_names):
         return True
-    direct_artifact_dirs = [path / "save_model", path / "artifacts", path / "model", path / "models", path / "saved_model", path / "data"]
+    direct_artifact_dirs = [path / "save_model", path / "artifacts", path / "model", path / "models", path / "saved_model"]
     if any(candidate.exists() for candidate in direct_artifact_dirs):
         return True
+    data_dir = path / "data"
+    if data_dir.is_dir():
+        for root, dirs, files in os.walk(data_dir):
+            root_path = Path(root)
+            if len(root_path.parts) - len(data_dir.parts) >= 4:
+                dirs[:] = []
+            if any(Path(file_name).suffix.lower() in ARTIFACT_SUFFIXES for file_name in files):
+                return True
     return any(file_path.suffix.lower() in ARTIFACT_SUFFIXES for file_path in path.iterdir() if file_path.is_file())
 
 

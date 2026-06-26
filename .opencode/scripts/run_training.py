@@ -5,14 +5,16 @@ import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
+from ensure_run_test_entrypoints import ensure_run_tests
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLES_DIR = ROOT / "samples"
 SAMPLE_OPTIONS = ["sklearn", "pytorch", "tensorflow"]
-ENTRYPOINTS = ["train.py", "run_model.py", "scripts/train.py"]
+ENTRYPOINTS = ["train.py", "run_model.py", "scripts/train.py", "run_test.py"]
 REQUIRED_DIRS = ["aiu_custom", "local_serving", "save_model"]
-ARTIFACT_DIRS = ["save_model", "model", "artifacts", "saved_model"]
-ARTIFACT_SUFFIXES = {".pkl", ".joblib", ".pt", ".pth", ".h5", ".keras", ".onnx", ".safetensors"}
+ARTIFACT_DIRS = ["save_model", "model", "models", "artifacts", "saved_model"]
+ARTIFACT_SUFFIXES = {".pkl", ".joblib", ".pt", ".pth", ".onnx", ".h5", ".keras", ".bst", ".ubj", ".safetensors"}
 AI_STUDIO_ENV_KEYS = [
     "mlflow_tracking_url",
     "mlflow_tracking_username",
@@ -33,6 +35,7 @@ class TrainingReport:
     executed: bool
     return_code: int | None
     artifacts: list[str] = field(default_factory=list)
+    generated_entrypoints: list[str] = field(default_factory=list)
     failures: list[str] = field(default_factory=list)
     next_steps: list[str] = field(default_factory=list)
 
@@ -43,13 +46,16 @@ def has_model_project(project: Path) -> bool:
         return True
     if any((project / name).exists() for name in ARTIFACT_DIRS):
         return True
-    return any(path.suffix in ARTIFACT_SUFFIXES for path in project.glob("*") if path.is_file())
+    return any(path.suffix in ARTIFACT_SUFFIXES for path in project.rglob("*") if path.is_file())
 
 
 def find_entrypoint(project: Path) -> Path | None:
     for name in ENTRYPOINTS:
         candidate = project / name
         if candidate.exists():
+            return candidate
+    for candidate in sorted(project.glob("run_test*.py")):
+        if candidate.is_file():
             return candidate
     return None
 
@@ -58,6 +64,8 @@ def build_command(python_bin: str, entrypoint: Path, prepare_only: bool) -> list
     cmd = [python_bin, str(entrypoint)]
     if prepare_only and entrypoint.name in {"run_model.py", "register_model.py"}:
         cmd.append("--prepare-only")
+    if prepare_only and entrypoint.name.startswith("run_test"):
+        cmd.append("--load-only")
     return cmd
 
 
@@ -113,6 +121,7 @@ def main():
     parser.add_argument("--python", default=sys.executable, help="Python interpreter to use")
     parser.add_argument("--execute", action="store_true", help="actually run the selected command")
     parser.add_argument("--force-sample", action="store_true", help="deprecated; use bootstrap_sample_project.py for sample folder copy")
+    parser.add_argument("--no-create-run-test", action="store_true", help="do not create run_test.py when only model artifacts are found")
     parser.add_argument("--prepare-only", action="store_true", help="prefer prepare-only mode when supported")
     parser.add_argument("--json", action="store_true", help="print machine-readable JSON")
     args = parser.parse_args()
@@ -133,8 +142,22 @@ def main():
         next_steps.append("python .opencode/scripts/bootstrap_sample_project.py --project <model-project-folder> --sample sklearn --execute")
 
     entrypoint = find_entrypoint(work_path)
+    generated_entrypoints: list[str] = []
+    artifacts = find_artifacts(work_path)
+    if entrypoint is None and model_found and artifacts and not args.no_create_run_test:
+        run_test_report = ensure_run_tests(work_path, execute=True)
+        generated_entrypoints = [
+            item.entrypoint_path
+            for item in run_test_report.generated
+            if item.created
+        ]
+        failures.extend(run_test_report.failures)
+        entrypoint = find_entrypoint(work_path)
+
     if entrypoint is None:
         failures.append("missing_train_entrypoint")
+        if model_found and artifacts:
+            next_steps.append("Create run_test.py with .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --execute")
         cmd = []
     else:
         cmd = build_command(args.python, entrypoint, args.prepare_only)
@@ -147,7 +170,6 @@ def main():
     elif cmd:
         next_steps.append("Run again with --execute to start training or model export.")
 
-    artifacts = find_artifacts(work_path)
     missing_dirs = missing_required_dirs(work_path)
     if missing_dirs:
         failures.extend(f"missing_required_dir:{name}" for name in missing_dirs)
@@ -167,6 +189,7 @@ def main():
         executed=args.execute,
         return_code=return_code,
         artifacts=artifacts,
+        generated_entrypoints=generated_entrypoints,
         failures=failures,
         next_steps=next_steps,
     )
@@ -185,6 +208,9 @@ def main():
         print("Artifacts:")
         for artifact in report.artifacts:
             print(f"- {artifact}")
+        print("Generated entrypoints:")
+        for generated in report.generated_entrypoints:
+            print(f"- {generated}")
         if report.failures:
             print("Failures:")
             for failure in report.failures:

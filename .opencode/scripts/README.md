@@ -105,10 +105,34 @@ python .opencode/scripts/check_environment.py --project <model-project-folder> -
 
 기본값은 안전 모드다. 실제 실행은 `--execute`를 명시해야 한다.
 실행 전 `ai_studio.env` 필수 키가 있는지 확인한다.
+모델 artifact는 있지만 실행 파일이 없으면 `run_test.py`, `run_test2.py` 계열 파일을 자동 생성한다.
 
 ```text
 python .opencode/scripts/run_training.py --project <model-project-folder>
 python .opencode/scripts/run_training.py --project <model-project-folder> --execute
+```
+
+### ensure_run_test_entrypoints.py
+
+모델 artifact는 있는데 실행 파일이 없을 때 제공 실행 파일을 생성한다.
+
+```text
+python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder>
+python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --execute
+```
+
+생성 규칙:
+
+```text
+첫 번째 모델 artifact -> run_test.py
+두 번째 모델 artifact -> run_test2.py
+세 번째 모델 artifact -> run_test3.py
+```
+
+지원 모델 확장자:
+
+```text
+.pkl, .joblib, .pt, .pth, .onnx, .h5, .keras, .bst, .ubj, .safetensors
 ```
 
 폐쇄망 모델 선택 샘플:

@@ -30,7 +30,12 @@ metadata:
   - `train.py`
   - `scripts/train.py`
   - `run_model.py`
+  - `run_test.py`, `run_test2.py`
   - framework별 학습 스크립트
+- 모델 artifact는 있는데 실행 파일이 없으면 제공된 실행 파일 템플릿으로 `run_test.py`를 생성한다.
+  - 모델 artifact가 1개이면 `run_test.py`
+  - 다른 모델 artifact가 추가로 있으면 `run_test2.py`, `run_test3.py` 순서로 생성한다.
+  - 모델 확장자에 따라 sklearn/joblib, PyTorch, ONNX, TensorFlow/Keras, XGBoost, safetensors 로더를 사용한다.
 - 학습 전에 필요한 입력 파일을 확인한다.
   - dataset 경로
   - config 파일
@@ -65,7 +70,7 @@ metadata:
 
 ```text
 1. Step 1의 selected_project_path를 실행 기준 경로로 사용한다.
-2. train_entrypoint 또는 run_model.py를 확인한다.
+2. train_entrypoint, run_model.py, run_test.py 계열 파일을 확인한다.
 3. 필요한 config/input/dataset/model path를 확인한다.
 4. prepare-only, dry run, smoke test가 있으면 먼저 실행한다.
 5. `ai_studio.env` 필수 키가 모두 준비되었는지 확인한다.
@@ -76,6 +81,28 @@ metadata:
 ```
 
 기존 모델 프로젝트가 있으면 `.opencode/samples`의 선택형 샘플은 사용하지 않는다.
+
+### Missing Entrypoint With Existing Artifacts
+
+모델 파일은 있는데 실행 파일이 없으면 실패로만 끝내지 않는다. 아래 스크립트로 모델 형식에 맞는 smoke test entrypoint를 생성한다.
+
+```text
+python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --execute
+```
+
+생성 규칙:
+
+```text
+첫 번째 모델 artifact -> run_test.py
+두 번째 모델 artifact -> run_test2.py
+세 번째 모델 artifact -> run_test3.py
+```
+
+지원 모델 확장자:
+
+```text
+.pkl, .joblib, .pt, .pth, .onnx, .h5, .keras, .bst, .ubj, .safetensors
+```
 
 ## Sample-Based Model Creation
 
@@ -133,13 +160,14 @@ input_example.json
 - 학습 실행 방식
 - 필요한 입력 파일 목록
 - 생성된 모델 artifact 목록
+- 생성된 run_test.py 계열 실행 파일 목록
 - 생성되지 않은 필수 산출물
 - 학습 로그 요약
 - 다음 단계: `agent-mlflow-skill-inference-test`
 
 ## Failure Classification
 
-- `missing_train_entrypoint`: 학습 스크립트를 찾을 수 없음
+- `missing_train_entrypoint`: 학습/실행 스크립트를 찾을 수 없고 run_test.py 자동 생성도 불가함
 - `sample_not_found`: 선택된 샘플 원본을 찾을 수 없음
 - `sample_bootstrap_required`: 샘플 폴더가 아직 워크스페이스로 복사되지 않음
 - `missing_dataset`: 학습 데이터 또는 입력 파일이 없음
