@@ -160,12 +160,13 @@ python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project
 그 다음 기존 `runtest.py` 또는 `run_test.py`를 템플릿으로 참고해서 선택 모델 형식에 맞는 `runtest_2.py`를 생성한다.
 
 ```text
+python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-index 1 --output runtest_2.py --execute
 python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-model data/model.pkl --output runtest_2.py --execute
 python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-model model.pkl --output runtest_2.py --execute
 python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-model data/model.pkl --template runtest.py --output runtest_2.py --execute
 ```
 
-이 모드는 선택한 `data/` 모델 파일의 확장자를 기준으로 로더를 결정하고, 템플릿 파일의 모델 경로와 모델 형식 상수만 새 대상 모델 기준으로 변환한다.
+이 모드는 선택한 `data/**` 모델 파일의 확장자를 기준으로 로더를 결정하고, 템플릿 파일의 모델 경로와 모델 형식 상수만 새 대상 모델 기준으로 변환한다.
 템플릿을 찾지 못하면 내장 실행 템플릿으로 생성한다.
 
 생성 규칙:

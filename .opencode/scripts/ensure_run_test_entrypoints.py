@@ -188,6 +188,18 @@ def resolve_target_model(project: Path, target_model: str) -> Path:
     raise FileNotFoundError(f"target_data_model_file_not_found:{target_model}")
 
 
+def resolve_target_model_by_index(project: Path, target_index: int) -> Path:
+    project = normalize_project_root(project)
+    artifacts = find_model_artifacts(project)
+    if target_index < 1:
+        raise ValueError(f"target_index_must_be_1_or_greater:{target_index}")
+    if not artifacts:
+        raise FileNotFoundError("data_model_file_not_found")
+    if target_index > len(artifacts):
+        raise ValueError(f"target_index_out_of_range:{target_index};available:{len(artifacts)}")
+    return artifacts[target_index - 1]
+
+
 def validate_data_model_file(project: Path, model_file: Path) -> str:
     project = normalize_project_root(project)
     nearest_data_dir(project, model_file)
@@ -599,10 +611,42 @@ def ensure_selected_run_test(
     return report
 
 
+def ensure_selected_run_test_by_index(
+    project: Path,
+    target_index: int,
+    output: str = "runtest_2.py",
+    template: str | None = None,
+    force: bool = False,
+    execute: bool = True,
+) -> RunTestReport:
+    project = normalize_project_root(project)
+    try:
+        artifact = resolve_target_model_by_index(project, target_index)
+        target_model = artifact.relative_to(project).as_posix()
+    except (FileNotFoundError, ValueError) as exc:
+        report = RunTestReport(
+            project_path=str(project),
+            aiu_studio_path=str(project / "aiu_studio"),
+            aiu_studio_preexisting=(project / "aiu_studio").is_dir(),
+        )
+        report.failures.append(str(exc))
+        return report
+
+    return ensure_selected_run_test(
+        project,
+        target_model=target_model,
+        output=output,
+        template=template,
+        force=force,
+        execute=execute,
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(description="Create run_test.py entrypoints for detected data model files.")
     parser.add_argument("--project", default=".", help="model project folder")
     parser.add_argument("--target-model", help="selected data model file path, relative to project or data/")
+    parser.add_argument("--target-index", type=int, help="1-based selected model number from model_artifact_paths")
     parser.add_argument("--output", default="runtest_2.py", help="output run test filename for --target-model")
     parser.add_argument("--template", help="template run test file; defaults to runtest.py then run_test.py")
     parser.add_argument("--execute", action="store_true", help="write run_test files")
@@ -610,7 +654,19 @@ def main():
     parser.add_argument("--json", action="store_true", help="print machine-readable JSON")
     args = parser.parse_args()
 
-    if args.target_model:
+    if args.target_model and args.target_index:
+        parser.error("use only one of --target-model or --target-index")
+
+    if args.target_index:
+        report = ensure_selected_run_test_by_index(
+            Path(args.project),
+            target_index=args.target_index,
+            output=args.output,
+            template=args.template,
+            force=args.force,
+            execute=args.execute,
+        )
+    elif args.target_model:
         report = ensure_selected_run_test(
             Path(args.project),
             target_model=args.target_model,

@@ -82,6 +82,13 @@ aiu_studio 복사 경로:
 python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-model data/<model-file> --output runtest_2.py --execute
 ```
 
+Project Analyze에서 표시된 모델 번호를 그대로 사용할 수도 있다.
+이 명령은 선택 번호에 해당하는 모델을 찾고, `data/**` 전체를 `aiu_studio/`로 병합 복사한 뒤, 선택 모델 형식에 맞게 `runtest_2.py`를 생성한다.
+
+```text
+python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-index 1 --output runtest_2.py --execute
+```
+
 대상 모델을 `data/` 기준 파일명으로 줄 수도 있다.
 
 ```text
