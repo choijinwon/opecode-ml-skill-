@@ -45,6 +45,8 @@ python .opencode/scripts/validate_mlflow_project.py --project <model-project-fol
 `data/` 폴더와 모델 파일만 별도로 스캔한다. 프로젝트 구조, 필수 폴더, MLflow 설정은 판단하지 않는다.
 
 기본 스캔은 `.git`, `.venv*`, `node_modules`, 숨김 폴더, `mlartifacts/`를 제외한다.
+`model_found`는 `data/` 폴더 안에서 모델 확장자가 발견될 때만 `true`가 된다.
+모델 파일이 `data/` 밖에 있으면 `outside_data_model_paths`에 후보로 표시된다.
 
 ```text
 python .opencode/scripts/scan_data_models.py --project <model-project-folder>

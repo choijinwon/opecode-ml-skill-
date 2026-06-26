@@ -74,6 +74,7 @@ class DataScanReport:
     model_found: bool
     model_count: int
     model_artifact_paths: list[str]
+    outside_data_model_paths: list[str]
     data_dirs: list[DataDir]
     skipped_dirs: list[str]
 
@@ -120,6 +121,57 @@ def iter_data_dirs(project: Path, include_hidden: bool, include_opencode: bool, 
                 data_dirs.append(root_path / dirname)
         dirs[:] = kept_dirs
     return sorted(set(data_dirs)), sorted(set(skipped_dirs))
+
+
+def iter_project_files(project: Path, include_hidden: bool, include_opencode: bool, include_mlartifacts: bool):
+    for root, dirs, files in os.walk(project):
+        root_path = Path(root)
+        kept_dirs = []
+        for dirname in dirs:
+            if should_skip_dir(
+                dirname,
+                include_hidden=include_hidden,
+                include_opencode=include_opencode,
+                include_mlartifacts=include_mlartifacts,
+            ):
+                continue
+            kept_dirs.append(dirname)
+        dirs[:] = kept_dirs
+
+        for file_name in files:
+            yield root_path / file_name
+
+
+def is_under_any(path: Path, parents: list[Path]) -> bool:
+    for parent in parents:
+        try:
+            path.relative_to(parent)
+            return True
+        except ValueError:
+            continue
+    return False
+
+
+def find_outside_data_model_paths(
+    project: Path,
+    data_dirs: list[Path],
+    include_hidden: bool,
+    include_opencode: bool,
+    include_mlartifacts: bool,
+) -> list[str]:
+    paths = []
+    for file_path in iter_project_files(
+        project,
+        include_hidden=include_hidden,
+        include_opencode=include_opencode,
+        include_mlartifacts=include_mlartifacts,
+    ):
+        if file_path.suffix.lower() not in MODEL_SUFFIX_TO_KIND:
+            continue
+        if is_under_any(file_path, data_dirs):
+            continue
+        paths.append(safe_relative(file_path, project))
+    return sorted(set(paths))
 
 
 def scan_data_dir(data_dir: Path, project: Path) -> DataDir:
@@ -173,6 +225,13 @@ def build_report(
         for data_dir in data_dirs
         for model in data_dir.model_files
     ]
+    outside_data_model_paths = find_outside_data_model_paths(
+        project,
+        data_dir_paths,
+        include_hidden=include_hidden,
+        include_opencode=include_opencode,
+        include_mlartifacts=include_mlartifacts,
+    )
     data_file_count = sum(data_dir.file_count for data_dir in data_dirs)
 
     return DataScanReport(
@@ -182,6 +241,7 @@ def build_report(
         model_found=bool(model_artifact_paths),
         model_count=len(model_artifact_paths),
         model_artifact_paths=model_artifact_paths,
+        outside_data_model_paths=outside_data_model_paths,
         data_dirs=data_dirs,
         skipped_dirs=[safe_relative(path, project) for path in skipped_dir_paths],
     )
@@ -199,6 +259,14 @@ def print_text(report: DataScanReport):
         print("Model artifact paths:")
         for index, path in enumerate(report.model_artifact_paths, start=1):
             print(f"{index}. {path}")
+        print()
+
+    if report.outside_data_model_paths:
+        print("Model candidates outside data/ folders:")
+        for index, path in enumerate(report.outside_data_model_paths[:50], start=1):
+            print(f"{index}. {path}")
+        if len(report.outside_data_model_paths) > 50:
+            print(f"... and {len(report.outside_data_model_paths) - 50} more")
         print()
 
     if report.data_dirs:
