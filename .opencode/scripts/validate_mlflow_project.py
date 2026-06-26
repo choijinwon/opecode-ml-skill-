@@ -79,6 +79,7 @@ REQUIRED_DIRS = [
     "aiu_custom",
     "local_serving",
     "save_model",
+    "aiu_studio",
 ]
 
 SKIP_DIR_NAMES = {
@@ -154,9 +155,6 @@ def has_project_markers(path: Path) -> bool:
     }
     if any((path / name).exists() for name in marker_names):
         return True
-    direct_artifact_dirs = [path / "save_model", path / "artifacts", path / "model", path / "models", path / "saved_model"]
-    if any(candidate.exists() for candidate in direct_artifact_dirs):
-        return True
     data_dir = path / "data"
     if data_dir.is_dir():
         for root, dirs, files in os.walk(data_dir):
@@ -165,7 +163,7 @@ def has_project_markers(path: Path) -> bool:
                 dirs[:] = []
             if any(Path(file_name).suffix.lower() in ARTIFACT_SUFFIXES for file_name in files):
                 return True
-    return any(file_path.suffix.lower() in ARTIFACT_SUFFIXES for file_path in path.iterdir() if file_path.is_file())
+    return False
 
 
 def score_project(path: Path) -> int:
@@ -259,17 +257,17 @@ def iter_files(path: Path, max_depth: int = 4):
 
 def find_artifacts(path: Path, max_depth: int = 4) -> list[Path]:
     artifacts: list[Path] = []
-    for file_path in iter_files(path, max_depth=max_depth):
-        if file_path.suffix.lower() in ARTIFACT_SUFFIXES:
-            artifacts.append(file_path)
-        if file_path.name in ARTIFACT_DIR_HINTS:
-            artifacts.append(file_path)
+    data_dir = path / "data"
+    if data_dir.is_dir():
+        for file_path in iter_files(data_dir, max_depth=max_depth):
+            if file_path.suffix.lower() in ARTIFACT_SUFFIXES:
+                artifacts.append(file_path)
     return sorted(set(artifacts))
 
 
 def detect_framework(project: Path, requirements_text: str, artifacts: list[Path]) -> tuple[str, list[str]]:
     # Framework detection is evidence-based and conservative. Unknown/custom is
-    # valid when the project does not expose recognizable dependency or artifact
+    # valid when the project does not expose recognizable dependency or data model
     # hints.
     evidence: list[str] = []
     lowered = requirements_text.lower()
@@ -610,7 +608,7 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
             [
                 f"config: {config_message}",
                 f"input_example: {input_message}",
-                f"artifact_count: {len(artifacts)}",
+                f"data_model_file_count: {len(artifacts)}",
             ],
         )
     )
@@ -667,7 +665,7 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
     if not has_mlflow_dep:
         next_steps.append("Add or confirm mlflow dependency in the project environment.")
     if not artifacts:
-        next_steps.append("Run training or provide a model artifact path.")
+        next_steps.append("Run training or provide a data model file under data/.")
     if not prepare_found:
         next_steps.append("Confirm a prepare-only or preflight behavior before registration.")
     if not local_remote_evidence:

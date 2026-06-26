@@ -105,7 +105,10 @@ python .opencode/scripts/check_environment.py --project <model-project-folder> -
 
 기본값은 안전 모드다. 실제 실행은 `--execute`를 명시해야 한다.
 실행 전 `ai_studio.env` 필수 키가 있는지 확인한다.
-모델 artifact는 있지만 실행 파일이 없으면 `run_test.py`, `run_test2.py` 계열 파일을 자동 생성한다.
+`data/` 폴더 안에 모델 형식 파일이 있으면 `data/` 안의 파일 전체를
+프로젝트 루트의 `aiu_studio/` 폴더로 복사한다. 필수 구조나 실행 파일이 없으면
+`aiu_custom/`, `local_serving/`, `save_model/`, `aiu_studio/`, `ai_studio.env`, `run_test.py`, `run_test2.py`
+계열 파일을 자동 생성한다.
 
 ```text
 python .opencode/scripts/run_training.py --project <model-project-folder>
@@ -114,19 +117,32 @@ python .opencode/scripts/run_training.py --project <model-project-folder> --exec
 
 ### ensure_run_test_entrypoints.py
 
-모델 artifact는 있는데 실행 파일이 없을 때 제공 실행 파일을 생성한다.
+`data/` 폴더 안에 모델 형식 파일은 있는데 실행 파일이 없을 때 제공 실행 파일을 생성한다.
 
 ```text
 python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder>
 python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --execute
 ```
 
+대상 모델을 직접 선택해서 별도 실행 파일을 만들 수도 있다.
+이 경우 먼저 `data/` 안의 파일 전체를 프로젝트 루트의 `aiu_studio/` 폴더로 복사한다.
+그 다음 기존 `runtest.py` 또는 `run_test.py`를 템플릿으로 참고해서 선택 모델 형식에 맞는 `runtest_2.py`를 생성한다.
+
+```text
+python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-model data/model.pkl --output runtest_2.py --execute
+python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-model model.pkl --output runtest_2.py --execute
+python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-model data/model.pkl --template runtest.py --output runtest_2.py --execute
+```
+
+이 모드는 선택한 `data/` 모델 파일의 확장자를 기준으로 로더를 결정하고, 템플릿 파일의 모델 경로와 모델 형식 상수만 새 대상 모델 기준으로 변환한다.
+템플릿을 찾지 못하면 내장 실행 템플릿으로 생성한다.
+
 생성 규칙:
 
 ```text
-첫 번째 모델 artifact -> run_test.py
-두 번째 모델 artifact -> run_test2.py
-세 번째 모델 artifact -> run_test3.py
+data/ 안의 첫 번째 모델 파일 -> run_test.py
+data/ 안의 두 번째 모델 파일 -> run_test2.py
+data/ 안의 세 번째 모델 파일 -> run_test3.py
 ```
 
 지원 모델 확장자:
@@ -134,6 +150,34 @@ python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project
 ```text
 .pkl, .joblib, .pt, .pth, .onnx, .h5, .keras, .bst, .ubj, .safetensors
 ```
+
+### ensure_required_project_files.py
+
+`data/` 폴더 안에 모델 형식 파일이 있을 때 AI Studio 연동에 필요한 기본 파일을 생성한다.
+`data/` 안의 파일 전체는 프로젝트 루트의 `aiu_studio/` 폴더로 복사한다.
+
+```text
+python .opencode/scripts/ensure_required_project_files.py --project <model-project-folder>
+python .opencode/scripts/ensure_required_project_files.py --project <model-project-folder> --execute
+```
+
+생성 대상:
+
+```text
+aiu_custom/
+local_serving/
+save_model/
+aiu_studio/
+requirements.txt
+input_example.json
+ai_studio.env
+ai_studio.env.example
+aiu_custom/predict.py
+local_serving/serving_app.py
+```
+
+`aiu_custom/predict.py`는 `aiu_studio/`에 복사된 모델 파일을 우선 로드하고,
+없으면 원본 `data/` 모델 파일을 로드한다.
 
 폐쇄망 모델 선택 샘플:
 

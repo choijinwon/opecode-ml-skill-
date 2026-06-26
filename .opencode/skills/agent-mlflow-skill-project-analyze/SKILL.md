@@ -1,6 +1,6 @@
 ---
 name: agent-mlflow-skill-project-analyze
-description: Use when the user asks "분석해줘", "MLflow 5단계", "모델 있음/없음", "워크스페이스 분석", or project structure analysis; analyzes framework, entrypoint, artifact, config, input example, aiu_custom/local_serving/save_model.
+description: Use when the user asks "분석해줘", "MLflow 5단계", "모델 있음/없음", "워크스페이스 분석", or project structure analysis; analyzes framework, entrypoint, data model files, config, input example, aiu_custom/local_serving/save_model/aiu_studio.
 license: MIT
 compatibility: opencode
 metadata:
@@ -16,14 +16,14 @@ metadata:
 - 사용자가 지정한 모델 프로젝트 폴더의 ML 프로젝트 구조를 분석해 달라고 요청할 때
 - 학습, 추론, MLflow 등록 전에 어떤 파일이 있는지 확인해야 할 때
 - 프로젝트가 sklearn, PyTorch, TensorFlow, HuggingFace, custom pyfunc 중 무엇에 가까운지 판단해야 할 때
-- `aiu_custom`, `local_serving`, `save_model`, `run_model.py`, `input_example.json` 같은 구성 요소가 필요한지 확인해야 할 때
+- `aiu_custom`, `local_serving`, `save_model`, `aiu_studio`, `run_model.py`, `input_example.json` 같은 구성 요소가 필요한지 확인해야 할 때
 - 사용자가 지정한 모델 프로젝트 폴더에 모델 프로젝트가 없어서 `.opencode/samples` 아래 샘플 3개 중 하나를 선택해 폴더째 복사해야 할 때
 
 ## Guidance Checks
 
 - 현재 작업 경로와 사용자가 지정한 프로젝트 경로를 확인한다.
-- 사용자가 루트 경로를 지정했는데 루트 자체에 모델 신호가 없으면, 루트 바로 아래의 모델 후보 폴더를 먼저 찾는다.
-  - 예: `<root>/data/`, `<root>/sklearn_sample/`, `<root>/pytorch_sample/`, `<root>/tensorflow_sample/`, `<root>/model/`
+- 사용자가 루트 경로를 지정했으면, 루트의 `data/` 폴더 안에 모델 형식 파일이 있는지 먼저 찾는다.
+  - 예: `<root>/data/model.pkl`, `<root>/data/model.pt`, `<root>/data/model.onnx`
 - 핵심 파일 존재 여부를 확인한다.
   - `requirements.txt`, `pyproject.toml`, `environment.yml`
   - `train.py`, `app.py`, `main.py`, `run_model.py`
@@ -31,14 +31,16 @@ metadata:
   - `aiu_custom/`, `aiu_custom/model_wrapper.py`, `aiu_custom/predict.py`
   - `local_serving/`
   - `save_model/`
-  - `artifacts/`, `model/`, `mlruns/`, `mlartifacts/`
+  - `aiu_studio/`
+  - `data/` 안의 모델 형식 파일
+  - `mlruns/`, `mlartifacts/`
 - framework 후보를 근거와 함께 분류한다.
   - sklearn: `sklearn`, `.pkl`, `.joblib`, `.fit()`
   - PyTorch: `torch`, `.pt`, `.pth`, `state_dict`
   - TensorFlow/Keras: `tensorflow`, `keras`, `.h5`, `.keras`, `saved_model.pb`
   - HuggingFace: `transformers`, tokenizer files, `model.safetensors`
   - Custom pyfunc: `mlflow.pyfunc.PythonModel`, `aiu_custom`, `ModelWrapper`
-- 모델 artifact 후보와 생성 위치를 확인한다.
+- `data/` 안의 모델 파일 후보와 생성 위치를 확인한다.
 - 학습 entrypoint와 추론 entrypoint를 분리해서 표시한다.
 - 누락 항목은 실패로 단정하지 않고 다음 단계에서 확인할 항목으로 분류한다.
 
@@ -57,7 +59,7 @@ MLflow 5단계로 봐줘
 
 ```text
 1. 현재 워크스페이스 경로를 확인한다.
-2. 루트 자체와 루트 바로 아래 후보 폴더에서 모델 파일, 실행 entrypoint, 필수 폴더를 찾는다.
+2. 루트 자체의 `data/` 폴더에서 모델 형식 파일을 찾고, 실행 entrypoint와 필수 폴더를 확인한다.
 3. model_found 값을 먼저 결정한다.
 4. model_found: true이면 기존 모델 기준 가이드를 출력한다.
 5. model_found: false이면 sklearn/pytorch/tensorflow 선택 가이드를 출력한다.
@@ -73,10 +75,11 @@ MLflow 5단계로 봐줘
 - aiu_custom/
 - local_serving/
 - save_model/
+- aiu_studio/
 - data/
 - input_example.json
-- MLmodel, python_model.pkl
-- .pkl, .joblib, .pt, .pth, .onnx, .h5, .keras, .bst, .ubj, .safetensors
+- data/*.pkl, data/*.joblib, data/*.pt, data/*.pth, data/*.onnx
+- data/*.h5, data/*.keras, data/*.bst, data/*.ubj, data/*.safetensors
 
 분석 결과:
 - model_found: true | false
@@ -92,7 +95,7 @@ MLflow 5단계로 봐줘
 중요 규칙:
 
 ```text
-모델 파일 또는 실행 entrypoint가 하나라도 발견되면 사용자에게 샘플 선택 질문을 하지 않는다.
+`data/` 안의 모델 형식 파일 또는 실행 entrypoint가 하나라도 발견되면 사용자에게 샘플 선택 질문을 하지 않는다.
 샘플 선택은 model_found: false일 때만 진행한다.
 ```
 
@@ -102,9 +105,9 @@ MLflow 5단계로 봐줘
 학습 entrypoint 존재: train.py, scripts/train.py
 실행/등록 entrypoint 존재: run_model.py
 추론 entrypoint 존재: predict.py, app.py, main.py
-필수 폴더 존재: aiu_custom/, local_serving/, save_model/
+필수 폴더 존재: aiu_custom/, local_serving/, save_model/, aiu_studio/
 모델 wrapper 존재: aiu_custom/model_wrapper.py, aiu_custom/predict.py
-모델 artifact 존재: data/, save_model/, model/, models/, artifacts/, saved_model/, .pkl, .joblib, .pt, .pth, .onnx, .h5, .keras, .bst, .ubj, .safetensors
+데이터 모델 파일 존재: data/*.pkl, data/*.joblib, data/*.pt, data/*.pth, data/*.onnx, data/*.h5, data/*.keras, data/*.bst, data/*.ubj, data/*.safetensors
 MLflow model 존재: MLmodel, python_model.pkl
 input example 존재: input_example.json
 ```
@@ -116,7 +119,6 @@ input example 존재: input_example.json
 <root>/pytorch_sample/
 <root>/tensorflow_sample/
 <root>/data/
-<root>/model/
 ```
 
 모델이 발견된 경우 출력에는 반드시 다음을 포함한다.
@@ -127,7 +129,7 @@ selected_project_path
 framework
 train_entrypoint
 inference_entrypoint
-model_artifact_path
+data_model_path
 input_example_path
 next_action: 발견된 프로젝트로 Step 2 환경 검증 후 Step 3 실행
 ```
@@ -208,6 +210,7 @@ next_action: 발견된 프로젝트로 Step 2 환경 검증 후 Step 3 실행
 aiu_custom/
 local_serving/
 save_model/
+aiu_studio/
 ```
 
 아래 폴더는 사용자가 폐쇄망 모델을 직접 넣는 기본 슬롯이며, 워크스페이스에 모델이 없을 때 선택형 폴더 복사 대상으로 사용한다.
@@ -238,6 +241,7 @@ tensorflow_sample/
 <model-project-folder>/<sample-folder>/aiu_custom/
 <model-project-folder>/<sample-folder>/local_serving/
 <model-project-folder>/<sample-folder>/save_model/
+<model-project-folder>/<sample-folder>/aiu_studio/
 <model-project-folder>/<sample-folder>/run_model.py
 <model-project-folder>/<sample-folder>/requirements.txt
 <model-project-folder>/<sample-folder>/input_example.json
@@ -262,6 +266,7 @@ mlflow.db
 aiu_custom/
 local_serving/
 save_model/
+aiu_studio/
 ```
 
 복사는 `agent-mlflow-skill-sample-bootstrap` 스킬과 아래 스크립트를 기준으로 한다.
@@ -280,7 +285,7 @@ selected_sample
 sample_source_path
 target_project_path
 copy_mode: folder
-required_dirs: aiu_custom, local_serving, save_model
+required_dirs: aiu_custom, local_serving, save_model, aiu_studio
 next_action
 ```
 
@@ -288,7 +293,7 @@ next_action
 
 - 선택된 프로젝트 경로
 - 모델 프로젝트 발견 여부
-- 모델이 있을 때 발견된 학습/추론/model artifact 경로
+- 모델이 있을 때 발견된 학습/추론/data 모델 파일 경로
 - 모델이 없을 때 사용자가 선택할 샘플 3개
 - 선택된 샘플 원본 경로와 폴더 복사 대상 경로
 - 발견된 핵심 파일 목록
@@ -296,15 +301,15 @@ next_action
 - framework 후보와 판단 근거
 - 학습 entrypoint 후보
 - 추론 entrypoint 후보
-- 모델 artifact 후보
+- `data/` 모델 파일 후보
 - `aiu_custom` 필요 여부
-- 필수 폴더 존재 여부: `aiu_custom/`, `local_serving/`, `save_model/`
+- 필수 폴더 존재 여부: `aiu_custom/`, `local_serving/`, `save_model/`, `aiu_studio/`
 - 다음 단계: `agent-mlflow-skill-environment-check`
 
 ## Safety
 
 - 이 단계에서는 파일을 수정하지 않는다.
-- 모델 artifact를 이동하거나 복사하지 않는다.
+- 분석 단계에서는 `data/` 모델 파일을 이동하거나 복사하지 않는다.
 - 샘플 원본 디렉터리를 직접 덮어쓰지 않는다.
 - 샘플을 폴더째 복사해야 하면 사용자 선택을 먼저 받은 뒤 `agent-mlflow-skill-sample-bootstrap` 기준으로 처리한다.
 - 모델이 발견된 경우에는 샘플 선택을 제안하지 않는다.

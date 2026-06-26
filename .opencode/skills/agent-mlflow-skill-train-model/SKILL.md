@@ -1,6 +1,6 @@
 ---
 name: agent-mlflow-skill-train-model
-description: Use when the user asks "학습 실행", "모델 생성", "run_model.py", "save_model 확인", "artifact 생성", or train model; checks local training entrypoint, model artifact creation, config, and input example.
+description: Use when the user asks "학습 실행", "모델 생성", "run_model.py", "save_model 확인", "data 모델 파일", or train model; checks local training entrypoint, data model files, config, and input example.
 license: MIT
 compatibility: opencode
 metadata:
@@ -14,7 +14,7 @@ metadata:
 ## When To Use
 
 - 실행 환경 검증 후 로컬 학습을 실행하거나 학습 가능 여부를 확인할 때
-- 학습 결과로 모델 artifact가 생성되는지 확인해야 할 때
+- 학습 결과로 모델 파일이 생성되는지 확인해야 할 때
 - `train.py`, notebook, `run_model.py --prepare-only`, custom training script 중 실제 학습 entrypoint를 판단해야 할 때
 - 학습 산출물이 MLflow 등록이나 추론 테스트에 충분한지 확인해야 할 때
 - Step 0에서 사용자가 선택한 샘플 폴더가 워크스페이스로 복사된 뒤 모델을 생성해야 할 때
@@ -32,10 +32,16 @@ metadata:
   - `run_model.py`
   - `run_test.py`, `run_test2.py`
   - framework별 학습 스크립트
-- 모델 artifact는 있는데 실행 파일이 없으면 제공된 실행 파일 템플릿으로 `run_test.py`를 생성한다.
-  - 모델 artifact가 1개이면 `run_test.py`
-  - 다른 모델 artifact가 추가로 있으면 `run_test2.py`, `run_test3.py` 순서로 생성한다.
+- `data/` 폴더 안에 모델 형식 파일이 있으면 `data/` 안의 파일 전체를 프로젝트 루트의 `aiu_studio/` 폴더로 복사한다.
+- `data/` 폴더 안에 모델 형식 파일은 있는데 필수 구조나 실행 파일이 없으면 제공된 템플릿으로 필수 파일과 `run_test.py`를 생성한다.
+  - `data/` 안의 모델 파일이 1개이면 `run_test.py`
+  - 다른 모델 파일이 추가로 있으면 `run_test2.py`, `run_test3.py` 순서로 생성한다.
   - 모델 확장자에 따라 sklearn/joblib, PyTorch, ONNX, TensorFlow/Keras, XGBoost, safetensors 로더를 사용한다.
+- 사용자가 대상 모델을 직접 선택하면 `agent-mlflow-skill-selected-run-test` 기준으로 선택 모델 전용 실행 파일을 생성한다.
+  - 기본 출력 파일명은 `runtest_2.py`
+  - 기존 `runtest.py` 또는 `run_test.py`를 템플릿으로 참고한다.
+  - 기존 `runtest.py`와 `run_test.py`는 수정하지 않는다.
+  - 선택한 모델 파일은 반드시 `data/` 아래에 있어야 한다.
 - 학습 전에 필요한 입력 파일을 확인한다.
   - dataset 경로
   - config 파일
@@ -54,13 +60,13 @@ metadata:
   - prepare-only
   - smoke test
 - 학습 후 생성되어야 하는 파일을 확인한다.
-  - model artifact
+  - data model file
   - tokenizer/preprocessor
   - config
   - input example
   - metrics/log file
-- 생성된 모델 artifact의 위치와 크기를 확인한다.
-- artifact가 빈 파일이거나 placeholder인지 확인한다.
+- 생성된 모델 파일의 위치와 크기를 확인한다.
+- 모델 파일이 빈 파일이거나 placeholder인지 확인한다.
 
 ## Existing Model Execution
 
@@ -75,16 +81,22 @@ metadata:
 4. prepare-only, dry run, smoke test가 있으면 먼저 실행한다.
 5. `ai_studio.env` 필수 키가 모두 준비되었는지 확인한다.
 6. 실제 학습 또는 모델 export를 실행한다.
-7. 기존 artifact를 덮어쓸 가능성이 있으면 사용자 확인을 받는다.
-8. 생성 또는 갱신된 save_model/model/artifacts 경로를 확인한다.
+7. 기존 모델 파일을 덮어쓸 가능성이 있으면 사용자 확인을 받는다.
+8. 생성 또는 갱신된 data/ 또는 save_model/ 경로를 확인한다.
 9. Step 4 추론 테스트에 사용할 model path와 input example을 넘긴다.
 ```
 
 기존 모델 프로젝트가 있으면 `.opencode/samples`의 선택형 샘플은 사용하지 않는다.
 
-### Missing Entrypoint With Existing Artifacts
+### Missing Required Files With Existing Data Model
 
-모델 파일은 있는데 실행 파일이 없으면 실패로만 끝내지 않는다. 아래 스크립트로 모델 형식에 맞는 smoke test entrypoint를 생성한다.
+`data/` 폴더 안에 모델 파일은 있는데 `aiu_custom/`, `local_serving/`, `save_model/`, `aiu_studio/`, 실행 파일이 없으면 실패로만 끝내지 않는다.
+먼저 `data/` 안의 모든 파일을 프로젝트 루트의 `aiu_studio/` 폴더로 복사한다.
+아래 스크립트로 필수 구조와 모델 형식에 맞는 smoke test entrypoint를 생성한다.
+
+```text
+python .opencode/scripts/ensure_required_project_files.py --project <model-project-folder> --execute
+```
 
 ```text
 python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --execute
@@ -93,9 +105,9 @@ python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project
 생성 규칙:
 
 ```text
-첫 번째 모델 artifact -> run_test.py
-두 번째 모델 artifact -> run_test2.py
-세 번째 모델 artifact -> run_test3.py
+data/ 안의 첫 번째 모델 파일 -> run_test.py
+data/ 안의 두 번째 모델 파일 -> run_test2.py
+data/ 안의 세 번째 모델 파일 -> run_test3.py
 ```
 
 지원 모델 확장자:
@@ -104,9 +116,26 @@ python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project
 .pkl, .joblib, .pt, .pth, .onnx, .h5, .keras, .bst, .ubj, .safetensors
 ```
 
+### Selected Data Model Run Test
+
+사용자가 특정 대상 모델을 선택하면 전체 자동 생성 순서와 별개로 선택 모델 전용 실행 파일을 만든다.
+이때 `data/` 안의 파일 전체를 프로젝트 루트의 `aiu_studio/`로 복사하고, 기존 `runtest.py` 또는 `run_test.py`를 참고해 `runtest_2.py`를 생성한다.
+
+```text
+python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-model data/<model-file> --output runtest_2.py --execute
+```
+
+예시:
+
+```text
+python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --target-model data/model.onnx --template runtest.py --output runtest_2.py --execute
+```
+
+이 흐름은 `agent-mlflow-skill-selected-run-test`를 우선 사용한다.
+
 ## Sample-Based Model Creation
 
-사용자가 지정한 모델 프로젝트 폴더에 모델이 없어 Step 0에서 선택형 샘플 폴더가 복사된 경우, 이 단계의 책임은 복사된 샘플 폴더에서 모델 artifact를 생성하는 것이다.
+사용자가 지정한 모델 프로젝트 폴더에 모델이 없어 Step 0에서 선택형 샘플 폴더가 복사된 경우, 이 단계의 책임은 복사된 샘플 폴더에서 모델 파일을 생성하는 것이다.
 
 ### Required Behavior
 
@@ -118,7 +147,7 @@ python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project
 5. `ai_studio.env` 필수 키가 모두 준비되었는지 확인한다.
 6. prepare-only 또는 smoke test가 있으면 먼저 실행 가능성을 검증한다.
 7. 로컬 학습 또는 로컬 모델 export를 실행한다.
-8. 생성된 save_model/model/artifacts 경로를 확인한다.
+8. 생성된 data/ 또는 save_model/ 경로를 확인한다.
 9. 다음 단계의 inference-test에서 사용할 input example과 model path를 넘긴다.
 ```
 
@@ -142,6 +171,7 @@ tensorflow -> .opencode/samples/tensorflow_sample
 aiu_custom/
 local_serving/
 save_model/
+aiu_studio/
 model/
 artifacts/
 saved_model/
@@ -159,7 +189,8 @@ input_example.json
 - 선택된 샘플 이름과 작업 경로
 - 학습 실행 방식
 - 필요한 입력 파일 목록
-- 생성된 모델 artifact 목록
+- 생성된 data 모델 파일 목록
+- 생성된 필수 파일 목록
 - 생성된 run_test.py 계열 실행 파일 목록
 - 생성되지 않은 필수 산출물
 - 학습 로그 요약
@@ -174,12 +205,12 @@ input_example.json
 - `missing_config`: 학습 설정 파일이 없음
 - `missing_env`: `ai_studio.env` 또는 필수 키가 없음
 - `runtime_error`: 학습 실행 중 예외 발생
-- `artifact_not_created`: 학습은 끝났지만 모델 파일이 생성되지 않음
-- `artifact_invalid`: 생성 파일이 비어 있거나 로드 불가함
+- `data_model_file_not_created`: 학습은 끝났지만 모델 파일이 생성되지 않음
+- `data_model_file_invalid`: 생성 파일이 비어 있거나 로드 불가함
 
 ## Safety
 
 - 오래 걸리는 학습은 사용자에게 예상 비용과 시간을 먼저 설명한다.
-- 기존 artifact를 덮어쓸 수 있으면 실행 전 경로를 명확히 확인한다.
+- 기존 모델 파일을 덮어쓸 수 있으면 실행 전 경로를 명확히 확인한다.
 - 샘플 원본을 직접 수정하지 않고 복사된 샘플 폴더에서 실행한다.
 - 원격 학습이나 외부 데이터 다운로드는 기본 동작으로 가정하지 않는다.

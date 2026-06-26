@@ -5,16 +5,18 @@ import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
+from ensure_required_project_files import ensure_required_files
+from ensure_run_test_entrypoints import ARTIFACT_SUFFIX_TO_KIND
 from ensure_run_test_entrypoints import ensure_run_tests
+from ensure_run_test_entrypoints import find_model_artifacts
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLES_DIR = ROOT / "samples"
 SAMPLE_OPTIONS = ["sklearn", "pytorch", "tensorflow"]
 ENTRYPOINTS = ["train.py", "run_model.py", "scripts/train.py", "run_test.py"]
-REQUIRED_DIRS = ["aiu_custom", "local_serving", "save_model"]
-ARTIFACT_DIRS = ["save_model", "model", "models", "artifacts", "saved_model"]
-ARTIFACT_SUFFIXES = {".pkl", ".joblib", ".pt", ".pth", ".onnx", ".h5", ".keras", ".bst", ".ubj", ".safetensors"}
+REQUIRED_DIRS = ["aiu_custom", "local_serving", "save_model", "aiu_studio"]
+ARTIFACT_SUFFIXES = set(ARTIFACT_SUFFIX_TO_KIND)
 AI_STUDIO_ENV_KEYS = [
     "mlflow_tracking_url",
     "mlflow_tracking_username",
@@ -34,8 +36,9 @@ class TrainingReport:
     command: list[str]
     executed: bool
     return_code: int | None
-    artifacts: list[str] = field(default_factory=list)
+    data_model_files: list[str] = field(default_factory=list)
     generated_entrypoints: list[str] = field(default_factory=list)
+    generated_required_files: list[str] = field(default_factory=list)
     failures: list[str] = field(default_factory=list)
     next_steps: list[str] = field(default_factory=list)
 
@@ -44,9 +47,7 @@ def has_model_project(project: Path) -> bool:
     markers = ["train.py", "run_model.py", "predict.py", "input_example.json", "MLmodel"]
     if any((project / name).exists() for name in markers):
         return True
-    if any((project / name).exists() for name in ARTIFACT_DIRS):
-        return True
-    return any(path.suffix in ARTIFACT_SUFFIXES for path in project.rglob("*") if path.is_file())
+    return bool(find_model_artifacts(project))
 
 
 def find_entrypoint(project: Path) -> Path | None:
@@ -71,12 +72,10 @@ def build_command(python_bin: str, entrypoint: Path, prepare_only: bool) -> list
 
 def find_artifacts(project: Path) -> list[str]:
     found: list[str] = []
-    for name in ARTIFACT_DIRS:
-        path = project / name
-        if path.exists():
-            found.append(str(path))
+    for path in find_model_artifacts(project):
+        found.append(str(path))
     for path in project.rglob("*"):
-        if path.is_file() and (path.suffix in ARTIFACT_SUFFIXES or path.name in {"MLmodel", "python_model.pkl"}):
+        if path.is_file() and path.name in {"MLmodel", "python_model.pkl"}:
             found.append(str(path))
     return sorted(set(found))
 
@@ -121,7 +120,8 @@ def main():
     parser.add_argument("--python", default=sys.executable, help="Python interpreter to use")
     parser.add_argument("--execute", action="store_true", help="actually run the selected command")
     parser.add_argument("--force-sample", action="store_true", help="deprecated; use bootstrap_sample_project.py for sample folder copy")
-    parser.add_argument("--no-create-run-test", action="store_true", help="do not create run_test.py when only model artifacts are found")
+    parser.add_argument("--no-create-run-test", action="store_true", help="do not create run_test.py when data model files are found")
+    parser.add_argument("--no-ensure-required-files", action="store_true", help="do not create required project files when data model files are found")
     parser.add_argument("--prepare-only", action="store_true", help="prefer prepare-only mode when supported")
     parser.add_argument("--json", action="store_true", help="print machine-readable JSON")
     args = parser.parse_args()
@@ -143,8 +143,20 @@ def main():
 
     entrypoint = find_entrypoint(work_path)
     generated_entrypoints: list[str] = []
-    artifacts = find_artifacts(work_path)
-    if entrypoint is None and model_found and artifacts and not args.no_create_run_test:
+    generated_required_files: list[str] = []
+    data_model_files = find_model_artifacts(work_path)
+    artifacts = [str(path) for path in data_model_files]
+
+    if model_found and data_model_files and not args.no_ensure_required_files:
+        required_report = ensure_required_files(work_path, execute=True)
+        generated_required_files = [
+            item.path
+            for item in required_report.ensured
+            if item.created
+        ]
+        failures.extend(required_report.failures)
+
+    if entrypoint is None and model_found and data_model_files and not args.no_create_run_test:
         run_test_report = ensure_run_tests(work_path, execute=True)
         generated_entrypoints = [
             item.entrypoint_path
@@ -156,7 +168,7 @@ def main():
 
     if entrypoint is None:
         failures.append("missing_train_entrypoint")
-        if model_found and artifacts:
+        if model_found and data_model_files:
             next_steps.append("Create run_test.py with .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project-folder> --execute")
         cmd = []
     else:
@@ -177,7 +189,7 @@ def main():
     if missing_env:
         failures.extend(f"missing_env:{name}" for name in missing_env)
     if args.execute and not artifacts:
-        failures.append("artifact_not_created")
+        failures.append("data_model_file_not_created")
 
     report = TrainingReport(
         project_path=str(project),
@@ -188,8 +200,9 @@ def main():
         command=cmd,
         executed=args.execute,
         return_code=return_code,
-        artifacts=artifacts,
+        data_model_files=artifacts,
         generated_entrypoints=generated_entrypoints,
+        generated_required_files=generated_required_files,
         failures=failures,
         next_steps=next_steps,
     )
@@ -205,11 +218,14 @@ def main():
         print(f"Command: {' '.join(report.command) if report.command else 'none'}")
         print(f"Executed: {report.executed}")
         print(f"Return code: {report.return_code}")
-        print("Artifacts:")
-        for artifact in report.artifacts:
-            print(f"- {artifact}")
+        print("Data model files:")
+        for data_model_file in report.data_model_files:
+            print(f"- {data_model_file}")
         print("Generated entrypoints:")
         for generated in report.generated_entrypoints:
+            print(f"- {generated}")
+        print("Generated required files:")
+        for generated in report.generated_required_files:
             print(f"- {generated}")
         if report.failures:
             print("Failures:")

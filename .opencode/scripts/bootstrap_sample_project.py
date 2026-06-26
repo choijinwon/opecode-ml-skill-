@@ -47,10 +47,15 @@ GENERATED_PATH_PREFIXES = {
     ("artifacts", "ai_studio"),
 }
 
-REQUIRED_PROJECT_DIRS = [
+SOURCE_REQUIRED_DIRS = [
     "aiu_custom",
     "local_serving",
     "save_model",
+]
+
+REQUIRED_PROJECT_DIRS = [
+    *SOURCE_REQUIRED_DIRS,
+    "aiu_studio",
 ]
 
 IGNORABLE_PROJECT_ROOT_NAMES = {
@@ -94,7 +99,7 @@ def list_samples() -> list[dict[str, str]]:
 
 
 def has_required_dirs(sample: Path) -> bool:
-    return all((sample / name).is_dir() for name in REQUIRED_PROJECT_DIRS)
+    return all((sample / name).is_dir() for name in SOURCE_REQUIRED_DIRS)
 
 
 def is_project_empty(project: Path) -> bool:
@@ -213,7 +218,7 @@ def main():
     if not sample_source.exists():
         failures.append(f"sample_not_found:{sample_source}")
     elif not has_required_dirs(sample_source):
-        failures.append(f"sample_missing_required_dirs:{','.join(REQUIRED_PROJECT_DIRS)}")
+        failures.append(f"sample_missing_required_dirs:{','.join(SOURCE_REQUIRED_DIRS)}")
 
     project_empty = is_project_empty(project)
     if project.exists() and not project.is_dir():
