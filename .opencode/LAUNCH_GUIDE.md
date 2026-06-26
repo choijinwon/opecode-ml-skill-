@@ -11,39 +11,142 @@ OpenCode 기본 로고 자체는 OpenCode 내장 화면이라 `.opencode` 설정
 
 ```text
 [Launch Guide]
-이 프로젝트는 MLflow 모델 프로젝트 분석과 샘플 생성을 돕는 OpenCode 패키지입니다.
-처음 진입하면 워크스페이스를 먼저 분석해 모델 있음/없음을 확인합니다.
+목적: MLflow 모델 프로젝트 분석, 샘플 생성, 배포 오류 가이드를 단계별로 진행합니다.
+기준: 사용자가 가져온 모델 파일은 항상 프로젝트 루트의 data/ 하위 트리에 둡니다.
 
-모델이 있으면 본인 모델 경로를 기준으로 MLflow 5단계를 진행합니다.
-현재 경로에 모델이 없지만 폐쇄망 프로젝트에 모델이 있다면 실제 모델 프로젝트 경로를 지정하거나 `<model-project-folder>/data/**` 아래로 반입한 뒤 다시 분석합니다.
-샘플 생성은 기존 모델을 반입하지 못할 때만 sklearn / pytorch / tensorflow 중 하나를 선택합니다.
+Process A. 모델이 있을 때
+1. data/** 모델 탐지
+2. model_artifact_paths에서 대상 모델 선택
+3. aiu_studio/ 템플릿 폴더만 복사
+4. 선택 모델을 직접 읽는 runtest_2.py 생성
+5. 환경 검증, 추론 테스트, MLflow 분석 리포트 확인
 
-실제 복사/모델 생성/환경 검증 실행은 OpenCode 빌드모드에서 선택해주세요.
+Process B. 모델이 없을 때
+1. 폐쇄망 모델을 data/** 아래로 반입
+2. 재분석 후 모델이 발견되면 Process A 진행
+3. 실제 모델 반입이 어려울 때만 sklearn / pytorch / tensorflow 샘플 선택
+4. 선택 샘플을 폴더째 복사하고 해당 샘플 폴더 기준으로 진행
+
+Process C. 배포 오류가 있을 때
+1. 오류 로그 또는 에러 메시지 수집
+2. 룰 기반 오류 가이드 확인
+3. 필요 시 Qwen endpoint로 추가 진단
+4. 조치 후 환경 검증과 MLflow 분석 리포트 재확인
 
 추천 첫 요청:
 - 이 워크스페이스를 MLflow 5단계 기준으로 분석해줘.
+- 1번 모델로 runtest_2.py 만들어줘.
 - 모델이 없으면 sklearn 샘플로 생성해줘.
+- 배포 오류 로그 분석해줘.
 
 보안 규칙: API key, password, token 값은 출력하지 않고 서버 배포 시 Secret/환경변수를 사용합니다.
 ```
+
+## 채팅용 접기형 가이드
+
+<details>
+<summary>모델이 있을 때 프로세스</summary>
+
+### Step 1. 모델 탐지
+- [ ] `data/**` 모델 목록 확인
+- [ ] `model_artifact_paths` 목록 생성
+
+### Step 2. 모델 선택
+- [ ] 사용할 모델 번호 또는 경로 선택
+- [ ] 선택 모델이 `<model-project-folder>/data/**` 아래에 있는지 확인
+
+### Step 3. 모델 형식 판별
+- [ ] 선택 모델 확장자 기준으로 모델 형식 판별
+- [ ] `.pkl`, `.pt`, `.onnx`, `.keras` 등 지원 형식 확인
+
+### Step 4. AI Studio 템플릿 준비
+- [ ] `aiu_studio/` 실행 템플릿 폴더만 프로젝트 루트로 복사
+- [ ] 모델 파일은 `aiu_studio/`로 복사하지 않음
+
+### Step 5. 선택 모델 실행 파일 생성
+- [ ] 자동: `MODEL_PATH = DATA_MODEL_PATH`로 설정해 선택 모델을 직접 읽음
+- [ ] 자동: `runtest.py` 우선 참조, 없으면 `run_test.py` 참조
+- [ ] 자동: 선택 모델 형식에 맞는 `runtest_2.py` 생성
+
+### Step 6. 환경 검증
+- [ ] `check_environment.py`로 Python, MLflow, dependency 확인
+- [ ] `requirements.txt`가 있으면 설치 명령 확인
+- [ ] 필요 시 `--install-requirements`로 설치
+
+### Step 7. 추론 테스트
+- [ ] `run_training.py` 또는 생성된 `runtest_2.py`로 모델 로드 확인
+- [ ] `aiu_custom/predict.py` 기준 추론 가능 여부 확인
+
+### Step 8. MLflow 분석 리포트
+- [ ] `verify_mlflow.py`로 run/artifact/model registry 분석
+- [ ] `pass` / `warn` / `block` 상태와 후속 조치 확인
+
+</details>
+
+<details>
+<summary>모델이 없을 때 프로세스</summary>
+
+### Step 1. 모델 미탐지 확인
+- [ ] 현재 워크스페이스 `data/**`에서 모델 파일을 찾지 못함
+- [ ] 분석 경로가 실제 모델 프로젝트인지 확인
+
+### Step 2. 폐쇄망 모델 반입 판단
+- [ ] 폐쇄망에 실제 모델이 있으면 모델 프로젝트 경로를 지정
+- [ ] 또는 모델 파일을 `<model-project-folder>/data/**` 아래로 반입
+
+### Step 3. 재분석
+- [ ] 반입 후 `validate_mlflow_project.py`로 재분석
+- [ ] 모델이 발견되면 모델 있음 프로세스로 전환
+
+### Step 4. 샘플 선택
+- [ ] 실제 모델을 반입할 수 없을 때만 샘플 사용
+- [ ] `sklearn` / `pytorch` / `tensorflow` 중 하나 선택
+
+### Step 5. 샘플 폴더 복사
+- [ ] `bootstrap_sample_project.py`가 샘플 폴더를 workspace 아래로 폴더째 복사
+- [ ] 복사된 샘플 폴더 기준으로 다시 모델 있음 프로세스 진행
+
+</details>
+
+<details>
+<summary>배포 오류가 있을 때 프로세스</summary>
+
+### Step 1. 오류 수집
+- [ ] 배포 오류 로그 또는 에러 메시지 확보
+- [ ] secret 값은 제거하거나 마스킹
+
+### Step 2. 룰 기반 오류 가이드
+- [ ] `check_environment.py --error-log deploy.log`로 오류 가이드 확인
+- [ ] `requirements.txt` 누락/설치 실패, 인증, endpoint, MLflow backend, 파일 경로 오류 분류
+
+### Step 3. Qwen 선택 진단
+- [ ] 폐쇄망 Qwen endpoint가 있으면 `--qwen-diagnose` 사용
+- [ ] `OPENAI_BASE_URL`, `OPENAI_API_KEY`, `OPENAI_MODEL`은 환경변수로 주입
+
+### Step 4. 조치 및 재검증
+- [ ] 가이드에 따라 설정/패키지/경로/권한 수정
+- [ ] 환경 검증과 MLflow 분석 리포트 재확인
+
+</details>
 
 다시 보고 싶으면 `opencode --reset-launch`, `./.opencode/start --reset-launch`, 또는 OpenCode 안에서 `/launch`를 사용합니다.
 
 ## 첫 채팅 응답 규칙
 
-초기 Launch Guide는 `.opencode/bin/opencode` 또는 `.opencode/start` 런처가 터미널에서 한 번만 출력한다. 채팅 첫 응답에서는 자동으로 다시 출력하지 않는다.
+`.opencode/opencode.json`의 기본 에이전트는 `launch`입니다. OpenCode 채팅에 처음 진입해 사용자가 `하이`, `안녕`, `분석해줘`처럼 어떤 메시지를 입력해도 첫 assistant 응답은 짧은 Launch Guide를 먼저 보여줍니다.
+
+단, `.opencode/bin/opencode` 또는 `.opencode/start` 런처를 사용해 이미 터미널 시작 안내를 본 경우에는 같은 안내가 중복될 수 있습니다. 중복이 싫으면 한 가지 방식을 선택합니다.
 
 ```text
-사용자: 하이
-assistant: [Launch Guide] ... 무엇부터 볼까요?
+방식 1. opencode . 실행
+  - 채팅 첫 응답에서 Launch Guide 표시
+
+방식 2. .opencode/bin/opencode 또는 .opencode/start 실행
+  - OpenCode 실행 직전에 터미널에서 Launch Guide 표시
+  - .opencode/.launch_seen 파일로 최초 1회 여부 관리
 ```
 
-```text
-사용자: sklearn 샘플 생성해줘
-assistant: [Launch Guide] ... 이어서 sklearn 샘플 생성을 진행합니다.
-```
-
-다시 보려면 `/launch`를 입력한다.
+다시 보려면 `/launch`, `opencode --reset-launch`, 또는 `./.opencode/start --reset-launch`를 사용합니다.
 
 ## 권장 실행 방식
 

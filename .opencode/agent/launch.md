@@ -48,23 +48,89 @@ Print this exact guide on the first assistant response, and also when the user e
 
 ```text
 [Launch Guide]
-이 프로젝트는 MLflow 모델 프로젝트 분석과 샘플 생성을 돕는 OpenCode 패키지입니다.
-처음 진입하면 워크스페이스의 `data/**` 트리를 먼저 분석해 모델 있음/없음을 확인합니다.
+목적: MLflow 모델 프로젝트 분석, 샘플 생성, 배포 오류 가이드를 단계별로 진행합니다.
+기준: 사용자가 가져온 모델 파일은 항상 프로젝트 루트의 `data/` 하위 트리에 둡니다.
 
-사용자가 가져온 모델 파일은 항상 프로젝트 루트의 `data/` 하위 트리 안에 넣어주세요.
-`data/**` 안에 .pkl, .pt, .onnx 같은 모델 파일이 있으면 본인 모델 경로를 기준으로 MLflow 5단계를 진행합니다.
-현재 경로에 모델이 없지만 폐쇄망 프로젝트에 모델이 있다면, 실제 모델 프로젝트 경로를 지정하거나 `<model-project-folder>/data/**` 아래로 반입한 뒤 다시 분석합니다.
-샘플 생성은 기존 모델을 반입하지 못할 때만 sklearn / pytorch / tensorflow 중 하나를 선택합니다.
-생성 시 샘플 내용만 루트에 풀지 않고 `<workspace>/sklearn_sample/` 같은 샘플 폴더 자체를 복사합니다.
+Process A. 모델이 있을 때
+1. `data/**` 모델 탐지
+2. `model_artifact_paths`에서 대상 모델 선택
+3. `aiu_studio/` 템플릿 폴더만 복사
+4. 선택 모델을 직접 읽는 `runtest_2.py` 생성
+5. 환경 검증, 추론 테스트, MLflow 분석 리포트 확인
 
-실제 복사/모델 생성/환경 검증 실행은 OpenCode 빌드모드에서 선택해주세요.
+Process B. 모델이 없을 때
+1. 폐쇄망 모델을 `data/**` 아래로 반입
+2. 재분석 후 모델이 발견되면 Process A 진행
+3. 실제 모델 반입이 어려울 때만 `sklearn` / `pytorch` / `tensorflow` 샘플 선택
+4. 선택 샘플을 폴더째 복사하고 해당 샘플 폴더 기준으로 진행
+
+Process C. 배포 오류가 있을 때
+1. 오류 로그 또는 에러 메시지 수집
+2. 룰 기반 오류 가이드 확인
+3. 필요 시 Qwen endpoint로 추가 진단
+4. 조치 후 환경 검증과 MLflow 분석 리포트 재확인
 
 추천 첫 요청:
 - 이 워크스페이스를 MLflow 5단계 기준으로 분석해줘.
+- 1번 모델로 runtest_2.py 만들어줘.
 - 모델이 없으면 sklearn 샘플로 생성해줘.
+- 배포 오류 로그 분석해줘.
 
 보안 규칙: API key, password, token 값은 출력하지 않고 서버 배포 시 Secret/환경변수를 사용합니다.
 ```
+
+<details>
+<summary>모델이 있을 때</summary>
+
+### Step 1. 모델 탐지
+- [ ] `data/**` 모델 목록 확인
+- [ ] `model_artifact_paths` 목록 생성
+
+### Step 2. 모델 선택
+- [ ] 사용할 모델 번호 또는 경로 선택
+- [ ] 선택 모델이 `<model-project-folder>/data/**` 아래에 있는지 확인
+
+### Step 3. 자동 생성
+- [ ] `aiu_studio/` 실행 템플릿 폴더만 프로젝트 루트로 복사
+- [ ] `MODEL_PATH = DATA_MODEL_PATH`로 설정해 선택 모델을 직접 읽음
+- [ ] `runtest.py` 우선 참조, 없으면 `run_test.py` 참조
+- [ ] 선택 모델 형식에 맞는 `runtest_2.py` 생성
+
+### Step 4. 검증
+- [ ] 환경 검증 및 `requirements.txt` 설치 옵션 확인
+- [ ] 추론 테스트
+- [ ] MLflow 분석 리포트 확인
+
+</details>
+
+<details>
+<summary>모델이 없을 때</summary>
+
+### Step 1. 모델 반입 확인
+- [ ] 폐쇄망에 실제 모델이 있으면 모델 프로젝트 경로를 지정하거나 `data/**` 아래로 반입
+- [ ] 반입 후 다시 분석
+
+### Step 2. 샘플 선택
+- [ ] 실제 모델을 반입할 수 없을 때만 `sklearn` / `pytorch` / `tensorflow` 샘플 선택
+- [ ] 샘플은 루트에 풀지 않고 `sklearn_sample/` 같은 폴더째 복사
+- [ ] 복사된 샘플 폴더 기준으로 다시 모델 있음 프로세스 진행
+
+</details>
+
+<details>
+<summary>배포 오류가 있을 때</summary>
+
+### Step 1. 오류 수집
+- [ ] 배포 오류 로그 또는 에러 메시지 확보
+
+### Step 2. 오류 가이드
+- [ ] `check_environment.py --error-log deploy.log`로 룰 기반 오류 가이드 확인
+- [ ] 폐쇄망 Qwen endpoint가 있으면 `--qwen-diagnose`로 추가 진단
+
+### Step 3. 재검증
+- [ ] 조치 후 환경 검증과 MLflow 분석 리포트 재확인
+
+</details>
 
 ## Work Rules
 
@@ -78,6 +144,7 @@ Print this exact guide on the first assistant response, and also when the user e
 - Ask the user to choose `sklearn`, `pytorch`, or `tensorflow` only when they want to start from a sample.
 - If the user explicitly asks to create/copy a selected sample, run `.opencode/scripts/bootstrap_sample_project.py --project <workspace-root> --sample <sklearn|pytorch|tensorflow> --execute`.
 - After sample creation, report `target_project_path` and tell the user to continue from that copied sample folder.
+- If `model_found: true` and `model_artifact_paths` are available, the next step is model selection first. Do not skip directly to sample creation or MLflow verification.
 - Tell the user that model creation, environment check, and verification actions should be selected in OpenCode build mode.
 - When implementation is requested, follow the repository patterns and avoid modifying unrelated files.
 
@@ -101,12 +168,13 @@ agent-mlflow-skill-environment-check
   - Python, dependency, MLflow, optional config/mlflow_config.json, environment variable checks
 
 agent-mlflow-skill-train-model
-  - local training, 프로젝트 진입점, data model file checks, aiu_studio copy, save_model checks
+  - local training, 프로젝트 진입점, data model file checks, aiu_studio template copy, save_model checks
 
 agent-mlflow-skill-selected-run-test
   - selected data model file after model_artifact_paths are shown
   - user selects a model number or model path after `model_found: true`
-  - copying data files to aiu_studio
+  - copying only the aiu_studio template folder
+  - keeping model files in data/**
   - referencing runtest.py or run_test.py
   - creating runtest_2.py or another model-format-specific run test file
 
