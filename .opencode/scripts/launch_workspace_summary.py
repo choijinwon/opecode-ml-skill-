@@ -60,17 +60,17 @@ def main() -> int:
         elif status in {"warn", "block", "fail"}:
             review_items.append(f"{name}: {message}")
 
-    data_model_files = payload.get("data_model_files") or []
-    model_found = bool(payload.get("model_found") or data_model_files)
+    model_artifact_paths = payload.get("model_artifact_paths") or payload.get("data_model_files") or []
+    model_found = bool(payload.get("model_found") or model_artifact_paths)
 
     print(f"- 분석 대상: {payload.get('selected_project', str(project_dir))}")
     print(f"- 모델 상태: {'있음' if model_found else '없음 또는 추가 확인 필요'}")
-    if data_model_files:
-        print(f"- data 모델 파일: {len(data_model_files)}개")
-        for item in data_model_files[:5]:
-            print(f"  - {item}")
-        if len(data_model_files) > 5:
-            print(f"  - 외 {len(data_model_files) - 5}개")
+    if model_artifact_paths:
+        print(f"- 선택 가능한 모델: {len(model_artifact_paths)}개")
+        for index, item in enumerate(model_artifact_paths[:9], start=1):
+            print(f"  {index}. {item}")
+        if len(model_artifact_paths) > 9:
+            print(f"  - 외 {len(model_artifact_paths) - 9}개")
 
     if evidence:
         print("- 발견 항목:")

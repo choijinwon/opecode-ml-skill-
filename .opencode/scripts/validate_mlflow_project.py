@@ -140,6 +140,8 @@ class ValidationReport:
     selection_reason: str
     model_found: bool
     data_model_files: list[str]
+    model_artifact_paths: list[str]
+    model_artifact_path: str | None
     os: str
     python: str
     checks: list[Check]
@@ -587,7 +589,7 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
 
     if not project.exists():
         checks.append(Check("local model path selection", "block", "selected project path does not exist", [str(project)]))
-        return ValidationReport(str(project), reason, False, [], platform.platform(), sys.version.split()[0], checks, ["Provide a valid --project path."])
+        return ValidationReport(str(project), reason, False, [], [], None, platform.platform(), sys.version.split()[0], checks, ["Provide a valid --project path."])
 
     checks.append(Check("local model path selection", "pass", "project selected", [str(project), reason]))
 
@@ -595,6 +597,8 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
     artifacts = find_artifacts(project)
     model_found = bool(artifacts)
     data_model_files = [safe_relative(path, project) for path in artifacts]
+    model_artifact_paths = data_model_files
+    model_artifact_path = model_artifact_paths[0] if model_artifact_paths else None
     framework, framework_evidence = detect_framework(project, requirements_text, artifacts)
     entrypoints = find_entrypoints(project)
     config_file = find_first_existing(project, CONFIG_NAMES)
@@ -719,16 +723,28 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
     if not next_steps:
         next_steps.append("Proceed to local/remote MLflow registration guidance.")
 
-    return ValidationReport(str(project), reason, model_found, data_model_files, platform.platform(), sys.version.split()[0], checks, next_steps)
+    return ValidationReport(
+        str(project),
+        reason,
+        model_found,
+        data_model_files,
+        model_artifact_paths,
+        model_artifact_path,
+        platform.platform(),
+        sys.version.split()[0],
+        checks,
+        next_steps,
+    )
 
 
 def print_text(report: ValidationReport):
     print(f"Selected project: {report.selected_project}")
     print(f"Selection reason: {report.selection_reason}")
     print(f"Model found: {report.model_found}")
-    print("Data model files:")
-    for data_model_file in report.data_model_files:
-        print(f"- {data_model_file}")
+    print(f"Model artifact path: {report.model_artifact_path or 'none'}")
+    print("Model artifact paths:")
+    for index, model_artifact_path in enumerate(report.model_artifact_paths, start=1):
+        print(f"{index}. {model_artifact_path}")
     print(f"OS: {report.os}")
     print(f"Python: {report.python}")
     print()

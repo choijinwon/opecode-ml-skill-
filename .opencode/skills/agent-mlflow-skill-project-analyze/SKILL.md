@@ -136,10 +136,15 @@ selected_project_path
 framework
 train_entrypoint
 inference_entrypoint
-data_model_path
+model_artifact_path
+model_artifact_paths
+data_model_files
 input_example_path
 next_action: 발견된 프로젝트로 Step 2 환경 검증 후 Step 3 실행
 ```
+
+`model_artifact_paths`는 사용자가 선택할 수 있도록 번호 목록으로 보여준다.
+`model_artifact_path`는 기본 선택값이며, 목록의 첫 번째 모델 경로를 사용한다.
 
 모델이 발견된 경우 사용자에게 보여줄 가이드는 아래 방향으로 작성한다.
 
