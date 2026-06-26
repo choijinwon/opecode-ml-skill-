@@ -72,7 +72,8 @@ aiu_studio 복사 경로:
 - MODEL_ID
 ```
 
-템플릿에서 위 상수명을 찾지 못하면 템플릿을 억지로 수정하지 않고, 선택 모델 형식에 맞는 표준 `runtest_2.py`를 생성한다.
+템플릿에서 일부 상수만 찾으면 찾은 상수는 치환하고, 없는 `DATA_MODEL_PATH`, `AIU_STUDIO_MODEL_PATH`, `MODEL_PATH`, `MODEL_KIND`, `MODEL_NAME`은 새 `runtest_2.py`에 보강한다.
+템플릿에서 위 상수명을 전혀 찾지 못하면 템플릿을 억지로 수정하지 않고, 선택 모델 형식에 맞는 표준 `runtest_2.py`를 생성한다.
 
 ## Command
 

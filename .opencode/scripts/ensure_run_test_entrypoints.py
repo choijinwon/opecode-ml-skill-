@@ -61,6 +61,8 @@ class GeneratedRunTest:
     entrypoint_path: str
     created: bool
     skipped_reason: str | None = None
+    template_path: str | None = None
+    converted_from_template: bool = False
 
 
 @dataclass
@@ -493,6 +495,12 @@ def render_selected_run_test(project: Path, artifact: Path, model_kind: str, tem
         support_lines.append(f"DATA_MODEL_PATH = PROJECT_DIR / {rel_artifact!r}")
     if not has_assignment(text, "AIU_STUDIO_MODEL_PATH"):
         support_lines.append(f'AIU_STUDIO_MODEL_PATH = PROJECT_DIR / "aiu_studio" / {rel_data_artifact!r}')
+    if not has_assignment(text, "MODEL_PATH"):
+        support_lines.append("MODEL_PATH = AIU_STUDIO_MODEL_PATH if AIU_STUDIO_MODEL_PATH.exists() else DATA_MODEL_PATH")
+    if not has_assignment(text, "MODEL_KIND"):
+        support_lines.append(f"MODEL_KIND = {model_kind!r}")
+    if not has_assignment(text, "MODEL_NAME"):
+        support_lines.append(f"MODEL_NAME = {model_var!r}")
     support_block = "\n".join(support_lines)
     if support_block:
         support_block = support_block + "\n"
@@ -592,6 +600,8 @@ def ensure_selected_run_test(
                 entrypoint_path=str(target),
                 created=False,
                 skipped_reason="entrypoint_exists",
+                template_path=str(template_file) if template_file else None,
+                converted_from_template=bool(template_file),
             )
         )
         return report
@@ -606,6 +616,8 @@ def ensure_selected_run_test(
             model_kind=model_kind,
             entrypoint_path=str(target),
             created=execute,
+            template_path=str(template_file) if template_file else None,
+            converted_from_template=bool(template_file),
         )
     )
     return report
@@ -688,6 +700,9 @@ def main():
         for item in report.generated:
             status = "created" if item.created else f"skipped:{item.skipped_reason}"
             print(f"- {status} {item.entrypoint_path} for {item.model_kind}: {item.data_model_file}")
+            if item.template_path:
+                print(f"  template: {item.template_path}")
+                print(f"  converted_from_template: {str(item.converted_from_template).lower()}")
         if report.copied_to_aiu_studio:
             print("Merged data files into aiu_studio:")
             for copied in report.copied_to_aiu_studio:
