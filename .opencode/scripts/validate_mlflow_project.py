@@ -110,6 +110,7 @@ SKIP_DIR_NAMES = {
     "__pycache__",
     "node_modules",
     "outputs",
+    "mlartifacts",
 }
 
 

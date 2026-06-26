@@ -44,7 +44,7 @@ python .opencode/scripts/validate_mlflow_project.py --project <model-project-fol
 
 `data/` 폴더와 모델 파일만 별도로 스캔한다. 프로젝트 구조, 필수 폴더, MLflow 설정은 판단하지 않는다.
 
-기본 스캔은 `.git`, `.venv*`, `node_modules`, 숨김 폴더를 제외한다. `mlartifacts/` 아래 `data/` 모델은 포함한다.
+기본 스캔은 `.git`, `.venv*`, `node_modules`, 숨김 폴더, `mlartifacts/`를 제외한다.
 
 ```text
 python .opencode/scripts/scan_data_models.py --project <model-project-folder>
@@ -55,6 +55,12 @@ python .opencode/scripts/scan_data_models.py --project <model-project-folder> --
 
 ```text
 python .opencode/scripts/scan_data_models.py --project <model-project-folder> --include-opencode
+```
+
+생성 산출물인 `mlartifacts/`까지 확인해야 할 때만 아래 옵션을 사용한다.
+
+```text
+python .opencode/scripts/scan_data_models.py --project <model-project-folder> --include-mlartifacts
 ```
 
 ### bootstrap_sample_project.py

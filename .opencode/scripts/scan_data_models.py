@@ -44,6 +44,7 @@ DEFAULT_SKIP_DIRS = {
     ".git",
     ".venv",
     "__pycache__",
+    "mlartifacts",
     "node_modules",
 }
 
@@ -84,9 +85,11 @@ def safe_relative(path: Path, base: Path) -> str:
         return str(path)
 
 
-def should_skip_dir(name: str, include_hidden: bool, include_opencode: bool) -> bool:
+def should_skip_dir(name: str, include_hidden: bool, include_opencode: bool, include_mlartifacts: bool) -> bool:
     lowered = name.lower()
     if name == ".opencode" and include_opencode:
+        return False
+    if name == "mlartifacts" and include_mlartifacts:
         return False
     if name in DEFAULT_SKIP_DIRS:
         return True
@@ -97,14 +100,19 @@ def should_skip_dir(name: str, include_hidden: bool, include_opencode: bool) -> 
     return False
 
 
-def iter_data_dirs(project: Path, include_hidden: bool, include_opencode: bool) -> tuple[list[Path], list[Path]]:
+def iter_data_dirs(project: Path, include_hidden: bool, include_opencode: bool, include_mlartifacts: bool) -> tuple[list[Path], list[Path]]:
     data_dirs: list[Path] = []
     skipped_dirs: list[Path] = []
     for root, dirs, _files in os.walk(project):
         root_path = Path(root)
         kept_dirs = []
         for dirname in dirs:
-            if should_skip_dir(dirname, include_hidden=include_hidden, include_opencode=include_opencode):
+            if should_skip_dir(
+                dirname,
+                include_hidden=include_hidden,
+                include_opencode=include_opencode,
+                include_mlartifacts=include_mlartifacts,
+            ):
                 skipped_dirs.append(root_path / dirname)
                 continue
             kept_dirs.append(dirname)
@@ -143,7 +151,12 @@ def scan_data_dir(data_dir: Path, project: Path) -> DataDir:
     )
 
 
-def build_report(project: Path, include_hidden: bool = False, include_opencode: bool = False) -> DataScanReport:
+def build_report(
+    project: Path,
+    include_hidden: bool = False,
+    include_opencode: bool = False,
+    include_mlartifacts: bool = False,
+) -> DataScanReport:
     project = project.expanduser().resolve()
     if not project.exists() or not project.is_dir():
         raise FileNotFoundError(f"project folder not found: {project}")
@@ -152,6 +165,7 @@ def build_report(project: Path, include_hidden: bool = False, include_opencode: 
         project,
         include_hidden=include_hidden,
         include_opencode=include_opencode,
+        include_mlartifacts=include_mlartifacts,
     )
     data_dirs = [scan_data_dir(path, project) for path in data_dir_paths]
     model_artifact_paths = [
@@ -206,6 +220,7 @@ def main():
     parser.add_argument("--project", default=".", help="workspace or model project folder")
     parser.add_argument("--include-hidden", action="store_true", help="include hidden folders except .git/.venv/node_modules")
     parser.add_argument("--include-opencode", action="store_true", help="include .opencode sample folders in the scan")
+    parser.add_argument("--include-mlartifacts", action="store_true", help="include generated mlartifacts folders in the scan")
     parser.add_argument("--json", action="store_true", help="print machine-readable JSON")
     args = parser.parse_args()
 
@@ -213,6 +228,7 @@ def main():
         Path(args.project),
         include_hidden=args.include_hidden,
         include_opencode=args.include_opencode,
+        include_mlartifacts=args.include_mlartifacts,
     )
     if args.json:
         print(json.dumps(asdict(report), ensure_ascii=False, indent=2))
