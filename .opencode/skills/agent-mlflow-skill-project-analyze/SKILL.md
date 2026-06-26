@@ -23,7 +23,7 @@ metadata:
 
 - 현재 작업 경로와 사용자가 지정한 프로젝트 경로를 확인한다.
 - 사용자가 루트 경로를 지정했는데 루트 자체에 모델 신호가 없으면, 루트 바로 아래의 모델 후보 폴더를 먼저 찾는다.
-  - 예: `<root>/sklearn_sample/`, `<root>/pytorch_sample/`, `<root>/tensorflow_sample/`, `<root>/model/`
+  - 예: `<root>/data/`, `<root>/sklearn_sample/`, `<root>/pytorch_sample/`, `<root>/tensorflow_sample/`, `<root>/model/`
 - 핵심 파일 존재 여부를 확인한다.
   - `requirements.txt`, `pyproject.toml`, `environment.yml`
   - `train.py`, `app.py`, `main.py`, `run_model.py`
@@ -73,6 +73,7 @@ MLflow 5단계로 봐줘
 - aiu_custom/
 - local_serving/
 - save_model/
+- data/
 - input_example.json
 - MLmodel, python_model.pkl
 - .pkl, .joblib, .pt, .pth, .h5, .keras, .onnx, .safetensors
@@ -103,7 +104,7 @@ MLflow 5단계로 봐줘
 추론 entrypoint 존재: predict.py, app.py, main.py
 필수 폴더 존재: aiu_custom/, local_serving/, save_model/
 모델 wrapper 존재: aiu_custom/model_wrapper.py, aiu_custom/predict.py
-모델 artifact 존재: save_model/, model/, artifacts/, saved_model/, .pkl, .joblib, .pt, .pth, .h5, .keras
+모델 artifact 존재: data/, save_model/, model/, models/, artifacts/, saved_model/, .pkl, .joblib, .pt, .pth, .h5, .keras
 MLflow model 존재: MLmodel, python_model.pkl
 input example 존재: input_example.json
 ```
@@ -114,6 +115,7 @@ input example 존재: input_example.json
 <root>/sklearn_sample/
 <root>/pytorch_sample/
 <root>/tensorflow_sample/
+<root>/data/
 <root>/model/
 ```
 

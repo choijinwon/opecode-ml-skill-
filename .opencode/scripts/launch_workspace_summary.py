@@ -10,8 +10,17 @@ MODEL_HINTS = [
     "predict.py",
     "aiu_custom/",
     "save_model/",
+    "data/",
     "MLmodel",
     "python_model.pkl",
+    ".pkl",
+    ".joblib",
+    ".pt",
+    ".pth",
+    ".onnx",
+    ".h5",
+    ".keras",
+    ".safetensors",
 ]
 
 
