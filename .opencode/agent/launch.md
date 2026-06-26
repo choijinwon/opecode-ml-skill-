@@ -99,10 +99,10 @@ agent-mlflow-skill-environment-check
   - Python, dependency, MLflow, ai_studio.env, environment variable checks
 
 agent-mlflow-skill-train-model
-  - local training, run_model.py, data model file checks, aiu_studio copy, save_model checks
+  - local training, 프로젝트 진입점, data model file checks, aiu_studio copy, save_model checks
 
 agent-mlflow-skill-selected-run-test
-  - selected data model file
+  - selected data model file after model_artifact_paths are shown
   - copying data files to aiu_studio
   - referencing runtest.py or run_test.py
   - creating runtest_2.py or another model-format-specific run test file

@@ -39,7 +39,7 @@ OpenCode Chatbot
   +-- local_serving/
   +-- save_model/
   +-- input_example.json
-  +-- train.py 또는 run_model.py
+  +-- train.py 또는 프로젝트 진입점
   |
   v
 MLflow Tracking / Model Registry
@@ -87,7 +87,7 @@ tensorflow_sample/
 ├── local_serving/
 ├── save_model/
 ├── input_example.json
-└── train.py 또는 run_model.py
+└── train.py 또는 프로젝트 진입점
 ```
 
 필수 폴더:
@@ -231,7 +231,7 @@ Step 1 구조 분석
   +-- 모델 있음
   |     |
   |     v
-  |   기존 train.py / run_model.py / aiu_custom 분석
+  |   기존 train.py / 프로젝트 진입점 / aiu_custom 분석
   |
   +-- 모델 없음
         |

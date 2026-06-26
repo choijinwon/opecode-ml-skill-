@@ -50,7 +50,7 @@ legal_agent_mlflow_aistudio/
     .gitkeep                실행 시 legal_agent_model.json 생성
   artifacts/
     .gitkeep                실행 결과 JSON, 로컬 MLflow DB 생성
-  run_model.py              저장/채팅/등록 실행 진입점
+  프로젝트 진입점              저장/채팅/등록 실행 진입점
 ```
 
 ## AI Studio endpoint 설정
@@ -83,23 +83,23 @@ LAW_API_TARGET="eflaw"
 샘플 폴더에서 실행합니다.
 
 ```bash
-python run_model.py --save
-python run_model.py --chat "임대차 계약 해지 통보는 어떻게 정리해야 하나요?"
-python run_model.py --langchain "임대차 계약 해지 통보는 어떻게 정리해야 하나요?"
-python run_model.py --langgraph "임대차 계약 해지 통보는 어떻게 정리해야 하나요?"
+OpenCode 빌드모드에서 해당 기능을 선택해 실행
+OpenCode 빌드모드에서 해당 기능을 선택해 실행
+OpenCode 빌드모드에서 해당 기능을 선택해 실행
+OpenCode 빌드모드에서 해당 기능을 선택해 실행
 python registry/prompt.py
 python registry/judge.py
 ```
 
 각 명령의 의미:
 
-- `python run_model.py --save`: `save_model/legal_agent_model.json`을 생성합니다. AI Studio에 올릴 모델 메타데이터와 prompt/model 정보를 확인하는 단계입니다.
-- `python run_model.py --chat "...질문..."`: 법률 에이전트를 실행하고 MLflow Trace, Session metadata를 남깁니다.
-- `python run_model.py --langchain "...질문..."`: LangChain 스타일로 Prompt, Tool, LLM을 조립해 실행합니다.
-- `python run_model.py --langgraph "...질문..."`: LangGraph StateGraph 스타일로 classify, retrieve, prompt, llm 노드를 실행합니다.
+- `OpenCode 빌드모드에서 해당 기능을 선택해 실행
+- `OpenCode 빌드모드에서 해당 기능을 선택해 실행
+- `OpenCode 빌드모드에서 해당 기능을 선택해 실행
+- `OpenCode 빌드모드에서 해당 기능을 선택해 실행
 - `python registry/prompt.py`: MLflow GenAI Prompt Registry가 지원되는 환경에서 Prompt를 등록합니다.
 - `python registry/judge.py`: 마지막 답변을 기준으로 면책 문구, 응답 길이, 체크리스트 포함 여부를 평가해 `artifacts/legal_judge_result.json`에 남깁니다.
-- `python run_model.py --register`: MLflow pyfunc 모델로 등록합니다. MLflow tracking server와 registry가 준비된 환경에서 사용합니다.
+- `OpenCode 빌드모드에서 해당 기능을 선택해 실행
 
 로컬 API:
 

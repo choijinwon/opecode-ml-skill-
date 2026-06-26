@@ -29,7 +29,6 @@ PROJECT_CHILD_PRIORITY = [
 # used only as hints when detecting a registration or inference entrypoint.
 ENTRYPOINT_NAMES = [
     "register_model.py",
-    "run_model.py",
     "serve.py",
     "inference.py",
     "predict.py",
@@ -109,11 +108,9 @@ SKIP_DIR_NAMES = {
     ".opencode",
     ".agents",
     ".codex",
-    ".venv",
     "__pycache__",
     "node_modules",
     "outputs",
-    "mlruns",
     "mlartifacts",
 }
 
@@ -171,6 +168,16 @@ def normalize_project_root(path: Path) -> Path:
     return path
 
 
+def should_skip_dir(name: str) -> bool:
+    lowered = name.lower()
+    return (
+        name in SKIP_DIR_NAMES
+        or name.startswith(".")
+        or lowered in {"venv", "env"}
+        or lowered.startswith("venv-")
+    )
+
+
 def has_project_markers(path: Path) -> bool:
     # Treat the current directory as a model project only when it has clear
     # ML project markers. This prevents the repository root from being selected
@@ -185,20 +192,11 @@ def has_project_markers(path: Path) -> bool:
         "config.json",
         "input_example.json",
         "register_model.py",
-        "run_model.py",
         "train.py",
     }
     if any((path / name).exists() for name in marker_names):
         return True
-    data_dir = path if path.name == "data" else path / "data"
-    if data_dir.is_dir():
-        for root, dirs, files in os.walk(data_dir):
-            root_path = Path(root)
-            if len(root_path.parts) - len(data_dir.parts) >= 4:
-                dirs[:] = []
-            if any(Path(file_name).suffix.lower() in ARTIFACT_SUFFIXES for file_name in files):
-                return True
-    return False
+    return bool(find_artifacts(path, max_depth=6))
 
 
 def score_project(path: Path) -> int:
@@ -225,7 +223,7 @@ def iter_child_project_candidates(root: Path) -> list[Path]:
         return []
     candidates: list[Path] = []
     for child in root.iterdir():
-        if not child.is_dir() or child.name in SKIP_DIR_NAMES or child.name.startswith("."):
+        if not child.is_dir() or should_skip_dir(child.name):
             continue
         if has_project_markers(child) or score_project(child) > 0:
             candidates.append(child)
@@ -291,16 +289,41 @@ def iter_files(path: Path, max_depth: int = 4):
         depth = len(root_path.parts) - base_depth
         if depth >= max_depth:
             dirs[:] = []
-        dirs[:] = [d for d in dirs if d not in SKIP_DIR_NAMES]
+        dirs[:] = [d for d in dirs if not should_skip_dir(d)]
         for file_name in files:
             yield root_path / file_name
+
+
+def find_data_dirs(path: Path, max_depth: int = 5) -> list[Path]:
+    path = path.expanduser().resolve()
+    if not path.exists() or not path.is_dir():
+        return []
+    if path.name == "data":
+        return [path]
+
+    direct = path / "data"
+    found: list[Path] = []
+    if direct.is_dir():
+        found.append(direct)
+
+    base_depth = len(path.parts)
+    for root, dirs, _files in os.walk(path):
+        root_path = Path(root)
+        depth = len(root_path.parts) - base_depth
+        if depth >= max_depth:
+            dirs[:] = []
+        dirs[:] = [d for d in dirs if not should_skip_dir(d)]
+        for dirname in list(dirs):
+            if dirname == "data":
+                found.append(root_path / dirname)
+
+    return sorted(set(found), key=lambda item: str(item))
 
 
 def find_artifacts(path: Path, max_depth: int = 4) -> list[Path]:
     artifacts: list[Path] = []
     path = normalize_project_root(path)
-    data_dir = path / "data"
-    if data_dir.is_dir():
+    for data_dir in find_data_dirs(path, max_depth=max_depth):
         for file_path in iter_files(data_dir, max_depth=max_depth):
             if file_path.suffix.lower() in ARTIFACT_SUFFIXES:
                 artifacts.append(file_path)
@@ -710,6 +733,9 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
         checks.append(write_permission_check(project))
 
     next_steps = []
+    if artifacts:
+        next_steps.append("Select one model_artifact_path by number or path before generating a test entrypoint.")
+        next_steps.append("Create the selected-model test entrypoint with ensure_run_test_entrypoints.py --target-model <selected-model> --output runtest_2.py --execute.")
     if any(check.status == "block" for check in checks):
         next_steps.append("Resolve blocked checks before MLflow registration.")
     if not has_mlflow_dep:

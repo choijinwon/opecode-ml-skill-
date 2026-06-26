@@ -33,7 +33,6 @@ IGNORED_NAMES = {
     ".venv",
     "venv",
     "env",
-    "mlruns",
     "mlartifacts",
     "mlflow.db",
 }
@@ -51,11 +50,11 @@ SOURCE_REQUIRED_DIRS = [
     "aiu_custom",
     "local_serving",
     "save_model",
+    "aiu_studio",
 ]
 
 REQUIRED_PROJECT_DIRS = [
     *SOURCE_REQUIRED_DIRS,
-    "aiu_studio",
 ]
 
 IGNORABLE_PROJECT_ROOT_NAMES = {
@@ -172,10 +171,10 @@ def copy_sample(sample: Path, project: Path, force: bool, execute: bool, copy_mo
 def build_next_steps(sample_key: str, target_project_path: Path) -> list[str]:
     return [
         f"선택한 샘플 폴더로 이동한다: {target_project_path}",
-        "해당 폴더에 사용자 모델 코드, 데이터, requirements.txt, run_model.py를 추가한다.",
+        "해당 폴더에 사용자 모델 코드, 데이터, requirements.txt를 추가한다.",
         "ai_studio.env 또는 config/ai_studio.env.example을 기준으로 MLflow/AI Studio 접속값을 설정한다.",
-        "run_model.py를 추가한 뒤 python run_model.py --prepare-only 로 모델 저장 구조를 확인한다.",
-        "python run_model.py 로 save_model/ 또는 MLflow artifact 생성 여부를 확인한다.",
+        "data/ 폴더의 모델 파일을 선택한 뒤 자동 생성되는 테스트 진입점으로 모델 로드를 확인한다.",
+        "save_model/ 또는 MLflow artifact 생성 여부를 확인한다.",
         "local_serving/ 또는 aiu_custom/predict.py 기준으로 추론 테스트를 수행한다.",
         "MLflow UI에서 traces, chat-sessions, prompts, judges, datasets 기록을 확인한다.",
         f"선택 샘플: {sample_key}",

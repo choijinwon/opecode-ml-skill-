@@ -1,6 +1,6 @@
 ---
 name: agent-mlflow-skill-train-model
-description: Use when the user asks "학습 실행", "모델 생성", "run_model.py", "save_model 확인", "data 모델 파일", or train model; checks local training entrypoint, data model files, config, and input example.
+description: Use when the user asks "학습 실행", "모델 생성", "프로젝트 진입점", "save_model 확인", "data 모델 파일", or train model; checks local training entrypoint, data model files, config, and input example.
 license: MIT
 compatibility: opencode
 metadata:
@@ -15,7 +15,7 @@ metadata:
 
 - 실행 환경 검증 후 로컬 학습을 실행하거나 학습 가능 여부를 확인할 때
 - 학습 결과로 모델 파일이 생성되는지 확인해야 할 때
-- `train.py`, notebook, `run_model.py --prepare-only`, custom training script 중 실제 학습 entrypoint를 판단해야 할 때
+- `train.py`, notebook, `프로젝트 진입점 --prepare-only`, custom training script 중 실제 학습 entrypoint를 판단해야 할 때
 - 학습 산출물이 MLflow 등록이나 추론 테스트에 충분한지 확인해야 할 때
 - Step 0에서 사용자가 선택한 샘플 폴더가 워크스페이스로 복사된 뒤 모델을 생성해야 할 때
 
@@ -29,7 +29,7 @@ metadata:
 - 학습 entrypoint 후보를 확인한다.
   - `train.py`
   - `scripts/train.py`
-  - `run_model.py`
+  - `프로젝트 진입점`
   - `run_test.py`, `run_test2.py`
   - framework별 학습 스크립트
 - `data/` 폴더 안에 모델 형식 파일이 있으면 `data/` 안의 파일 전체를 프로젝트 루트의 `aiu_studio/` 폴더로 복사한다.
@@ -76,7 +76,7 @@ metadata:
 
 ```text
 1. Step 1의 selected_project_path를 실행 기준 경로로 사용한다.
-2. train_entrypoint, run_model.py, run_test.py 계열 파일을 확인한다.
+2. train_entrypoint, 프로젝트 진입점, run_test.py 계열 파일을 확인한다.
 3. 필요한 config/input/dataset/model path를 확인한다.
 4. prepare-only, dry run, smoke test가 있으면 먼저 실행한다.
 5. `ai_studio.env` 필수 키가 모두 준비되었는지 확인한다.

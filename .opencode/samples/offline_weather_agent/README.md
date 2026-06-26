@@ -10,7 +10,7 @@
 - RAG: `offline_weather_agent_core/retrieval.py`가 로컬 문서를 검색해 프롬프트에 추가
 - LangChain: `offline_weather_agent_core/frameworks/langchain_agent.py`
 - LangGraph: `offline_weather_agent_core/frameworks/langgraph_agent.py`
-- AI Studio pyfunc: `aiu_custom/`, `run_model.py`
+- AI Studio pyfunc: `aiu_custom/`, `프로젝트 진입점`
 - Prompt Registry: `offline-weather-agent-chat`
 - Model Registry: `offline-weather-agent-qwen`
 - Judge/Scorer: `offline_weather_response_length`
@@ -24,7 +24,7 @@
 README.md                  # 샘플 설명
 .env.example               # 로컬/폐쇄망 환경 변수 예시
 requirements.txt           # 샘플 의존성
-run_model.py               # AI Studio 스타일 pyfunc 등록 entrypoint
+프로젝트 진입점               # AI Studio 스타일 pyfunc 등록 entrypoint
 artifacts/                 # 로컬 산출물 보관 폴더(.gitkeep만 Git 추적)
 aiu_custom/
 └── predict.py              # AI Studio 스타일 MLflow pyfunc ModelWrapper
@@ -191,7 +191,7 @@ PYTHONPATH=.opencode/samples/offline_weather_agent \
 
 `aiu_custom` 폴더는 AI Studio 스타일 등록에서 필수로 사용하는 custom code package다.
 `artifacts/` 폴더는 로컬 산출물이나 반입 파일을 둘 수 있는 자리이며, 실제 파일은 Git에 올리지 않고 `.gitkeep`만 추적한다.
-`run_model.py`는 `mlflow.pyfunc.log_model()` 호출 시 다음 값을 사용한다.
+`프로젝트 진입점`는 `mlflow.pyfunc.log_model()` 호출 시 다음 값을 사용한다.
 
 ```python
 code_paths=["aiu_custom", "offline_weather_agent_core"]
@@ -202,14 +202,14 @@ artifacts={"config": "generated/config/config.json"}
 사전 준비 검증:
 
 ```bash
-.venv/bin/python .opencode/samples/offline_weather_agent/run_model.py --prepare-only
+python .opencode/scripts/run_training.py --project <model-project-folder> --execute
 ```
 
 MLflow 등록:
 
 ```bash
 MLFLOW_TRACKING_URI=http://127.0.0.1:5001 \
-.venv/bin/python .opencode/samples/offline_weather_agent/run_model.py --register
+python .opencode/scripts/run_training.py --project <model-project-folder> --execute
 ```
 
 ## MLflow Setup

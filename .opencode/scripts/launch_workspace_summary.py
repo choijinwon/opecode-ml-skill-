@@ -84,9 +84,11 @@ def main() -> int:
 
     print("- 다음 단계:")
     if model_found:
-        print("  - 샘플은 사용하지 않고 본인 모델 경로 기준으로 MLflow 5단계를 진행하세요.")
-        print("  - 실제 분석/환경 검증/모델 실행은 OpenCode 빌드모드에서 선택해주세요.")
-        print("  - 추천 요청: 내 모델 경로 기준으로 MLflow 5단계 분석해줘.")
+        print("  - 먼저 위 모델 목록에서 사용할 모델 번호 또는 경로를 선택하세요.")
+        print("  - 선택한 모델 기준으로 aiu_studio/ 복사와 runtest_2.py 생성을 진행하세요.")
+        print("  - 이후 환경 검증, 추론 테스트, MLflow 등록 검증 순서로 진행하세요.")
+        print("  - 실제 모델 선택/파일 생성/환경 검증 실행은 OpenCode 빌드모드에서 선택해주세요.")
+        print("  - 추천 요청: 1번 모델로 runtest_2.py 만들어줘.")
     else:
         print("  - 모델이 없으면 sklearn / pytorch / tensorflow 중 하나를 선택해 샘플을 생성할 수 있습니다.")
         print("  - 실제 샘플 복사/모델 생성/검증 실행은 OpenCode 빌드모드에서 선택해주세요.")

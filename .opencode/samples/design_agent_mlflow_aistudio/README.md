@@ -49,7 +49,7 @@ design_agent_mlflow_aistudio/
     .gitkeep                실행 시 design_agent_model.json 생성
   artifacts/
     .gitkeep                실행 결과 JSON, 로컬 MLflow DB 생성
-  run_model.py              저장/채팅/등록 실행 진입점
+  프로젝트 진입점              저장/채팅/등록 실행 진입점
 ```
 
 ## Endpoint 설정
@@ -74,14 +74,14 @@ MLFLOW_REGISTER_MODEL_NAME="design-agent-ai-studio"
 ## 실행 순서
 
 ```bash
-python run_model.py --save
-python run_model.py --chat "금융 앱 온보딩 화면 디자인 방향 잡아줘"
-python run_model.py --langchain "B2B SaaS 대시보드 디자인 가이드 만들어줘"
-python run_model.py --langgraph "법률 AI 서비스 랜딩 페이지 디자인 브리프 만들어줘"
-python run_model.py --analyze-source /path/to/frontend-project
+OpenCode 빌드모드에서 해당 기능을 선택해 실행
+OpenCode 빌드모드에서 해당 기능을 선택해 실행
+OpenCode 빌드모드에서 해당 기능을 선택해 실행
+OpenCode 빌드모드에서 해당 기능을 선택해 실행
+OpenCode 빌드모드에서 해당 기능을 선택해 실행
 python registry/prompt.py
 python registry/judge.py
-python run_model.py --register
+OpenCode 빌드모드에서 해당 기능을 선택해 실행
 ```
 
 각 명령의 의미:
@@ -159,7 +159,7 @@ Dataset
 frontend/source 프로젝트 경로를 지정하면 정적 분석으로 디자인 가이드 초안을 생성합니다.
 
 ```bash
-python run_model.py --analyze-source /Users/me/project/frontend
+OpenCode 빌드모드에서 해당 기능을 선택해 실행
 ```
 
 생성 파일:

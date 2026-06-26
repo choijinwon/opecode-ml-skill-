@@ -15,7 +15,7 @@ from ensure_run_test_entrypoints import normalize_project_root
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLES_DIR = ROOT / "samples"
 SAMPLE_OPTIONS = ["sklearn", "pytorch", "tensorflow"]
-ENTRYPOINTS = ["train.py", "run_model.py", "scripts/train.py", "run_test.py"]
+ENTRYPOINTS = ["train.py", "scripts/train.py", "run_test.py"]
 REQUIRED_DIRS = ["aiu_custom", "local_serving", "save_model", "aiu_studio"]
 ARTIFACT_SUFFIXES = set(ARTIFACT_SUFFIX_TO_KIND)
 AI_STUDIO_ENV_KEYS = [
@@ -45,7 +45,7 @@ class TrainingReport:
 
 
 def has_model_project(project: Path) -> bool:
-    markers = ["train.py", "run_model.py", "predict.py", "input_example.json", "MLmodel"]
+    markers = ["train.py", "predict.py", "input_example.json", "MLmodel"]
     if any((project / name).exists() for name in markers):
         return True
     return bool(find_model_artifacts(project))
@@ -64,7 +64,7 @@ def find_entrypoint(project: Path) -> Path | None:
 
 def build_command(python_bin: str, entrypoint: Path, prepare_only: bool) -> list[str]:
     cmd = [python_bin, str(entrypoint)]
-    if prepare_only and entrypoint.name in {"run_model.py", "register_model.py"}:
+    if prepare_only and entrypoint.name == "register_model.py":
         cmd.append("--prepare-only")
     if prepare_only and entrypoint.name.startswith("run_test"):
         cmd.append("--load-only")

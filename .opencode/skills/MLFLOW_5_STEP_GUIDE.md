@@ -164,7 +164,7 @@ pyproject.toml
 environment.yml
 train.py
 scripts/train.py
-run_model.py
+프로젝트 진입점
 predict.py
 input_example.json
 ai_studio.env
@@ -187,7 +187,7 @@ python_model.pkl
   - scripts/train.py
 
 실행/등록 entrypoint
-  - run_model.py
+  - 프로젝트 진입점
 
 추론 entrypoint
   - predict.py
@@ -217,7 +217,7 @@ MLflow model
 model_found: true
 selected_project_path: <model-project-folder>
 framework: sklearn | pytorch | tensorflow | huggingface | custom_pyfunc | unknown
-train_entrypoint: train.py | scripts/train.py | run_model.py | null
+train_entrypoint: train.py | scripts/train.py | 프로젝트 진입점 | null
 inference_entrypoint: predict.py | aiu_custom/model_wrapper.py | local_serving/ | null
 required_dirs:
   aiu_custom: set | missing
@@ -360,7 +360,7 @@ model_found: true
 
 ```text
 1. selected_project_path를 실행 기준 경로로 사용한다.
-2. train_entrypoint 또는 run_model.py를 확인한다.
+2. train_entrypoint 또는 프로젝트 진입점를 확인한다.
 3. ai_studio.env 필수 키를 확인한다.
 4. prepare-only, dry run, smoke test가 있으면 먼저 실행한다.
 5. 실제 학습 또는 모델 export를 실행한다.

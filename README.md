@@ -140,7 +140,7 @@ AI Studio pyfunc 방식까지 확인하려면 아래처럼 요청합니다.
 
 ```text
 이 프로젝트가 AI Studio pyfunc 방식으로 MLflow 등록 가능한지 봐줘.
-aiu_custom 폴더, run_model.py, ModelWrapper, input_example, config, requirements를 확인해줘.
+aiu_custom 폴더, 프로젝트 진입점, ModelWrapper, input_example, config, requirements를 확인해줘.
 ```
 
 샘플 구조를 먼저 확인하려면 `.opencode/samples/` 아래 프로젝트를 참고합니다. `.opencode` 전체를 복사하면 스킬, 샘플, 검증 스크립트가 함께 적용됩니다.

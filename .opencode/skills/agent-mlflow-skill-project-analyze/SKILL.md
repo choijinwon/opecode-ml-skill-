@@ -16,7 +16,7 @@ metadata:
 - 사용자가 지정한 모델 프로젝트 폴더의 ML 프로젝트 구조를 분석해 달라고 요청할 때
 - 학습, 추론, MLflow 등록 전에 어떤 파일이 있는지 확인해야 할 때
 - 프로젝트가 sklearn, PyTorch, TensorFlow, HuggingFace, custom pyfunc 중 무엇에 가까운지 판단해야 할 때
-- `aiu_custom`, `local_serving`, `save_model`, `aiu_studio`, `run_model.py`, `input_example.json` 같은 구성 요소가 필요한지 확인해야 할 때
+- `aiu_custom`, `local_serving`, `save_model`, `aiu_studio`, `프로젝트 진입점`, `input_example.json` 같은 구성 요소가 필요한지 확인해야 할 때
 - 사용자가 지정한 모델 프로젝트 폴더에 모델 프로젝트가 없어서 `.opencode/samples` 아래 샘플 3개 중 하나를 선택해 폴더째 복사해야 할 때
 
 ## Guidance Checks
@@ -27,14 +27,14 @@ metadata:
   - 예: `<root>/data/model.pkl`, `<root>/data/model.pt`, `<root>/data/model.onnx`, `<root>/data/model.gguf`
 - 핵심 파일 존재 여부를 확인한다.
   - `requirements.txt`, `pyproject.toml`, `environment.yml`
-  - `train.py`, `app.py`, `main.py`, `run_model.py`
+  - `train.py`, `app.py`, `main.py`, `프로젝트 진입점`
   - `config.json`, `.env.example`, `input_example.json`
   - `aiu_custom/`, `aiu_custom/model_wrapper.py`, `aiu_custom/predict.py`
   - `local_serving/`
   - `save_model/`
   - `aiu_studio/`
   - `data/` 안의 모델 형식 파일
-  - `mlruns/`, `mlartifacts/`
+  - `MLflow 로컬 실행 산출물`, `mlartifacts/`
 - framework 후보를 근거와 함께 분류한다.
   - sklearn: `sklearn`, `.pkl`, `.joblib`, `.fit()`
   - PyTorch: `torch`, `.pt`, `.pth`, `state_dict`
@@ -60,9 +60,9 @@ MLflow 5단계로 봐줘
 
 ```text
 1. 현재 워크스페이스 경로를 확인한다.
-2. 루트 자체의 `data/` 폴더에서 모델 형식 파일을 찾고, 실행 entrypoint와 필수 폴더를 확인한다.
+2. 루트 및 하위 프로젝트의 `data/` 폴더에서 모델 형식 파일을 찾고, 실행 entrypoint와 필수 폴더를 확인한다.
 3. model_found 값을 먼저 결정한다.
-4. model_found: true이면 기존 모델 기준 가이드를 출력한다.
+4. model_found: true이면 `model_artifact_paths` 목록을 먼저 보여주고 사용자가 모델을 선택하게 한다.
 5. model_found: false이면 sklearn/pytorch/tensorflow 선택 가이드를 출력한다.
 ```
 
@@ -76,7 +76,7 @@ MLflow 5단계로 봐줘
 워크스페이스를 먼저 분석했습니다.
 
 확인 기준:
-- run_model.py, train.py, predict.py
+- 프로젝트 진입점, train.py, predict.py
 - aiu_custom/
 - local_serving/
 - save_model/
@@ -110,7 +110,7 @@ MLflow 5단계로 봐줘
 
 ```text
 학습 entrypoint 존재: train.py, scripts/train.py
-실행/등록 entrypoint 존재: run_model.py
+실행/등록 entrypoint 존재: 프로젝트 진입점
 추론 entrypoint 존재: predict.py, app.py, main.py
 필수 폴더 존재: aiu_custom/, local_serving/, save_model/, aiu_studio/
 모델 wrapper 존재: aiu_custom/model_wrapper.py, aiu_custom/predict.py
@@ -140,11 +140,12 @@ model_artifact_path
 model_artifact_paths
 data_model_files
 input_example_path
-next_action: 발견된 프로젝트로 Step 2 환경 검증 후 Step 3 실행
+next_action: model_artifact_paths 중 사용할 모델 선택
 ```
 
 `model_artifact_paths`는 사용자가 선택할 수 있도록 번호 목록으로 보여준다.
 `model_artifact_path`는 기본 선택값이며, 목록의 첫 번째 모델 경로를 사용한다.
+모델이 1개만 있어도 사용자가 확인할 수 있도록 경로를 보여주고 선택 확인을 받는다.
 
 모델이 발견된 경우 사용자에게 보여줄 가이드는 아래 방향으로 작성한다.
 
@@ -153,11 +154,11 @@ next_action: 발견된 프로젝트로 Step 2 환경 검증 후 Step 3 실행
 샘플은 사용하지 않고 기존 모델 프로젝트 기준으로 진행합니다.
 
 다음 단계:
-1. ai_studio.env 확인
-2. requirements.txt 또는 pyproject.toml 확인
-3. input_example.json 확인
-4. run_model.py 또는 train.py 실행 가능 여부 확인
-5. MLflow 기록 확인
+1. 사용할 모델 번호 또는 경로 선택
+2. 선택 모델 기준 aiu_studio/ 복사
+3. 선택 모델 형식에 맞는 runtest_2.py 생성
+4. ai_studio.env 및 dependency 확인
+5. 추론 테스트 후 MLflow 기록 확인
 ```
 
 모델이 발견되면 `.opencode/samples`는 참조하지 않는다.
@@ -254,7 +255,7 @@ tensorflow_sample/
 <model-project-folder>/<sample-folder>/local_serving/
 <model-project-folder>/<sample-folder>/save_model/
 <model-project-folder>/<sample-folder>/aiu_studio/
-<model-project-folder>/<sample-folder>/run_model.py
+<model-project-folder>/<sample-folder>/<project-entrypoint>
 <model-project-folder>/<sample-folder>/requirements.txt
 <model-project-folder>/<sample-folder>/input_example.json
 ```
@@ -267,7 +268,7 @@ saved_model/
 artifacts/ai_studio/
 .venv/
 __pycache__/
-mlruns/
+MLflow 로컬 실행 산출물
 mlartifacts/
 mlflow.db
 ```

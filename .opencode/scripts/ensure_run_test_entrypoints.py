@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import re
 import shutil
 from dataclasses import asdict, dataclass, field
@@ -46,11 +47,9 @@ SKIP_DIR_NAMES = {
     ".opencode",
     ".agents",
     ".codex",
-    ".venv",
     "__pycache__",
     "node_modules",
     "outputs",
-    "mlruns",
     "mlartifacts",
 }
 
@@ -85,22 +84,55 @@ def normalize_project_root(project: Path) -> Path:
     return project
 
 
+def should_skip_dir(name: str) -> bool:
+    lowered = name.lower()
+    return (
+        name in SKIP_DIR_NAMES
+        or name.startswith(".")
+        or lowered in {"venv", "env"}
+        or lowered.startswith("venv-")
+    )
+
+
 def iter_files(project: Path):
     for path in project.rglob("*"):
-        if any(part in SKIP_DIR_NAMES for part in path.relative_to(project).parts):
+        if any(should_skip_dir(part) for part in path.relative_to(project).parts):
             continue
         if path.is_file():
             yield path
 
 
+def find_data_dirs(project: Path) -> list[Path]:
+    project = normalize_project_root(project)
+    if not project.exists() or not project.is_dir():
+        return []
+    if project.name == "data":
+        return [project]
+
+    found: list[Path] = []
+    direct = project / "data"
+    if direct.is_dir():
+        found.append(direct)
+
+    base_depth = len(project.parts)
+    for root, dirs, _files in os.walk(project):
+        root_path = Path(root)
+        depth = len(root_path.parts) - base_depth
+        if depth >= 6:
+            dirs[:] = []
+        dirs[:] = [d for d in dirs if not should_skip_dir(d)]
+        for dirname in list(dirs):
+            if dirname == "data":
+                found.append(root_path / dirname)
+
+    return sorted(set(found), key=lambda item: str(item))
+
+
 def find_model_artifacts(project: Path) -> list[Path]:
     project = normalize_project_root(project)
-    data_dir = project / "data"
-    if not data_dir.is_dir():
-        return []
-
     artifacts = [
         path
+        for data_dir in find_data_dirs(project)
         for path in iter_files(data_dir)
         if path.suffix.lower() in ARTIFACT_SUFFIX_TO_KIND
     ]
@@ -111,9 +143,20 @@ def run_test_filename(index: int) -> str:
     return "run_test.py" if index == 1 else f"run_test{index}.py"
 
 
-def copy_data_files_to_aiu_studio(project: Path, force: bool = False) -> list[str]:
+def nearest_data_dir(project: Path, artifact: Path) -> Path:
     project = normalize_project_root(project)
-    data_dir = project / "data"
+    for candidate in [artifact.parent, *artifact.parents]:
+        if candidate.name == "data":
+            try:
+                candidate.relative_to(project)
+            except ValueError:
+                continue
+            return candidate
+    raise ValueError(f"target_model_must_be_under_data:{artifact}")
+
+
+def copy_data_files_to_aiu_studio(project: Path, data_dir: Path, force: bool = False) -> list[str]:
+    project = normalize_project_root(project)
     target_root = project / "aiu_studio"
     copied: list[str] = []
 
@@ -145,10 +188,7 @@ def resolve_target_model(project: Path, target_model: str) -> Path:
 
 def validate_data_model_file(project: Path, model_file: Path) -> str:
     project = normalize_project_root(project)
-    try:
-        model_file.relative_to(project / "data")
-    except ValueError as exc:
-        raise ValueError(f"target_model_must_be_under_data:{model_file}") from exc
+    nearest_data_dir(project, model_file)
 
     suffix = model_file.suffix.lower()
     if suffix not in ARTIFACT_SUFFIX_TO_KIND:
@@ -158,7 +198,7 @@ def validate_data_model_file(project: Path, model_file: Path) -> str:
 
 def render_run_test(project: Path, artifact: Path, model_kind: str) -> str:
     rel_artifact = artifact.relative_to(project).as_posix()
-    rel_data_artifact = artifact.relative_to(project / "data").as_posix()
+    rel_data_artifact = artifact.relative_to(nearest_data_dir(project, artifact)).as_posix()
     model_var = safe_name(artifact)
     return f'''"""Auto-generated model smoke test entrypoint.
 
@@ -351,7 +391,7 @@ def render_selected_run_test(project: Path, artifact: Path, model_kind: str, tem
         return render_run_test(project, artifact, model_kind)
 
     rel_artifact = artifact.relative_to(project).as_posix()
-    rel_data_artifact = artifact.relative_to(project / "data").as_posix()
+    rel_data_artifact = artifact.relative_to(nearest_data_dir(project, artifact)).as_posix()
     model_var = safe_name(artifact)
     text = template.read_text(encoding="utf-8")
 
@@ -444,7 +484,7 @@ def ensure_selected_run_test(
     template_file = find_template_file(project, template)
 
     if execute:
-        report.copied_to_aiu_studio = copy_data_files_to_aiu_studio(project, force=force)
+        report.copied_to_aiu_studio = copy_data_files_to_aiu_studio(project, nearest_data_dir(project, artifact), force=force)
 
     if target.exists() and not force:
         report.generated.append(

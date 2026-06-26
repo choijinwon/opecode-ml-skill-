@@ -10,7 +10,8 @@
 aiu_custom/
 local_serving/
 save_model/
-run_model.py
+aiu_studio/
+프로젝트 진입점
 input_example.json
 requirements.txt
 ai_studio.env.example

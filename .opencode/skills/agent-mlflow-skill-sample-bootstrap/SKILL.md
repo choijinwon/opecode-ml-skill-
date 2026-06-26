@@ -99,7 +99,7 @@ save_model/
 <workspace-root>/<sample-folder>/aiu_custom/
 <workspace-root>/<sample-folder>/local_serving/
 <workspace-root>/<sample-folder>/save_model/
-<workspace-root>/<sample-folder>/run_model.py
+<workspace-root>/<sample-folder>/<project-entrypoint>
 <workspace-root>/<sample-folder>/requirements.txt
 <workspace-root>/<sample-folder>/input_example.json
 ```
@@ -109,7 +109,7 @@ save_model/
 ```text
 .venv/
 __pycache__/
-mlruns/
+MLflow 로컬 실행 산출물
 mlartifacts/
 mlflow.db
 .DS_Store

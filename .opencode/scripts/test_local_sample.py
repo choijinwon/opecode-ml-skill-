@@ -68,16 +68,23 @@ def test_sample(sample_name: str, rebuild: bool, do_install: bool, do_register: 
     if do_install:
         install_requirements(python_bin, sample_dir)
 
-    # Each current sample exposes run_model.py as the main local prepare/export
-    # entrypoint. Older train.py/register_model.py files are optional.
+    # Samples may expose framework-specific entrypoints. If a data model exists
+    # without one, the skill can generate a smoke-test entrypoint separately.
+    executed_any = False
     if (sample_dir / "train.py").exists():
         run([str(python_bin), "train.py"], cwd=sample_dir)
+        executed_any = True
     if (sample_dir / "register_model.py").exists():
         run([str(python_bin), "register_model.py", "--prepare-only"], cwd=sample_dir)
-    if (sample_dir / "run_model.py").exists():
-        run([str(python_bin), "run_model.py", "--prepare-only"], cwd=sample_dir)
-    else:
-        raise FileNotFoundError(f"missing run_model.py: {sample_dir}")
+        executed_any = True
+    if (sample_dir / "run_test.py").exists():
+        run([str(python_bin), "run_test.py", "--load-only"], cwd=sample_dir)
+        executed_any = True
+    if not executed_any:
+        required_dirs = ["aiu_custom", "local_serving", "save_model"]
+        missing = [name for name in required_dirs if not (sample_dir / name).is_dir()]
+        if missing:
+            raise FileNotFoundError(f"missing required sample dirs in {sample_dir}: {', '.join(missing)}")
 
     # Full registration is optional because each user may have different local
     # or remote MLflow tracking settings.
@@ -85,7 +92,7 @@ def test_sample(sample_name: str, rebuild: bool, do_install: bool, do_register: 
         if (sample_dir / "register_model.py").exists():
             run([str(python_bin), "register_model.py"], cwd=sample_dir)
         else:
-            run([str(python_bin), "run_model.py"], cwd=sample_dir)
+            raise FileNotFoundError(f"missing registration entrypoint: {sample_dir}")
 
 
 def main():

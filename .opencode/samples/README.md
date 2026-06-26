@@ -17,7 +17,7 @@
 - 각 샘플은 skill 점검 대상이 되는 최소 프로젝트 구조를 제공한다.
 - 실제 model artifact는 기본 포함하지 않고, 학습 단계가 수행되는 환경에서 생성한다.
 - `register_model.py`는 등록 전 사전 준비 검증 단계와 MLflow 등록 흐름 예시를 담는다.
-- `run_model.py`와 `aiu_custom/`은 AI Studio 스타일 pyfunc 등록 흐름 예시를 담는다.
+- `프로젝트 진입점`와 `aiu_custom/`은 AI Studio 스타일 pyfunc 등록 흐름 예시를 담는다.
 - 샘플은 사용자가 자신의 프로젝트 구조를 이해하는 참고용이며, 고정 표준을 강제하지 않는다.
 - OpenCode 챗봇 응답에서는 사용자에게 개별 Python 명령 실행을 지시하지 않고, 파일/기능 존재 여부와 보완 기준을 안내한다.
 
@@ -47,7 +47,7 @@ python .opencode/scripts/bootstrap_sample_project.py --project <model-project-fo
 2. `requirements.txt`를 설치한다.
 3. 학습 entrypoint를 호출해 artifact 생성을 확인한다.
 4. 등록 전 사전 준비 검증 기능이 동작하는지 확인한다.
-5. `run_model.py`가 있으면 AI Studio pyfunc용 사전 준비 검증 기능도 확인한다.
+5. `프로젝트 진입점`가 있으면 AI Studio pyfunc용 사전 준비 검증 기능도 확인한다.
 
 선택 동작:
 

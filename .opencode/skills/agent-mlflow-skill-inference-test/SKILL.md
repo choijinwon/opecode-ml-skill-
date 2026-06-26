@@ -26,7 +26,7 @@ metadata:
   - `aiu_custom/model_wrapper.py`
   - `aiu_custom/predict.py`
   - `local_serving/`
-  - `run_model.py`
+  - `프로젝트 진입점`
   - serving/test script
 - input example을 확인한다.
   - `input_example.json`

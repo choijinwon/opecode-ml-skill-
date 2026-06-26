@@ -23,7 +23,7 @@ get-pip.py
 input_example.json
 model_summary.txt
 requirements.txt
-run_model.py
+프로젝트 진입점
 ```
 
 ## OpenCode Chat Prompt
@@ -65,7 +65,7 @@ secret 값은 출력하지 마.
 
 MLflow 값은 `.env`가 아니라 아래 위치에서 확인합니다.
 
-- `run_model.py` 코드 내부 상수
+- `프로젝트 진입점` 코드 내부 상수
 - `config/mlflow_config.json`
 
 확인할 값:
