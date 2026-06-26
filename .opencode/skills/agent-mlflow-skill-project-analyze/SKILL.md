@@ -66,6 +66,10 @@ MLflow 5단계로 봐줘
 5. model_found: false이면 sklearn/pytorch/tensorflow 선택 가이드를 출력한다.
 ```
 
+`data_model_files`가 1개 이상이면 `model_found`는 반드시 true로 판단한다.
+필수 폴더나 `ai_studio.env`가 누락되어도 모델 없음으로 바꾸지 않는다.
+누락 항목은 별도 block/warn 항목으로만 분류한다.
+
 초기 분석 응답은 아래 구조를 사용한다. 문장은 자연스럽게 바꿔도 되지만 순서는 유지한다.
 
 ```text
