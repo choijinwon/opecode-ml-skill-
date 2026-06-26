@@ -734,8 +734,9 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
 
     next_steps = []
     if artifacts:
-        next_steps.append("Select one model_artifact_path by number or path before generating a test entrypoint.")
-        next_steps.append("Create the selected-model test entrypoint with ensure_run_test_entrypoints.py --target-model <selected-model> --output runtest_2.py --execute.")
+        next_steps.append("Select one model_artifact_path by number or path.")
+        next_steps.append("Continue with agent-mlflow-skill-selected-run-test; copy data/ files to aiu_studio/ and create runtest_2.py for the selected model.")
+        next_steps.append("After runtest_2.py is created, run environment check, inference test, and MLflow verify in order.")
     if any(check.status == "block" for check in checks):
         next_steps.append("Resolve blocked checks before MLflow registration.")
     if not has_mlflow_dep:

@@ -63,6 +63,9 @@ MLflow 5단계로 봐줘
 2. 루트 및 하위 프로젝트의 `data/` 폴더에서 모델 형식 파일을 찾고, 실행 entrypoint와 필수 폴더를 확인한다.
 3. model_found 값을 먼저 결정한다.
 4. model_found: true이면 `model_artifact_paths` 목록을 먼저 보여주고 사용자가 모델을 선택하게 한다.
+   - 모델이 1개뿐이면 기본 선택값으로 제안하되, 다음 실행 단계는 `agent-mlflow-skill-selected-run-test`로 이어진다고 안내한다.
+   - 모델이 여러 개이면 번호 또는 경로 선택을 요청한다.
+   - 사용자가 번호나 경로를 선택하면 프로젝트 분석을 반복하지 않고 `agent-mlflow-skill-selected-run-test`로 진행한다.
 5. model_found: false이면 sklearn/pytorch/tensorflow 선택 가이드를 출력한다.
 ```
 
@@ -146,6 +149,8 @@ next_action: model_artifact_paths 중 사용할 모델 선택
 `model_artifact_paths`는 사용자가 선택할 수 있도록 번호 목록으로 보여준다.
 `model_artifact_path`는 기본 선택값이며, 목록의 첫 번째 모델 경로를 사용한다.
 모델이 1개만 있어도 사용자가 확인할 수 있도록 경로를 보여주고 선택 확인을 받는다.
+사용자가 `1`, `1번`, `첫 번째`, 모델 파일명, 모델 경로처럼 응답하면 분석 스킬을 다시 실행하지 않는다.
+그 응답은 모델 선택으로 처리하고 `agent-mlflow-skill-selected-run-test` 단계로 이어간다.
 
 모델이 발견된 경우 사용자에게 보여줄 가이드는 아래 방향으로 작성한다.
 
@@ -155,10 +160,11 @@ next_action: model_artifact_paths 중 사용할 모델 선택
 
 다음 단계:
 1. 사용할 모델 번호 또는 경로 선택
-2. 선택 모델 기준 aiu_studio/ 복사
+2. `agent-mlflow-skill-selected-run-test`로 선택 모델 기준 aiu_studio/ 복사
 3. 선택 모델 형식에 맞는 runtest_2.py 생성
-4. dependency 확인
-5. 추론 테스트 후 MLflow 기록 확인
+4. `agent-mlflow-skill-environment-check`로 dependency 확인
+5. `agent-mlflow-skill-inference-test`로 추론 테스트
+6. `agent-mlflow-skill-mlflow-verify`로 MLflow 기록 확인
 ```
 
 모델이 발견되면 `.opencode/samples`는 참조하지 않는다.

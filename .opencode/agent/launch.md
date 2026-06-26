@@ -103,6 +103,7 @@ agent-mlflow-skill-train-model
 
 agent-mlflow-skill-selected-run-test
   - selected data model file after model_artifact_paths are shown
+  - user selects a model number or model path after `model_found: true`
   - copying data files to aiu_studio
   - referencing runtest.py or run_test.py
   - creating runtest_2.py or another model-format-specific run test file
@@ -117,5 +118,7 @@ agent-mlflow-skill-mlflow-verify
 If the user says a broad phrase such as `분석해줘`, `MLflow 5단계 진행해줘`, `모델 있음/없음 봐줘`, or `처음부터 봐줘`, start with `agent-mlflow-skill-project-analyze`.
 
 If the user says `sklearn`, `pytorch`, `tensorflow`, `샘플 생성`, `폴더째 복사`, or `모델이 없으면 샘플`, use `agent-mlflow-skill-sample-bootstrap`.
+
+If the previous project analysis result showed `model_found: true` and `model_artifact_paths`, then a later user message such as `1`, `1번`, `첫 번째`, `이 모델`, `선택`, a model file name, or a model path means the user selected a model. In that case, do not run project analysis again. Continue with `agent-mlflow-skill-selected-run-test`.
 
 If the user says `대상 모델`, `선택한 모델`, `runtest.py`, `run_test.py 참고`, `run_test_2.py`, `runtest_2.py`, or asks to create a run test file for one selected model, use `agent-mlflow-skill-selected-run-test`.

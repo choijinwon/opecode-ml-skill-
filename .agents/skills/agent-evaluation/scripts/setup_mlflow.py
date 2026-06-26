@@ -18,7 +18,6 @@ import argparse
 import os
 import subprocess
 import sys
-from pathlib import Path
 
 
 def parse_arguments():
@@ -82,10 +81,9 @@ def start_local_mlflow_server(port: int = 5050) -> bool:
     print(f"\nStarting local MLflow server on port {port}...")
 
     try:
-        # Create mlruns directory if it doesn't exist
-        Path("./mlruns").mkdir(exist_ok=True)
-
-        # Start server in background
+        # Start server in background. Do not create a repository-level artifact
+        # folder here; deployment-specific storage should be provided by MLflow
+        # configuration or environment settings.
         cmd = [
             "mlflow",
             "server",
@@ -93,8 +91,6 @@ def start_local_mlflow_server(port: int = 5050) -> bool:
             str(port),
             "--backend-store-uri",
             "sqlite:///mlflow.db",
-            "--default-artifact-root",
-            "./mlruns",
         ]
 
         print(f"  Command: {' '.join(cmd)}")

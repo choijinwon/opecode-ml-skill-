@@ -18,20 +18,22 @@ metadata:
 - 기존 `runtest.py` 또는 `run_test.py`와 같은 템플릿 구조를 유지하면서 다른 모델 형식용 실행 파일이 필요할 때
 - 여러 모델 중 하나를 선택해 smoke test entrypoint를 분리해야 할 때
 - 사용자가 "선택된 모델 양식으로 변환", "`runtest.py` 참고", "`runtest_2.py` 새로 생성"처럼 요청할 때
+- 직전 Project Analyze 결과에서 `model_found: true`와 `model_artifact_paths`가 표시된 뒤, 사용자가 `1`, `1번`, `첫 번째`, 모델 파일명, 모델 경로처럼 대상 모델을 선택했을 때
 
 ## Required Behavior
 
 1. 사용자가 지정한 모델 프로젝트 폴더를 확인한다.
-2. `<model-project-folder>/data/` 아래에 지원 모델 형식 파일이 있는지 확인한다.
-3. 모델이 있으면 `data/` 안의 파일 전체를 프로젝트 루트의 `aiu_studio/` 폴더로 복사한다.
-4. 대상 모델 파일이 반드시 `<model-project-folder>/data/` 아래에 있는지 확인한다.
-5. 대상 모델 확장자를 기준으로 모델 형식을 판별한다.
-6. 기존 `runtest.py`를 먼저 템플릿으로 사용하고, 없으면 `run_test.py`를 템플릿으로 사용한다.
-7. 템플릿의 모델 경로와 모델 형식 상수를 대상 모델 기준으로 바꾼다.
-8. 반드시 기존 템플릿 파일은 수정하지 않고 새 파일 `runtest_2.py`를 생성한다.
-9. 출력 파일명은 사용자가 지정하면 그 값을 사용하고, 없으면 `runtest_2.py`를 기본값으로 사용한다.
-10. 기존 출력 파일이 있으면 기본적으로 덮어쓰지 않는다.
-11. 사용자가 "새로 생성", "다시 생성", "변환 안됨", "덮어써"처럼 재생성을 요청하면 `--force`를 사용한다.
+2. 직전 분석 결과의 `model_artifact_paths`가 있으면 사용자의 번호 선택을 해당 경로로 해석한다.
+3. `<model-project-folder>/data/` 아래에 지원 모델 형식 파일이 있는지 확인한다.
+4. 모델이 있으면 `data/` 안의 파일 전체를 프로젝트 루트의 `aiu_studio/` 폴더로 복사한다.
+5. 대상 모델 파일이 반드시 `<model-project-folder>/data/` 아래에 있는지 확인한다.
+6. 대상 모델 확장자를 기준으로 모델 형식을 판별한다.
+7. 기존 `runtest.py`를 먼저 템플릿으로 사용하고, 없으면 `run_test.py`를 템플릿으로 사용한다.
+8. 템플릿의 모델 경로와 모델 형식 상수를 대상 모델 기준으로 바꾼다.
+9. 반드시 기존 템플릿 파일은 수정하지 않고 새 파일 `runtest_2.py`를 생성한다.
+10. 출력 파일명은 사용자가 지정하면 그 값을 사용하고, 없으면 `runtest_2.py`를 기본값으로 사용한다.
+11. 기존 출력 파일이 있으면 기본적으로 덮어쓰지 않는다.
+12. 사용자가 "새로 생성", "다시 생성", "변환 안됨", "덮어써"처럼 재생성을 요청하면 `--force`를 사용한다.
 
 ## Template Conversion Rules
 
@@ -119,7 +121,7 @@ Portable/LLM:   .pmml, .mlmodel, .gguf, .ggml, .mar, .nemo, .engine, .plan, .npz
 - 판별된 모델 형식
 - 생성된 실행 파일 경로
 - 생성 여부 또는 skip 사유
-- 다음 단계: 생성된 `runtest_2.py`를 `--load-only`로 실행
+- 다음 단계: 생성된 `runtest_2.py`를 `--load-only`로 실행한 뒤 `agent-mlflow-skill-environment-check` 또는 `agent-mlflow-skill-inference-test`로 진행
 
 ## Safety
 
