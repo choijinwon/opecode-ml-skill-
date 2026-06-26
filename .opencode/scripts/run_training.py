@@ -9,6 +9,7 @@ from ensure_required_project_files import ensure_required_files
 from ensure_run_test_entrypoints import ARTIFACT_SUFFIX_TO_KIND
 from ensure_run_test_entrypoints import ensure_run_tests
 from ensure_run_test_entrypoints import find_model_artifacts
+from ensure_run_test_entrypoints import normalize_project_root
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -126,7 +127,7 @@ def main():
     parser.add_argument("--json", action="store_true", help="print machine-readable JSON")
     args = parser.parse_args()
 
-    project = Path(args.project).expanduser().resolve()
+    project = normalize_project_root(Path(args.project))
     if not project.exists():
         raise FileNotFoundError(f"project folder not found: {project}")
 

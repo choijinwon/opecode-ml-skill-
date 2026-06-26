@@ -6,6 +6,7 @@ from pathlib import Path
 
 from ensure_run_test_entrypoints import ARTIFACT_SUFFIX_TO_KIND
 from ensure_run_test_entrypoints import find_model_artifacts
+from ensure_run_test_entrypoints import normalize_project_root
 
 
 REQUIRED_DIRS = ["aiu_custom", "local_serving", "save_model", "aiu_studio"]
@@ -20,11 +21,18 @@ AI_STUDIO_ENV_KEYS = [
 KIND_REQUIREMENTS = {
     "sklearn_pickle": ["mlflow", "scikit-learn"],
     "sklearn_joblib": ["mlflow", "joblib", "scikit-learn"],
+    "python_dill": ["mlflow", "dill"],
+    "python_cloudpickle": ["mlflow", "cloudpickle"],
     "pytorch": ["mlflow", "torch"],
     "onnx": ["mlflow", "onnxruntime"],
     "tensorflow": ["mlflow", "tensorflow"],
+    "tensorflow_lite": ["mlflow", "tensorflow"],
+    "tensorflow_pb": ["mlflow", "tensorflow"],
     "xgboost": ["mlflow", "xgboost"],
+    "catboost": ["mlflow", "catboost"],
+    "lightgbm": ["mlflow", "lightgbm"],
     "safetensors": ["mlflow", "torch", "safetensors"],
+    "numpy_weights": ["mlflow", "numpy"],
 }
 
 
@@ -126,6 +134,18 @@ def load_model():
 
         return joblib.load(MODEL_PATH)
 
+    if MODEL_KIND == "python_dill":
+        import dill
+
+        with MODEL_PATH.open("rb") as handle:
+            return dill.load(handle)
+
+    if MODEL_KIND == "python_cloudpickle":
+        import cloudpickle
+
+        with MODEL_PATH.open("rb") as handle:
+            return cloudpickle.load(handle)
+
     if MODEL_KIND == "pytorch":
         import torch
 
@@ -141,6 +161,13 @@ def load_model():
 
         return keras.models.load_model(MODEL_PATH)
 
+    if MODEL_KIND == "tensorflow_lite":
+        import tensorflow as tf
+
+        interpreter = tf.lite.Interpreter(model_path=str(MODEL_PATH))
+        interpreter.allocate_tensors()
+        return interpreter
+
     if MODEL_KIND == "xgboost":
         import xgboost as xgb
 
@@ -148,10 +175,42 @@ def load_model():
         booster.load_model(str(MODEL_PATH))
         return booster
 
+    if MODEL_KIND == "catboost":
+        from catboost import CatBoost
+
+        model = CatBoost()
+        model.load_model(str(MODEL_PATH))
+        return model
+
+    if MODEL_KIND == "lightgbm":
+        import lightgbm as lgb
+
+        return lgb.Booster(model_file=str(MODEL_PATH))
+
     if MODEL_KIND == "safetensors":
         from safetensors.torch import load_file
 
         return load_file(str(MODEL_PATH))
+
+    if MODEL_KIND == "numpy_weights":
+        import numpy as np
+
+        return np.load(MODEL_PATH)
+
+    if MODEL_KIND in {{
+        "tensorflow_pb",
+        "pmml",
+        "coreml",
+        "gguf",
+        "torchserve_mar",
+        "nemo",
+        "tensorrt",
+    }}:
+        return {{
+            "model_path": str(MODEL_PATH),
+            "model_kind": MODEL_KIND,
+            "message": "file format detected; custom runtime loader is required",
+        }}
 
     raise ValueError(f"unsupported model kind: {{MODEL_KIND}}")
 '''
@@ -220,7 +279,7 @@ def copy_data_files_to_aiu_studio(project: Path, report: RequiredFilesReport, fo
 
 
 def ensure_required_files(project: Path, force: bool = False, execute: bool = True) -> RequiredFilesReport:
-    project = project.expanduser().resolve()
+    project = normalize_project_root(project)
     report = RequiredFilesReport(project_path=str(project), data_model_file=None, model_kind=None)
 
     if not project.exists() or not project.is_dir():

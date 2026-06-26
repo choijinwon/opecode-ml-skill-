@@ -22,8 +22,9 @@ metadata:
 ## Guidance Checks
 
 - 현재 작업 경로와 사용자가 지정한 프로젝트 경로를 확인한다.
+- 사용자가 가져온 모델 파일은 프로젝트 루트의 `data/` 폴더 안에 두는 것이 기본 계약임을 안내한다.
 - 사용자가 루트 경로를 지정했으면, 루트의 `data/` 폴더 안에 모델 형식 파일이 있는지 먼저 찾는다.
-  - 예: `<root>/data/model.pkl`, `<root>/data/model.pt`, `<root>/data/model.onnx`
+  - 예: `<root>/data/model.pkl`, `<root>/data/model.pt`, `<root>/data/model.onnx`, `<root>/data/model.gguf`
 - 핵심 파일 존재 여부를 확인한다.
   - `requirements.txt`, `pyproject.toml`, `environment.yml`
   - `train.py`, `app.py`, `main.py`, `run_model.py`
@@ -78,8 +79,10 @@ MLflow 5단계로 봐줘
 - aiu_studio/
 - data/
 - input_example.json
-- data/*.pkl, data/*.joblib, data/*.pt, data/*.pth, data/*.onnx
-- data/*.h5, data/*.keras, data/*.bst, data/*.ubj, data/*.safetensors
+- sklearn/python: data/*.pkl, data/*.pickle, data/*.sav, data/*.joblib, data/*.dill, data/*.cloudpickle
+- PyTorch/HF: data/*.pt, data/*.pth, data/*.ckpt, data/*.bin, data/*.safetensors
+- ONNX/TensorFlow: data/*.onnx, data/*.ort, data/*.h5, data/*.hdf5, data/*.keras, data/*.pb, data/*.tflite
+- Boosting/portable/LLM: data/*.bst, data/*.ubj, data/*.xgb, data/*.cbm, data/*.lgb, data/*.pmml, data/*.mlmodel, data/*.gguf, data/*.ggml, data/*.mar, data/*.nemo, data/*.engine, data/*.plan, data/*.npz
 
 분석 결과:
 - model_found: true | false
@@ -107,7 +110,7 @@ MLflow 5단계로 봐줘
 추론 entrypoint 존재: predict.py, app.py, main.py
 필수 폴더 존재: aiu_custom/, local_serving/, save_model/, aiu_studio/
 모델 wrapper 존재: aiu_custom/model_wrapper.py, aiu_custom/predict.py
-데이터 모델 파일 존재: data/*.pkl, data/*.joblib, data/*.pt, data/*.pth, data/*.onnx, data/*.h5, data/*.keras, data/*.bst, data/*.ubj, data/*.safetensors
+데이터 모델 파일 존재: 지원 확장자의 파일이 data/ 아래에 있음
 MLflow model 존재: MLmodel, python_model.pkl
 input example 존재: input_example.json
 ```

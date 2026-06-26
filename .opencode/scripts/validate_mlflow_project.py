@@ -55,15 +55,37 @@ INPUT_EXAMPLE_NAMES = [
 
 ARTIFACT_SUFFIXES = [
     ".pkl",
+    ".pickle",
+    ".sav",
     ".joblib",
+    ".dill",
+    ".cloudpickle",
     ".pt",
     ".pth",
+    ".ckpt",
+    ".bin",
     ".onnx",
+    ".ort",
     ".h5",
+    ".hdf5",
     ".keras",
+    ".pb",
+    ".tflite",
     ".bst",
     ".ubj",
+    ".xgb",
+    ".cbm",
+    ".lgb",
     ".safetensors",
+    ".pmml",
+    ".mlmodel",
+    ".gguf",
+    ".ggml",
+    ".mar",
+    ".nemo",
+    ".engine",
+    ".plan",
+    ".npz",
 ]
 
 ARTIFACT_DIR_HINTS = [
@@ -116,6 +138,8 @@ class Check:
 class ValidationReport:
     selected_project: str
     selection_reason: str
+    model_found: bool
+    data_model_files: list[str]
     os: str
     python: str
     checks: list[Check]
@@ -134,6 +158,15 @@ def safe_relative(path: Path, base: Path) -> str:
         return str(path.relative_to(base))
     except ValueError:
         return str(path)
+
+
+def normalize_project_root(path: Path) -> Path:
+    path = path.expanduser().resolve()
+    if path.is_dir():
+        for candidate in (path, *path.parents):
+            if candidate.name == "data":
+                return candidate.parent
+    return path
 
 
 def has_project_markers(path: Path) -> bool:
@@ -155,7 +188,7 @@ def has_project_markers(path: Path) -> bool:
     }
     if any((path / name).exists() for name in marker_names):
         return True
-    data_dir = path / "data"
+    data_dir = path if path.name == "data" else path / "data"
     if data_dir.is_dir():
         for root, dirs, files in os.walk(data_dir):
             root_path = Path(root)
@@ -206,8 +239,11 @@ def select_best_child_project(root: Path) -> tuple[Path, str] | None:
         priority = PROJECT_CHILD_PRIORITY.index(path.name) if path.name in PROJECT_CHILD_PRIORITY else len(PROJECT_CHILD_PRIORITY)
         return (-score_project(path), priority, path.name)
 
-    selected = sorted(candidates, key=rank)[0].resolve()
-    return selected, f"child model project under root: {selected.name}"
+    selected_raw = sorted(candidates, key=rank)[0].resolve()
+    selected = normalize_project_root(selected_raw)
+    if selected_raw.name == "data" and selected_raw.is_dir():
+        return selected, "child data folder under root; using parent project root"
+    return selected, f"child model project under root: {selected_raw.name}"
 
 
 def select_project(explicit: str | None) -> tuple[Path, str]:
@@ -217,8 +253,11 @@ def select_project(explicit: str | None) -> tuple[Path, str]:
     # 3. current directory when it looks like a model project
     # 4. bundled samples, using SAMPLE_PRIORITY as a tie breaker
     if explicit:
-        project = Path(explicit).expanduser().resolve()
+        raw_project = Path(explicit).expanduser().resolve()
+        project = normalize_project_root(raw_project)
         if has_project_markers(project):
+            if raw_project != project and raw_project.is_dir():
+                return project, "explicit data folder or subfolder; using parent project root"
             return project, "explicit path"
         child = select_best_child_project(project)
         if child:
@@ -257,6 +296,7 @@ def iter_files(path: Path, max_depth: int = 4):
 
 def find_artifacts(path: Path, max_depth: int = 4) -> list[Path]:
     artifacts: list[Path] = []
+    path = normalize_project_root(path)
     data_dir = path / "data"
     if data_dir.is_dir():
         for file_path in iter_files(data_dir, max_depth=max_depth):
@@ -274,13 +314,17 @@ def detect_framework(project: Path, requirements_text: str, artifacts: list[Path
     artifact_names = " ".join(path.name.lower() for path in artifacts)
 
     rules = [
-        ("tensorflow", ["tensorflow", "keras", ".keras", ".h5", "saved_model.pb"]),
-        ("pytorch", ["torch", ".pt", ".pth", "pytorch_model.bin"]),
-        ("sklearn", ["scikit-learn", "sklearn", ".pkl", ".joblib"]),
-        ("onnx", ["onnx", ".onnx"]),
-        ("huggingface", ["transformers", "tokenizer.json", "model.safetensors"]),
-        ("xgboost", ["xgboost", ".bst", ".ubj"]),
-        ("lightgbm", ["lightgbm"]),
+        ("tensorflow", ["tensorflow", "keras", ".keras", ".h5", ".hdf5", ".pb", ".tflite", "saved_model.pb"]),
+        ("pytorch", ["torch", ".pt", ".pth", ".ckpt", ".bin", "pytorch_model.bin"]),
+        ("sklearn", ["scikit-learn", "sklearn", ".pkl", ".pickle", ".sav", ".joblib"]),
+        ("onnx", ["onnx", ".onnx", ".ort"]),
+        ("huggingface", ["transformers", "tokenizer.json", "model.safetensors", ".safetensors"]),
+        ("xgboost", ["xgboost", ".bst", ".ubj", ".xgb"]),
+        ("catboost", ["catboost", ".cbm"]),
+        ("lightgbm", ["lightgbm", ".lgb"]),
+        ("llm-local", [".gguf", ".ggml"]),
+        ("runtime-package", [".mar", ".nemo", ".engine", ".plan"]),
+        ("portable-model", [".pmml", ".mlmodel"]),
     ]
 
     for framework, hints in rules:
@@ -539,16 +583,18 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
     # model select -> project check -> mlflow check -> gap guide ->
     # run-model guide -> preflight check -> register guide.
     checks: list[Check] = []
-    project = project.resolve()
+    project = normalize_project_root(project)
 
     if not project.exists():
         checks.append(Check("local model path selection", "block", "selected project path does not exist", [str(project)]))
-        return ValidationReport(str(project), reason, platform.platform(), sys.version.split()[0], checks, ["Provide a valid --project path."])
+        return ValidationReport(str(project), reason, False, [], platform.platform(), sys.version.split()[0], checks, ["Provide a valid --project path."])
 
     checks.append(Check("local model path selection", "pass", "project selected", [str(project), reason]))
 
     requirements_path, requirements_text, packages = parse_requirements(project)
     artifacts = find_artifacts(project)
+    model_found = bool(artifacts)
+    data_model_files = [safe_relative(path, project) for path in artifacts]
     framework, framework_evidence = detect_framework(project, requirements_text, artifacts)
     entrypoints = find_entrypoints(project)
     config_file = find_first_existing(project, CONFIG_NAMES)
@@ -673,12 +719,16 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
     if not next_steps:
         next_steps.append("Proceed to local/remote MLflow registration guidance.")
 
-    return ValidationReport(str(project), reason, platform.platform(), sys.version.split()[0], checks, next_steps)
+    return ValidationReport(str(project), reason, model_found, data_model_files, platform.platform(), sys.version.split()[0], checks, next_steps)
 
 
 def print_text(report: ValidationReport):
     print(f"Selected project: {report.selected_project}")
     print(f"Selection reason: {report.selection_reason}")
+    print(f"Model found: {report.model_found}")
+    print("Data model files:")
+    for data_model_file in report.data_model_files:
+        print(f"- {data_model_file}")
     print(f"OS: {report.os}")
     print(f"Python: {report.python}")
     print()

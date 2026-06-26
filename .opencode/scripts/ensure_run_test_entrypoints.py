@@ -8,15 +8,37 @@ from pathlib import Path
 
 ARTIFACT_SUFFIX_TO_KIND = {
     ".pkl": "sklearn_pickle",
+    ".pickle": "sklearn_pickle",
+    ".sav": "sklearn_pickle",
     ".joblib": "sklearn_joblib",
+    ".dill": "python_dill",
+    ".cloudpickle": "python_cloudpickle",
     ".pt": "pytorch",
     ".pth": "pytorch",
+    ".ckpt": "pytorch",
+    ".bin": "pytorch",
     ".onnx": "onnx",
+    ".ort": "onnx",
     ".h5": "tensorflow",
+    ".hdf5": "tensorflow",
     ".keras": "tensorflow",
+    ".pb": "tensorflow_pb",
+    ".tflite": "tensorflow_lite",
     ".bst": "xgboost",
     ".ubj": "xgboost",
+    ".xgb": "xgboost",
+    ".cbm": "catboost",
+    ".lgb": "lightgbm",
     ".safetensors": "safetensors",
+    ".pmml": "pmml",
+    ".mlmodel": "coreml",
+    ".gguf": "gguf",
+    ".ggml": "gguf",
+    ".mar": "torchserve_mar",
+    ".nemo": "nemo",
+    ".engine": "tensorrt",
+    ".plan": "tensorrt",
+    ".npz": "numpy_weights",
 }
 
 SKIP_DIR_NAMES = {
@@ -54,6 +76,15 @@ def safe_name(path: Path) -> str:
     return re.sub(r"[^A-Za-z0-9_]+", "_", path.stem).strip("_") or "model"
 
 
+def normalize_project_root(project: Path) -> Path:
+    project = project.expanduser().resolve()
+    if project.is_dir():
+        for candidate in (project, *project.parents):
+            if candidate.name == "data":
+                return candidate.parent
+    return project
+
+
 def iter_files(project: Path):
     for path in project.rglob("*"):
         if any(part in SKIP_DIR_NAMES for part in path.relative_to(project).parts):
@@ -63,6 +94,7 @@ def iter_files(project: Path):
 
 
 def find_model_artifacts(project: Path) -> list[Path]:
+    project = normalize_project_root(project)
     data_dir = project / "data"
     if not data_dir.is_dir():
         return []
@@ -80,6 +112,7 @@ def run_test_filename(index: int) -> str:
 
 
 def copy_data_files_to_aiu_studio(project: Path, force: bool = False) -> list[str]:
+    project = normalize_project_root(project)
     data_dir = project / "data"
     target_root = project / "aiu_studio"
     copied: list[str] = []
@@ -100,6 +133,7 @@ def copy_data_files_to_aiu_studio(project: Path, force: bool = False) -> list[st
 
 
 def resolve_target_model(project: Path, target_model: str) -> Path:
+    project = normalize_project_root(project)
     target = Path(target_model).expanduser()
     candidates = [target] if target.is_absolute() else [project / target, project / "data" / target]
     for candidate in candidates:
@@ -110,6 +144,7 @@ def resolve_target_model(project: Path, target_model: str) -> Path:
 
 
 def validate_data_model_file(project: Path, model_file: Path) -> str:
+    project = normalize_project_root(project)
     try:
         model_file.relative_to(project / "data")
     except ValueError as exc:
@@ -168,6 +203,18 @@ def load_model():
 
         return joblib.load(MODEL_PATH)
 
+    if MODEL_KIND == "python_dill":
+        import dill
+
+        with MODEL_PATH.open("rb") as handle:
+            return dill.load(handle)
+
+    if MODEL_KIND == "python_cloudpickle":
+        import cloudpickle
+
+        with MODEL_PATH.open("rb") as handle:
+            return cloudpickle.load(handle)
+
     if MODEL_KIND == "pytorch":
         import torch
 
@@ -183,6 +230,13 @@ def load_model():
 
         return keras.models.load_model(MODEL_PATH)
 
+    if MODEL_KIND == "tensorflow_lite":
+        import tensorflow as tf
+
+        interpreter = tf.lite.Interpreter(model_path=str(MODEL_PATH))
+        interpreter.allocate_tensors()
+        return interpreter
+
     if MODEL_KIND == "xgboost":
         import xgboost as xgb
 
@@ -190,10 +244,42 @@ def load_model():
         booster.load_model(str(MODEL_PATH))
         return booster
 
+    if MODEL_KIND == "catboost":
+        from catboost import CatBoost
+
+        model = CatBoost()
+        model.load_model(str(MODEL_PATH))
+        return model
+
+    if MODEL_KIND == "lightgbm":
+        import lightgbm as lgb
+
+        return lgb.Booster(model_file=str(MODEL_PATH))
+
     if MODEL_KIND == "safetensors":
         from safetensors.torch import load_file
 
         return load_file(str(MODEL_PATH))
+
+    if MODEL_KIND == "numpy_weights":
+        import numpy as np
+
+        return np.load(MODEL_PATH)
+
+    if MODEL_KIND in {{
+        "tensorflow_pb",
+        "pmml",
+        "coreml",
+        "gguf",
+        "torchserve_mar",
+        "nemo",
+        "tensorrt",
+    }}:
+        return {{
+            "model_path": str(MODEL_PATH),
+            "model_kind": MODEL_KIND,
+            "message": "file format detected; custom runtime loader is required",
+        }}
 
     raise ValueError(f"unsupported model kind: {{MODEL_KIND}}")
 
@@ -289,7 +375,7 @@ def render_selected_run_test(project: Path, artifact: Path, model_kind: str, tem
 
 
 def ensure_run_tests(project: Path, force: bool = False, execute: bool = True) -> RunTestReport:
-    project = project.expanduser().resolve()
+    project = normalize_project_root(project)
     report = RunTestReport(project_path=str(project))
 
     if not project.exists() or not project.is_dir():
@@ -340,7 +426,7 @@ def ensure_selected_run_test(
     force: bool = False,
     execute: bool = True,
 ) -> RunTestReport:
-    project = project.expanduser().resolve()
+    project = normalize_project_root(project)
     report = RunTestReport(project_path=str(project))
 
     if not project.exists() or not project.is_dir():

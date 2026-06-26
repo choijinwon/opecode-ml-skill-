@@ -30,10 +30,13 @@ Step 5  MLflow Run/Model 기록 확인
 ### validate_mlflow_project.py
 
 모델 프로젝트 폴더를 분석한다.
+`--project`에 프로젝트 루트가 아니라 `<model-project-folder>/data` 또는 `data/` 하위 폴더를 직접 넘겨도 부모 폴더를 프로젝트 루트로 보정하고 `data/` 전체를 재귀 검색한다.
 
 ```text
 python .opencode/scripts/validate_mlflow_project.py --project <model-project-folder>
 python .opencode/scripts/validate_mlflow_project.py --project <model-project-folder> --json
+python .opencode/scripts/validate_mlflow_project.py --project <model-project-folder>/data --json
+python .opencode/scripts/validate_mlflow_project.py --project <model-project-folder>/data/nested --json
 ```
 
 ### bootstrap_sample_project.py
@@ -102,6 +105,7 @@ python .opencode/scripts/check_environment.py --project <model-project-folder> -
 ### run_training.py
 
 기존 모델 프로젝트를 실행한다. 모델이 없고 샘플을 가져와야 하면 먼저 `bootstrap_sample_project.py`로 사용자가 선택한 샘플 폴더를 복사한다.
+`--project`에 `<model-project-folder>/data` 또는 `data/` 하위 폴더를 넘기면 부모 프로젝트 루트로 보정한 뒤 `data/` 전체를 검색해 실행한다.
 
 기본값은 안전 모드다. 실제 실행은 `--execute`를 명시해야 한다.
 실행 전 `ai_studio.env` 필수 키가 있는지 확인한다.
@@ -148,7 +152,12 @@ data/ 안의 세 번째 모델 파일 -> run_test3.py
 지원 모델 확장자:
 
 ```text
-.pkl, .joblib, .pt, .pth, .onnx, .h5, .keras, .bst, .ubj, .safetensors
+sklearn/python: .pkl, .pickle, .sav, .joblib, .dill, .cloudpickle
+PyTorch/HF:     .pt, .pth, .ckpt, .bin, .safetensors
+ONNX:           .onnx, .ort
+TensorFlow:     .h5, .hdf5, .keras, .pb, .tflite
+Boosting:       .bst, .ubj, .xgb, .cbm, .lgb
+Portable/LLM:   .pmml, .mlmodel, .gguf, .ggml, .mar, .nemo, .engine, .plan, .npz
 ```
 
 ### ensure_required_project_files.py

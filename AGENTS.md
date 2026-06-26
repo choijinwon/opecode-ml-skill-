@@ -22,6 +22,6 @@ ai_studio.env
 
 `ai_studio.env`의 secret 값은 절대 출력하지 않습니다. `mlflow_tracking_password`와 API key는 값이 아니라 `set`, `empty`, `missing` 상태만 말합니다.
 
-모델 프로젝트 루트의 `data/` 폴더 안에 `.pkl`, `.joblib`, `.pt`, `.pth`, `.onnx`, `.h5`, `.keras`, `.bst`, `.ubj`, `.safetensors` 모델 파일이 있으면 기존 프로젝트를 분석해서 실행합니다. 이 경우 `data/` 안의 파일 전체를 프로젝트 루트의 `aiu_studio/` 폴더로 복사해 사용합니다. 모델이 없고 프로젝트 루트가 비어 있으면 `.opencode/samples`의 `sklearn_sample`, `pytorch_sample`, `tensorflow_sample` 중 하나를 사용자가 선택해 폴더째 복사합니다.
+사용자가 가져온 모델 파일은 항상 모델 프로젝트 루트의 `data/` 폴더 안에 둡니다. `data/` 안에 sklearn/python, PyTorch/HF, ONNX, TensorFlow, Boosting, portable/LLM 계열 모델 파일이 있으면 기존 프로젝트를 분석해서 실행합니다. 이 경우 `data/` 안의 파일 전체를 프로젝트 루트의 `aiu_studio/` 폴더로 복사해 사용합니다. 모델이 없고 프로젝트 루트가 비어 있으면 `.opencode/samples`의 `sklearn_sample`, `pytorch_sample`, `tensorflow_sample` 중 하나를 사용자가 선택해 폴더째 복사합니다.
 
 상세 문서는 `.opencode/skills/MLFLOW_5_STEP_GUIDE.md`와 `.opencode/skills/MLFLOW_5_STEP_ARCHITECTURE.md`를 기준으로 합니다.

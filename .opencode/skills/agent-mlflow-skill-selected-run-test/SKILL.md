@@ -60,16 +60,12 @@ python .opencode/scripts/ensure_run_test_entrypoints.py --project <model-project
 ## Supported Model Suffixes
 
 ```text
-.pkl
-.joblib
-.pt
-.pth
-.onnx
-.h5
-.keras
-.bst
-.ubj
-.safetensors
+sklearn/python: .pkl, .pickle, .sav, .joblib, .dill, .cloudpickle
+PyTorch/HF:     .pt, .pth, .ckpt, .bin, .safetensors
+ONNX:           .onnx, .ort
+TensorFlow:     .h5, .hdf5, .keras, .pb, .tflite
+Boosting:       .bst, .ubj, .xgb, .cbm, .lgb
+Portable/LLM:   .pmml, .mlmodel, .gguf, .ggml, .mar, .nemo, .engine, .plan, .npz
 ```
 
 ## Output

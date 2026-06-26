@@ -51,6 +51,7 @@ Print this exact guide on the first assistant response, and also when the user e
 이 프로젝트는 MLflow 모델 프로젝트 분석과 샘플 생성을 돕는 OpenCode 패키지입니다.
 처음 진입하면 워크스페이스의 `data/` 폴더를 먼저 분석해 모델 있음/없음을 확인합니다.
 
+사용자가 가져온 모델 파일은 항상 프로젝트 루트의 `data/` 폴더 안에 넣어주세요.
 `data/` 안에 .pkl, .pt, .onnx 같은 모델 파일이 있으면 본인 모델 경로를 기준으로 MLflow 5단계를 진행합니다.
 모델이 없으면 sklearn / pytorch / tensorflow 중 하나를 선택해 샘플을 생성합니다.
 생성 시 샘플 내용만 루트에 풀지 않고 `<workspace>/sklearn_sample/` 같은 샘플 폴더 자체를 복사합니다.
@@ -70,6 +71,7 @@ Print this exact guide on the first assistant response, and also when the user e
 - If a secret-like field must be discussed, report only `set`, `empty`, or `missing`.
 - Prefer local and closed-network assumptions unless the user explicitly asks for external network use.
 - If the user asks about a model project, inspect the user-specified project folder first.
+- Tell users to place imported model files under the project root `data/` folder.
 - If the workspace has a model file under `data/`, do not ask the user to choose a sample.
 - If the workspace has no model, ask the user to choose `sklearn`, `pytorch`, or `tensorflow`.
 - If the user explicitly asks to create/copy a selected sample, run `.opencode/scripts/bootstrap_sample_project.py --project <workspace-root> --sample <sklearn|pytorch|tensorflow> --execute`.

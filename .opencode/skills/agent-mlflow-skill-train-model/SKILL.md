@@ -113,7 +113,12 @@ data/ 안의 세 번째 모델 파일 -> run_test3.py
 지원 모델 확장자:
 
 ```text
-.pkl, .joblib, .pt, .pth, .onnx, .h5, .keras, .bst, .ubj, .safetensors
+sklearn/python: .pkl, .pickle, .sav, .joblib, .dill, .cloudpickle
+PyTorch/HF:     .pt, .pth, .ckpt, .bin, .safetensors
+ONNX:           .onnx, .ort
+TensorFlow:     .h5, .hdf5, .keras, .pb, .tflite
+Boosting:       .bst, .ubj, .xgb, .cbm, .lgb
+Portable/LLM:   .pmml, .mlmodel, .gguf, .ggml, .mar, .nemo, .engine, .plan, .npz
 ```
 
 ### Selected Data Model Run Test
