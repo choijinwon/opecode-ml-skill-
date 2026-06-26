@@ -76,7 +76,7 @@ MLflow 5단계로 봐줘
 - data/
 - input_example.json
 - MLmodel, python_model.pkl
-- .pkl, .joblib, .pt, .pth, .h5, .keras, .onnx, .safetensors
+- .pkl, .joblib, .pt, .pth, .onnx, .h5, .keras, .bst, .ubj, .safetensors
 
 분석 결과:
 - model_found: true | false
@@ -104,7 +104,7 @@ MLflow 5단계로 봐줘
 추론 entrypoint 존재: predict.py, app.py, main.py
 필수 폴더 존재: aiu_custom/, local_serving/, save_model/
 모델 wrapper 존재: aiu_custom/model_wrapper.py, aiu_custom/predict.py
-모델 artifact 존재: data/, save_model/, model/, models/, artifacts/, saved_model/, .pkl, .joblib, .pt, .pth, .h5, .keras
+모델 artifact 존재: data/, save_model/, model/, models/, artifacts/, saved_model/, .pkl, .joblib, .pt, .pth, .onnx, .h5, .keras, .bst, .ubj, .safetensors
 MLflow model 존재: MLmodel, python_model.pkl
 input example 존재: input_example.json
 ```

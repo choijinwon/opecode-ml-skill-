@@ -20,6 +20,8 @@ MODEL_HINTS = [
     ".onnx",
     ".h5",
     ".keras",
+    ".bst",
+    ".ubj",
     ".safetensors",
 ]
 
