@@ -62,8 +62,14 @@ def main() -> int:
 
     model_artifact_paths = payload.get("model_artifact_paths") or payload.get("data_model_files") or []
     model_found = bool(payload.get("model_found") or model_artifact_paths)
+    data_dir_paths = payload.get("data_dir_paths") or []
+    data_file_count = payload.get("data_file_count", 0)
+    unsupported_data_files = payload.get("unsupported_data_files") or []
 
     print(f"- 분석 대상: {payload.get('selected_project', str(project_dir))}")
+    print(f"- data/ 상태: {'있음' if data_dir_paths else '없음'}")
+    if data_dir_paths:
+        print(f"- data/ 파일 수: {data_file_count}")
     print(f"- 모델 상태: {'있음' if model_found else '없음 또는 추가 확인 필요'}")
     if model_artifact_paths:
         print(f"- 선택 가능한 모델: {len(model_artifact_paths)}개")
@@ -71,6 +77,10 @@ def main() -> int:
             print(f"  {index}. {item}")
         if len(model_artifact_paths) > 9:
             print(f"  - 외 {len(model_artifact_paths) - 9}개")
+    elif unsupported_data_files:
+        print(f"- 지원하지 않는 data 파일: {len(unsupported_data_files)}개")
+        for index, item in enumerate(unsupported_data_files[:5], start=1):
+            print(f"  {index}. {item}")
 
     if evidence:
         print("- 발견 항목:")
@@ -90,7 +100,11 @@ def main() -> int:
         print("  - 실제 모델 선택/파일 생성/환경 검증 실행은 OpenCode 빌드모드에서 선택해주세요.")
         print("  - 추천 요청: 1번 모델로 runtest_2.py 만들어줘.")
     else:
-        print("  - 모델이 없으면 sklearn / pytorch / tensorflow 중 하나를 선택해 샘플을 생성할 수 있습니다.")
+        if data_dir_paths:
+            print("  - data/는 있지만 지원 모델 확장자를 찾지 못했습니다.")
+            print("  - .pkl, .joblib, .pt, .onnx, .keras 등 지원 모델 파일을 data/ 아래에 넣어주세요.")
+        else:
+            print("  - 모델이 없으면 sklearn / pytorch / tensorflow 중 하나를 선택해 샘플을 생성할 수 있습니다.")
         print("  - 실제 샘플 복사/모델 생성/검증 실행은 OpenCode 빌드모드에서 선택해주세요.")
         print("  - 추천 요청: 모델이 없으니 sklearn 샘플로 생성해줘.")
 

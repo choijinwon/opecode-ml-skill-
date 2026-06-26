@@ -127,6 +127,9 @@ class ValidationReport:
     selected_project: str
     selection_reason: str
     model_found: bool
+    data_dir_paths: list[str]
+    data_file_count: int
+    unsupported_data_files: list[str]
     data_model_files: list[str]
     model_artifact_paths: list[str]
     model_artifact_path: str | None
@@ -319,6 +322,14 @@ def find_artifacts(path: Path, max_depth: int = 4) -> list[Path]:
             if file_path.suffix.lower() in ARTIFACT_SUFFIXES:
                 artifacts.append(file_path)
     return sorted(set(artifacts))
+
+
+def find_data_files(path: Path, max_depth: int = 4) -> list[Path]:
+    files: list[Path] = []
+    path = normalize_project_root(path)
+    for data_dir in find_data_dirs(path, max_depth=max_depth):
+        files.extend(iter_files(data_dir, max_depth=max_depth))
+    return sorted(set(files))
 
 
 def detect_framework(project: Path, requirements_text: str, artifacts: list[Path]) -> tuple[str, list[str]]:
@@ -591,13 +602,21 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
 
     if not project.exists():
         checks.append(Check("local model path selection", "block", "selected project path does not exist", [str(project)]))
-        return ValidationReport(str(project), reason, False, [], [], None, platform.platform(), sys.version.split()[0], checks, ["Provide a valid --project path."])
+        return ValidationReport(str(project), reason, False, [], 0, [], [], [], None, platform.platform(), sys.version.split()[0], checks, ["Provide a valid --project path."])
 
     checks.append(Check("local model path selection", "pass", "project selected", [str(project), reason]))
 
     requirements_path, requirements_text, packages = parse_requirements(project)
+    data_dirs = find_data_dirs(project)
+    data_files = find_data_files(project)
     artifacts = find_artifacts(project)
     model_found = bool(artifacts)
+    data_dir_paths = [safe_relative(path, project) for path in data_dirs]
+    unsupported_data_files = [
+        safe_relative(path, project)
+        for path in data_files
+        if path.suffix.lower() not in ARTIFACT_SUFFIXES
+    ]
     data_model_files = [safe_relative(path, project) for path in artifacts]
     model_artifact_paths = data_model_files
     model_artifact_path = model_artifact_paths[0] if model_artifact_paths else None
@@ -660,6 +679,8 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
             [
                 f"config: {config_message}",
                 f"input_example: {input_message}",
+                f"data_dir_count: {len(data_dirs)}",
+                f"data_file_count: {len(data_files)}",
                 f"data_model_file_count: {len(artifacts)}",
             ],
         )
@@ -720,7 +741,10 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
     if not has_mlflow_dep:
         next_steps.append("Add or confirm mlflow dependency in the project environment.")
     if not artifacts:
-        next_steps.append("Run training or provide a data model file under data/.")
+        if data_dirs:
+            next_steps.append("data/ exists, but no supported model artifact was found. Add one of the supported model suffixes under data/.")
+        else:
+            next_steps.append("Create data/ and provide a supported model artifact under it.")
     if not prepare_found:
         next_steps.append("Confirm a prepare-only or preflight behavior before registration.")
     if not local_remote_evidence:
@@ -732,6 +756,9 @@ def build_report(project: Path, reason: str, write_check: bool) -> ValidationRep
         str(project),
         reason,
         model_found,
+        data_dir_paths,
+        len(data_files),
+        unsupported_data_files,
         data_model_files,
         model_artifact_paths,
         model_artifact_path,
@@ -746,7 +773,13 @@ def print_text(report: ValidationReport):
     print(f"Selected project: {report.selected_project}")
     print(f"Selection reason: {report.selection_reason}")
     print(f"Model found: {report.model_found}")
+    print(f"Data folders: {', '.join(report.data_dir_paths) if report.data_dir_paths else 'none'}")
+    print(f"Data file count: {report.data_file_count}")
     print(f"Model artifact path: {report.model_artifact_path or 'none'}")
+    if report.unsupported_data_files:
+        print("Unsupported data files:")
+        for item in report.unsupported_data_files[:20]:
+            print(f"- {item}")
     print("Model artifact paths:")
     for index, model_artifact_path in enumerate(report.model_artifact_paths, start=1):
         print(f"{index}. {model_artifact_path}")
