@@ -67,6 +67,7 @@ Step 3. 템플릿 변환
         복사된 템플릿 기준으로 선택 모델 경로와 모델 형식 연결부를 수정한다.
         모델 선택 명령 한 번으로 이 단계까지 수행한다. `--sync-runtime`은 이미 선택된 모델 기준으로 런타임 파일을 다시 맞출 때만 사용한다.
         requirements.txt 필수 5개 패키지는 .opencode/scripts/03-environment-check/requirements.required.txt 기준을 사용하며 절대 제거하지 않는다.
+        Python 3.13에서 kserve 호환성 문제가 있어도 kserve==0.15.0은 제거하지 않고 Python 3.11.9 환경으로 전환하도록 안내한다.
         내부 일치 검증은 선택된 runtest_2.py와 런타임 파일 기준으로 수행한다.
 Step 4. 환경변수/requirements 갱신
         입력값 3개와 자동값 2개 상태를 확인한다.

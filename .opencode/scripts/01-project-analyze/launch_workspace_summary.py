@@ -121,6 +121,7 @@ def main() -> int:
     if model_artifact_paths:
         print("- 모델 선택 화면:")
         print(format_model_selection_hint(indent="  "))
+        print("  모델 목록은 프로젝트 기준 상대경로 알파벳 순서입니다.")
         print("  숫자키는 TODO 단계가 아니라 아래 모델 번호 선택입니다.")
         for index, path in enumerate(model_artifact_paths[:10], start=1):
             print(f"  {index}. {path}")

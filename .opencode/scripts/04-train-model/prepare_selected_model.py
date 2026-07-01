@@ -3536,6 +3536,7 @@ def print_report(report: PreparedModelReport, verbose: bool = False) -> None:
                 print(f"- 프로젝트에 {total_model_count}개 모델이 있습니다. data 폴더 {data_model_count}개 포함, 선택해주세요.")
             else:
                 print(f"- 현재 프로젝트 루트 바로 아래에 {total_model_count}개 모델이 있습니다. 선택해주세요.")
+            print("- 모델 목록은 프로젝트 기준 상대경로 알파벳 순서입니다.")
             print("- 숫자키는 TODO 단계가 아니라 아래 모델 번호 선택입니다.")
             for index, path in enumerate(report.model_artifact_paths, start=1):
                 print(f"  {index}. {path}")

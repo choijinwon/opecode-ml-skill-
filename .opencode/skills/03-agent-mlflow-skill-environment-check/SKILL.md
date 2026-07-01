@@ -42,6 +42,7 @@ metadata:
 4. MLflow 3.13.0 설치/version을 확인한다.
 5. mlflow_tracking_url이 있으면 원격 MLflow 서버 version을 확인한다.
 6. 변환된 코드 import 기준 추가 Python 패키지가 필요하면 requirements.txt를 업데이트한다. 이때 필수 패키지 5개는 항상 유지한다.
+7. Python 3.13 등에서 kserve 설치 호환성 문제가 보여도 `kserve==0.15.0`을 requirements.txt에서 제거하지 않는다. Python 버전 차단/전환 대상으로 안내한다.
 7. runtest_2.py 설정 블록의 비어 있는 값은 사용자가 직접 소스에 입력하도록 안내한다.
 ```
 
