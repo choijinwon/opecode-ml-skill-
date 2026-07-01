@@ -709,6 +709,12 @@ def find_reference_entrypoint(project: Path, kind: str | None = None) -> Path | 
     return None
 
 
+def runtest_generation_reference(kind: str | None, reference: Path) -> Path:
+    if kind in {"pytorch", "safetensors"} and PYTORCH_REFERENCE_ENTRYPOINT.is_file():
+        return PYTORCH_REFERENCE_ENTRYPOINT
+    return reference
+
+
 def preserve_reference_code(reference: Path) -> bool:
     if reference.resolve() == PYTORCH_REFERENCE_ENTRYPOINT.resolve():
         return True
@@ -1984,7 +1990,7 @@ def reference_style_loader_code(kind: str) -> str:
 '''
 
 
-def generated_constant_free_runtest_text(project: Path, selected_model: Path, kind: str) -> str:
+def generated_constant_free_runtest_text(project: Path, selected_model: Path, kind: str, reference: Path | None = None) -> str:
     selected_relative = rel(selected_model, project)
     default_experiment_name, default_register_model_name = default_mlflow_names(project, selected_model)
     profile = model_profile(project, selected_model, kind)
@@ -1993,7 +1999,10 @@ def generated_constant_free_runtest_text(project: Path, selected_model: Path, ki
     config_literal = pformat(config, width=100, sort_dicts=False)
     loader = reference_style_loader_code(kind)
     input_example_code = reference_style_input_example_code(kind, input_example).rstrip()
-    return f'''import io
+    reference_header = ""
+    if reference is not None:
+        reference_header = f"# 참조 템플릿: {reference_display_path(reference)}\n"
+    return f'''{reference_header}import io
 import inspect
 import json
 import logging
@@ -2431,7 +2440,8 @@ MODEL_PATH = MODEL_DIR / "model.pt"'''
 
 
 def generated_runtest_text(project: Path, selected_model: Path, kind: str, reference: Path) -> str:
-    return generated_constant_free_runtest_text(project, selected_model, kind)
+    generation_reference = runtest_generation_reference(kind, reference)
+    return generated_constant_free_runtest_text(project, selected_model, kind, generation_reference)
 
     reference_text = reference.read_text(encoding="utf-8", errors="ignore")
     selected_relative = rel(selected_model, project)
@@ -2605,10 +2615,24 @@ def generated_localservingtest_text(project: Path, selected_model: Path, kind: s
 from __future__ import annotations
 
 import importlib.util
+import contextlib
+import io
 import json
 import re
+import warnings
 from pathlib import Path
 
+
+warnings.filterwarnings(
+    "ignore",
+    message=r".*Add type hints to the `predict` method.*",
+    category=UserWarning,
+)
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    module="mlflow[.]pyfunc[.]utils[.]data_validation",
+)
 
 LOCAL_SERVING_DIR = Path(__file__).resolve().parent
 AI_STUDIO_DIR = LOCAL_SERVING_DIR.parent
@@ -2647,7 +2671,9 @@ def load_aiu_custom_wrapper():
         if spec is None or spec.loader is None:
             continue
         module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
+        with warnings.catch_warnings(), contextlib.redirect_stderr(io.StringIO()):
+            warnings.simplefilter("ignore", UserWarning)
+            spec.loader.exec_module(module)
         wrapper_class = getattr(module, "ModelWrapper", None)
         if wrapper_class is not None:
             return wrapper_class()
@@ -2658,7 +2684,9 @@ def run_inference():
     payload = load_input_example()
     wrapper = load_aiu_custom_wrapper()
     if wrapper is not None:
-        return wrapper.predict(None, payload)
+        with warnings.catch_warnings(), contextlib.redirect_stderr(io.StringIO()):
+            warnings.simplefilter("ignore", UserWarning)
+            return wrapper.predict(None, payload)
 
     model = load_selected_model()
     if hasattr(model, "predict"):
@@ -2673,29 +2701,34 @@ def run_inference():
     }}
 
 
-def _print_tod(local_status="완료"):
-    print("\\n============================================================")
-    print("AI Studio TODO Guide - 7단계")
-    print("============================================================")
-    print("숫자키로 단계 실행 가능 / 모델 목록 화면에서는 숫자=모델 번호")
-    print("[1] 모델 목록 확인: 완료")
-    print("[2] 모델 선택: 완료")
-    print("[3] 템플릿 변환: 완료")
-    print("[4] 환경변수/requirements 갱신: 확인 필요")
-    print("[5] 원격 MLflow 등록 실행: 완료")
-    print(f"[6] 추론 테스트: {{local_status}}")
-    print("[7] 오류 수정 및 재실행: 오류 시")
-    print("============================================================")
+def _shorten(value):
+    if isinstance(value, list):
+        if len(value) > 10:
+            return [_shorten(item) for item in value[:10]] + [f"... {{len(value) - 10}} more"]
+        return [_shorten(item) for item in value]
+    if isinstance(value, dict):
+        hidden_keys = {{"input", "inputs", "input_example", "data"}}
+        return {{key: _shorten(item) for key, item in value.items() if key not in hidden_keys}}
+    return value
+
+
+def compact_result(result):
+    compact = _shorten(result)
+    if isinstance(compact, dict):
+        compact.setdefault("model_kind", MODEL_KIND)
+        compact.setdefault("model_path", str(MODEL_PATH))
+        return compact
+    return {{
+        "status": "completed",
+        "model_kind": MODEL_KIND,
+        "model_path": str(MODEL_PATH),
+        "result": compact,
+    }}
 
 
 def main():
-    local_status = "확인 필요"
-    try:
-        result = run_inference()
-        print(json.dumps(result, ensure_ascii=False, indent=2, default=str))
-        local_status = "완료"
-    finally:
-        _print_tod(local_status)
+    result = run_inference()
+    print(json.dumps(compact_result(result), ensure_ascii=False, indent=2, default=str))
 
 
 if __name__ == "__main__":
@@ -3005,6 +3038,7 @@ def write_runtest_2(project: Path, selected_model: Path, kind: str, reference: P
     changed: list[str] = []
     skipped: list[str] = []
     failures: list[str] = []
+    generation_reference = runtest_generation_reference(kind, reference)
     reference_digest_before = file_sha256(reference)
     existed_before = target.exists()
     if execute:
@@ -3019,6 +3053,8 @@ def write_runtest_2(project: Path, selected_model: Path, kind: str, reference: P
         if existed_before
         else "runtest_2.py generated from selected model"
     )
+    if generation_reference.resolve() != reference.resolve():
+        changed.append(f"runtest_2.py reference template: {reference_display_path(generation_reference)}")
     return changed, skipped, failures
 
 
@@ -3351,21 +3387,6 @@ def build_report(args: argparse.Namespace) -> PreparedModelReport:
             f"selected_model_changed:{rel(current_selected, project)}->{rel(selected_model, project)}"
         )
         report.next_steps.append(f"선택 모델을 새 값으로 변경합니다: {rel(selected_model, project)}")
-    if (
-        args.model
-        and normalize_path_text(args.model.strip()).isdigit()
-        and selected_model
-        and not (
-            current_selected is not None
-            and current_selected.resolve() == selected_model.resolve()
-        )
-    ):
-        stable_path = rel(selected_model, project)
-        report.warnings.append(f"numeric_model_selection_resolved:{args.model}->{stable_path}")
-        report.next_steps.append(f"번호 {args.model} 선택은 알파벳 경로 정렬 목록 기준으로 {stable_path}에 매핑되었습니다.")
-        report.next_steps.append(f"자동 재실행 시에는 실제 경로를 사용해도 됩니다: --model {stable_path}")
-        report.next_steps.append("이미 준비된 선택 모델을 다시 쓰려면: --model selected")
-
     if args.sync_runtime:
         runtime_reference = project / "runtest_2.py"
         report.reference_entrypoint = "runtest_2.py"
@@ -3558,15 +3579,9 @@ def print_report(report: PreparedModelReport, verbose: bool = False) -> None:
             else:
                 print("- dry-run: --execute를 붙이면 실제 파일을 갱신합니다.")
         if report.warnings:
-            actionable_warnings = [
-                warning
-                for warning in report.warnings
-                if not warning.startswith("numeric_model_selection_resolved:")
-            ]
-            if actionable_warnings:
-                print("\nWarnings:")
-                for warning in actionable_warnings:
-                    print(f"- {warning}")
+            print("\nWarnings:")
+            for warning in report.warnings:
+                print(f"- {warning}")
         if report.failures:
             print("\nFailures:")
             for failure in report.failures:

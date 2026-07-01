@@ -8,8 +8,7 @@
     }
   },
   "instructions": [
-    ".opencode/AIUSTUDIO_GUIDE.md",
-    ".opencode/START_GUIDE.md"
+    ".opencode/AIUSTUDIO_GUIDE.md"
   ],
   "skills": {
     "paths": [

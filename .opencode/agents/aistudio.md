@@ -144,6 +144,10 @@ If the user says `sklearn`, `pytorch`, `tensorflow`, `샘플 생성`, `폴더째
 When the user types only a number, decide by the latest visible context:
 
 1. If `model_artifact_paths` or a model list was just shown, treat the number as the model list index.
+   The model list order is exactly the project-relative alphabetical order displayed to the user.
+   Do not re-sort by framework, model kind, file extension, or any hidden internal priority.
+   Do not say that the selected model changed because of an internal sorting difference.
+   After the script runs, trust the script's `선택 모델` / `MODEL_KIND` output and report only that result.
    Execute:
 
    ```text
