@@ -97,7 +97,7 @@ Secrets: mlflow_tracking_password=set, value hidden
   mlflow_tracking_password (secret — 출력하지 않음)
 
 처리 완료 후 실행:
-- 원격 MLflow 등록 실행: python runtest_2.py
+- 원격 MLflow 등록 실행: python .opencode/scripts/04-train-model/run_training.py --project . --entrypoint runtest_2.py --execute
 - 추론 테스트는 사용자가 선택할 때만 실행: python local_serving/localservingtest.py
 ```
 

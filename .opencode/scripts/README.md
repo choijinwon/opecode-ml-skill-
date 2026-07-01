@@ -63,7 +63,7 @@ QA / Maintenance
 2. 모델 선택                       -> prepare_selected_model.py --model <번호|경로>
 3. 템플릿 변환                     -> 템플릿 복사 + 복사된 템플릿 기준 연결부 수정
 4. 환경변수/requirements 갱신      -> check_environment.py --entrypoint runtest_2.py
-5. 학습 실행 및 원격 MLflow 등록   -> python runtest_2.py
+5. 학습 실행 및 원격 MLflow 등록   -> run_training.py --entrypoint runtest_2.py --execute
 6. 추론 테스트                     -> 사용자가 6번 선택 시 python local_serving/localservingtest.py
 7. 오류 수정 및 재실행             -> Failures 기준으로 실패한 단계부터 재실행
 ```
@@ -81,7 +81,7 @@ QA / Maintenance
 ```text
 1~3 -> python .opencode/scripts/04-train-model/prepare_selected_model.py --project . --model <번호|경로> --execute
 4 -> python .opencode/scripts/03-environment-check/check_environment.py --project . --entrypoint runtest_2.py
-5 -> python runtest_2.py
+5 -> python .opencode/scripts/04-train-model/run_training.py --project . --entrypoint runtest_2.py --execute
 6 -> 사용자가 선택하면 python local_serving/localservingtest.py
 7 -> Failures와 오류 메시지 기준으로 수정 후 실패한 단계부터 재실행
 ```
@@ -89,8 +89,8 @@ QA / Maintenance
 Windows PowerShell에서는 선택 프로젝트의 실행 폴더로 이동한 뒤 실행한다.
 
 ```powershell
-cd '<selected-project-path>\aiu_studio'
-python runtest_2.py
+cd '<selected-project-path>'
+python .opencode\scripts\04-train-model\run_training.py --project . --entrypoint runtest_2.py --execute
 
 cd '<selected-project-path>\local_serving'
 python localservingtest.py
@@ -173,7 +173,7 @@ python .opencode/scripts/qa-maintenance/doctor.py --workspace . --project <model
 현재 프로젝트 루트 바로 아래와 `data/**` 아래 모델 파일 목록을 만들고, 사용자가 선택한 모델 기준으로 기존 `runtest.py`를 참조해 `runtest_2.py`만 생성/갱신한다.
 `runtest_2.py`는 외부 데이터셋을 다운로드하지 않고 MODEL_KIND에 맞는 synthetic `input_example.json`을 생성한다.
 기존 `runtest.py`는 수정하지 않고 참조만 한다.
-PyTorch/safetensors 모델은 `.opencode/samples/pytorch_sample/` 내부를 참조해서 선택 모델 실행/등록에 필요한 연결부만 안전하게 변환해줘.
+PyTorch/safetensors 모델은 `.opencode/samples/pytorch_sample/` 내부를 참조해서 선택 모델 실행/등록에 필요한 연결부만 안전하게 변환한다. 샘플 `requirements.txt`는 참조하지 않는다.
 선택 모델 경로와 `MODEL_KIND`를 반영한다.
 `runtest_2.py` 생성 시퀀스는 `모델 선택 -> 모델 형식 확인 -> 기존 runtest.py 읽기 전용 참조 -> 선택 모델 경로와 MODEL_KIND를 반영한 연결부 변환 -> 변환 결과 검증` 순서로 수행한다.
 

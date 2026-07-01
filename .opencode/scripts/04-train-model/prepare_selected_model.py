@@ -63,7 +63,8 @@ REQUIRED_REQUIREMENTS_FILE = ROOT / "scripts" / "03-environment-check" / "requir
 CHECK_ENVIRONMENT_SCRIPT = ROOT / "scripts" / "03-environment-check" / "check_environment.py"
 PREPARE_SELECTED_MODEL_SCRIPT = ROOT / "scripts" / "04-train-model" / "prepare_selected_model.py"
 RUN_TRAINING_SCRIPT = ROOT / "scripts" / "04-train-model" / "run_training.py"
-PYTORCH_REFERENCE_ENTRYPOINT = ROOT / "samples" / "pytorch_sample" / "runtest.py"
+PYTORCH_REFERENCE_DIR = ROOT / "samples" / "pytorch_sample"
+PYTORCH_REFERENCE_ENTRYPOINT = PYTORCH_REFERENCE_DIR / "runtest.py"
 
 REFERENCE_ENTRYPOINT_BY_KIND = {
     "pytorch": PYTORCH_REFERENCE_ENTRYPOINT,
@@ -817,10 +818,16 @@ def reference_display_path(reference: Path) -> str:
         return normalize_path_text(reference.as_posix())
 
 
+def reference_scope_display_path(kind: str | None, reference: Path) -> str:
+    if kind in {"pytorch", "safetensors"} and PYTORCH_REFERENCE_DIR.is_dir():
+        return f"{reference_display_path(PYTORCH_REFERENCE_DIR)} (requirements.txt 제외)"
+    return reference_display_path(reference)
+
+
 def conversion_reference_step(kind: str, reference: Path) -> str:
-    display_path = reference_display_path(reference)
+    display_path = reference_scope_display_path(kind, reference)
     if kind in {"pytorch", "safetensors"}:
-        return f"4. samples/pytorch_sample/ 내부 참조(복사 금지): {display_path}"
+        return f"4. PyTorch 참조 영역 확인: {display_path}"
     return f"4. 선택 모델 기준 참조: {display_path}"
 
 
@@ -828,7 +835,7 @@ def runtest_2_sequence(project: Path, selected_model: Path, kind: str, reference
     return [
         f"1. 선택 모델 경로 및 형식 확인: {rel(selected_model, project)} / MODEL_KIND={kind}",
         "2. aiu_studio/ 템플릿을 현재 워크스페이스 루트로 복사",
-        f"3. 참조 entrypoint 확인: {reference_display_path(reference)}",
+        f"3. 참조 영역 확인: {reference_scope_display_path(kind, reference)}",
         "4. runtest.py 참조해서 runtest_2.py 생성",
         "5. 복사된 템플릿 기준으로 선택 모델 경로와 모델 형식 연결부 수정",
         "6. 변환 결과 검증",
@@ -2001,7 +2008,10 @@ def generated_constant_free_runtest_text(project: Path, selected_model: Path, ki
     input_example_code = reference_style_input_example_code(kind, input_example).rstrip()
     reference_header = ""
     if reference is not None:
-        reference_header = f"# 참조 템플릿: {reference_display_path(reference)}\n"
+        reference_header = (
+            f"# 참조 영역: {reference_scope_display_path(kind, reference)}\n"
+            f"# 참조 파일: {reference_display_path(reference)}\n"
+        )
     return f'''{reference_header}import io
 import inspect
 import json
@@ -3054,7 +3064,7 @@ def write_runtest_2(project: Path, selected_model: Path, kind: str, reference: P
         else "runtest_2.py generated from selected model"
     )
     if generation_reference.resolve() != reference.resolve():
-        changed.append(f"runtest_2.py reference template: {reference_display_path(generation_reference)}")
+        changed.append(f"runtest_2.py reference scope: {reference_scope_display_path(kind, generation_reference)}")
     return changed, skipped, failures
 
 
@@ -3389,7 +3399,20 @@ def build_report(args: argparse.Namespace) -> PreparedModelReport:
         report.next_steps.append(f"선택 모델을 새 값으로 변경합니다: {rel(selected_model, project)}")
     if args.sync_runtime:
         runtime_reference = project / "runtest_2.py"
-        report.reference_entrypoint = "runtest_2.py"
+        reference = find_reference_entrypoint(project, selected_kind)
+        report.reference_entrypoint = rel(reference, project) if reference else None
+        if reference is None:
+            report.failures.append("reference_entrypoint_missing:runtest.py_or_run_test.py")
+            report.next_steps.append("워크스페이스 루트에 기존 runtest.py 또는 run_test.py를 넣어주세요.")
+            return report
+
+        changed, write_skipped, write_failures = write_runtest_2(project, selected_model, selected_kind, reference, args.execute, args.force)
+        report.prepared_paths.extend(changed)
+        report.skipped.extend(write_skipped)
+        report.failures.extend(write_failures)
+        if report.failures:
+            return report
+
         if not runtime_reference.is_file():
             report.failures.append("runtest_2_missing")
             report.next_steps.append("먼저 모델 선택으로 runtest_2.py를 생성하세요.")
@@ -3474,7 +3497,7 @@ def build_report(args: argparse.Namespace) -> PreparedModelReport:
                 "PowerShell에서는 선택한 Windows 프로젝트 루트에서 실행하세요.",
                 "python .opencode/scripts/03-environment-check/check_environment.py --project . --entrypoint runtest_2.py",
                 "환경 체크 완료 후 5번 원격 MLflow 등록 실행을 진행하세요.",
-                "python runtest_2.py",
+                "python .opencode/scripts/04-train-model/run_training.py --project . --entrypoint runtest_2.py --execute",
                 "6번 추론 테스트는 자동 실행하지 않습니다. 사용자가 6번을 선택했을 때만 진행합니다.",
             ]
         )
@@ -3595,7 +3618,7 @@ def print_report(report: PreparedModelReport, verbose: bool = False) -> None:
                 print("- 오류 항목을 수정한 뒤 같은 명령을 다시 실행하세요.")
         elif report.selected_model_path:
             print("- 4번 환경 체크: python .opencode/scripts/03-environment-check/check_environment.py --project . --entrypoint runtest_2.py")
-            print("- 5번 원격 MLflow 등록: python runtest_2.py")
+            print("- 5번 원격 MLflow 등록: python .opencode/scripts/04-train-model/run_training.py --project . --entrypoint runtest_2.py --execute")
             print("- 6번 추론 테스트: python local_serving/localservingtest.py")
         elif report.next_steps:
             for step in report.next_steps[:3]:

@@ -157,6 +157,12 @@ When the user types only a number, decide by the latest visible context:
    This is Step 3, not inference. It must read the existing workspace-root `runtest.py` as the reference and create/refresh only `runtest_2.py` for the selected model.
 
 2. If no model list is active and the TODO Guide is active, treat the number as a TODO step.
+   For Step 5, execute the guarded registration command so the selected model runtime is checked and re-transformed before MLflow registration:
+
+   ```text
+   python .opencode/scripts/04-train-model/run_training.py --project . --entrypoint runtest_2.py --execute
+   ```
+
 3. If `model_found: false` and the sample choices are active, treat `1`, `2`, `3` as `sklearn`, `pytorch`, `tensorflow` sample choices.
 
 Do not route model-list number input to `agent-mlflow-skill-inference-test`. Inference runs only after selected-model preparation and remote MLflow registration steps are complete or when the user explicitly asks for `추론 테스트`.

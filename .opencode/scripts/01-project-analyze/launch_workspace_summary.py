@@ -7,7 +7,7 @@ SCRIPT_ROOT = Path(__file__).resolve().parents[1]
 if str(SCRIPT_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPT_ROOT))
 
-from ai_studio_process import format_model_selection_hint, format_todo_guide
+from ai_studio_process import format_model_selection_hint
 
 
 MODEL_HINTS = [
@@ -132,10 +132,7 @@ def main() -> int:
         for item in review_items[:4]:
             print(f"  - {item}")
 
-    if model_found:
-        print(format_todo_guide(("완료", "대기", "대기", "3번 완료 후", "4번 완료 후", "선택 시", "오류 시")))
-    else:
-        print(format_todo_guide(("모델 없음", "샘플 선택", "샘플 생성 후", "3번 완료 후", "4번 완료 후", "선택 시", "오류 시")))
+    if not model_found:
         print("모델 없음 상태에서는 샘플 선택 후 다음 단계로 진행합니다.")
         print("  - 모델이 없으면 sklearn / pytorch / tensorflow 중 하나를 선택해 샘플을 생성할 수 있습니다.")
         print("  - 실제 샘플 복사/모델 생성/검증 실행은 OpenCode AIU Studio 빌드 모드에서 선택해주세요.")
