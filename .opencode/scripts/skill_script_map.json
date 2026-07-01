@@ -1,0 +1,66 @@
+{
+  "01-project-analyze": {
+    "skill_folder": "01-agent-mlflow-skill-project-analyze",
+    "primary_scripts": [
+      "01-project-analyze/launch_workspace_summary.py",
+      "01-project-analyze/validate_mlflow_project.py",
+      "04-train-model/prepare_selected_model.py"
+    ],
+    "purpose": "workspace analysis, model_found decision, model list and model selection"
+  },
+  "02-sample-bootstrap": {
+    "skill_folder": "02-agent-mlflow-skill-sample-bootstrap",
+    "primary_scripts": [
+      "02-sample-bootstrap/bootstrap_sample_project.py"
+    ],
+    "purpose": "copy sklearn, pytorch, or tensorflow sample when no model exists"
+  },
+  "03-environment-check": {
+    "skill_folder": "03-agent-mlflow-skill-environment-check",
+    "primary_scripts": [
+      "03-environment-check/check_environment.py"
+    ],
+        "support_scripts": [
+            "03-environment-check/response_speed_check.py",
+            "03-environment-check/apply_index_ignore.py"
+        ],
+        "required_files": [
+            "03-environment-check/requirements.required.txt"
+        ],
+    "purpose": "check Python, requirements.txt, MLflow settings, and closed-network speed"
+  },
+  "04-train-model": {
+    "skill_folder": "04-agent-mlflow-skill-train-model",
+    "primary_scripts": [
+      "04-train-model/prepare_selected_model.py",
+      "04-train-model/run_training.py"
+    ],
+    "support_scripts": [
+      "04-train-model/adapt_ai_studio.py"
+    ],
+    "purpose": "reference runtest.py, generate selected-model runtest_2.py, and run confirmed entrypoint"
+  },
+  "05-inference-test": {
+    "skill_folder": "05-agent-mlflow-skill-inference-test",
+    "primary_scripts": [
+      "05-inference-test/test_inference.py"
+    ],
+    "generated_entrypoints": [
+      "local_serving/localservingtest.py"
+    ],
+    "purpose": "run selected-model local serving smoke test and inference contract checks"
+  },
+  "qa-maintenance": {
+    "primary_scripts": [
+      "qa-maintenance/doctor.py",
+      "qa-maintenance/test_local_sample.py"
+    ],
+    "documents": [
+      "README.md",
+      "MAINTENANCE.md",
+      "SCRIPT_INDEX.md",
+      "skill_script_map.json"
+    ],
+    "purpose": "one-page QA, bundled sample QA, and script maintenance"
+  }
+}

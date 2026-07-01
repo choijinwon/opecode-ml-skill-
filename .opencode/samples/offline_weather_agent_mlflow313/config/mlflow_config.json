@@ -1,0 +1,11 @@
+{
+  "mlflow_tracking_url": "http://127.0.0.1:5001",
+  "mlflow_tracking_username": "",
+  "mlflow_tracking_password": "",
+  "mlflow_experiment_id": "4",
+  "mlflow_experiment_name": "offline_weather_agent_local",
+  "mlflow_register_model_name": "",
+  "judge_model_uri": "ollama:/qwen2.5-coder:14b",
+  "judge_api_base": "http://127.0.0.1:11434/v1",
+  "judge_api_key": "ollama"
+}
