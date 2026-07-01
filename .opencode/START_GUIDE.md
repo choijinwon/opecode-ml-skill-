@@ -1,7 +1,7 @@
 # Start Guide
 
 ```text
-AIU Studio MLflow Onboarding
+AI Studio TODO Guide - 7단계
 
 1. 먼저 워크스페이스를 분석합니다.
    model_found: true | false

@@ -415,6 +415,14 @@ def model_kind(path: Path) -> str | None:
     return SUPPORTED_MODEL_KINDS.get(path.suffix.lower())
 
 
+def model_sort_key(path: Path, project: Path) -> str:
+    try:
+        relative = path.resolve().relative_to(project.resolve())
+    except ValueError:
+        relative = path
+    return normalize_path_text(str(relative)).lower()
+
+
 def is_filesystem_root(path: Path) -> bool:
     return path.parent == path
 
@@ -442,7 +450,7 @@ def scan_model_artifacts(project: Path) -> list[Path]:
 
     data_root = project / "data"
     if not data_root.is_dir():
-        return sorted(set(found))
+        return sorted(set(found), key=lambda path: model_sort_key(path, project))
 
     for path in data_root.rglob("*"):
         try:
@@ -453,7 +461,7 @@ def scan_model_artifacts(project: Path) -> list[Path]:
             continue
         if path.is_file() and model_kind(path):
             found.append(path)
-    return sorted(set(found))
+    return sorted(set(found), key=lambda path: model_sort_key(path, project))
 
 
 def scan_data_files(project: Path) -> list[Path]:
@@ -499,11 +507,12 @@ def artifacts_under(path: Path) -> list[Path]:
     for child in path.rglob("*"):
         if child.is_file() and model_kind(child):
             found.append(child)
-    return sorted(set(found))
+    project = path if path.is_dir() else path.parent
+    return sorted(set(found), key=lambda item: model_sort_key(item, project))
 
 
 def resolve_single_artifact(project: Path, candidates: list[Path], raw: str) -> tuple[Path | None, str | None]:
-    candidates = sorted(set(path.resolve() for path in candidates))
+    candidates = sorted(set(path.resolve() for path in candidates), key=lambda path: model_sort_key(path, project))
     if len(candidates) == 1:
         return candidates[0], None
     if not candidates:
@@ -2613,8 +2622,8 @@ AIU_REQUIRED_PACKAGE = "{required_package}"
 AIU_LOAD_HINT = "{load_hint}"
 REFERENCE_ENTRYPOINT = {reference_entrypoint!r}
 
-# AIU Studio 변환: 선택 모델 원본 경로 {selected_relative} 기준 추론 테스트입니다.
-# 모델 파일은 템플릿 폴더로 복사하지 않고 프로젝트 내 원본 위치에서 직접 읽습니다.
+# AIU Studio 변환: 선택 모델 {selected_relative} 기준 추론 테스트입니다.
+# 추론 테스트는 선택 모델 원본 경로와 saved_model/ 복사본 후보를 확인합니다.
 # MODEL_KIND={kind}, loader={load_hint}
 
 {loader}
@@ -3061,9 +3070,9 @@ def write_localservingtest(project: Path, selected_model: Path, kind: str, refer
     changed: list[str] = []
     skipped: list[str] = []
     failures: list[str] = []
-    reference_digest_before = file_sha256(reference)
     existed_before = target.exists()
     if execute:
+        reference_digest_before = file_sha256(reference)
         target.parent.mkdir(parents=True, exist_ok=True)
         copied_text = target.read_text(encoding="utf-8", errors="ignore") if target.is_file() else None
         target.write_text(
@@ -3352,8 +3361,9 @@ def build_report(args: argparse.Namespace) -> PreparedModelReport:
         )
     ):
         stable_path = rel(selected_model, project)
-        report.warnings.append(f"numeric_model_selection_is_order_dependent:{args.model}->{stable_path}")
-        report.next_steps.append(f"다음 실행부터는 목록 순서가 바뀌어도 안전하게 실제 경로를 사용하세요: --model {stable_path}")
+        report.warnings.append(f"numeric_model_selection_resolved:{args.model}->{stable_path}")
+        report.next_steps.append(f"번호 {args.model} 선택은 알파벳 경로 정렬 목록 기준으로 {stable_path}에 매핑되었습니다.")
+        report.next_steps.append(f"자동 재실행 시에는 실제 경로를 사용해도 됩니다: --model {stable_path}")
         report.next_steps.append("이미 준비된 선택 모델을 다시 쓰려면: --model selected")
 
     if args.sync_runtime:
@@ -3497,7 +3507,16 @@ def print_todo_guide(report: PreparedModelReport) -> None:
     print(format_todo_guide(todo_statuses(report)))
 
 
-def print_report(report: PreparedModelReport) -> None:
+def print_report(report: PreparedModelReport, verbose: bool = False) -> None:
+    if not verbose and report.execute and report.selected_model_path and not report.failures:
+        print("준비 결과:")
+        print(f"- 선택 모델: {report.selected_model_path}")
+        print(f"- MODEL_KIND: {report.model_kind or 'missing'}")
+        print("- 완료: 템플릿 복사 후 선택 모델 형식에 맞게 변환")
+        print("- 변환: runtest_2.py, aiu_custom/model.py, aiu_custom/predict.py")
+        print("- 변환: local_serving/localservingtest.py, config/config.json, input_example.json, requirements.txt")
+        return
+
     print(f"Project: {report.project_path}")
     print(f"Data root: {report.data_root}")
 
@@ -3505,11 +3524,12 @@ def print_report(report: PreparedModelReport) -> None:
         data_model_count = sum(1 for path in report.model_artifact_paths if path == "data" or path.startswith("data/"))
         total_model_count = len(report.model_artifact_paths)
         print("\n모델 선택 화면")
-        print(format_model_selection_hint())
         if report.selected_model_path:
             print(f"- 선택 모델: {report.selected_model_path}")
+            print(f"- MODEL_KIND: {report.model_kind or 'missing'}")
             print("- 이후 단계는 이 선택 모델 기준으로 계속 진행합니다.")
         else:
+            print(format_model_selection_hint())
             if data_model_count == total_model_count:
                 print(f"- data 폴더에 {total_model_count}개 모델이 있습니다. 선택해주세요.")
             elif data_model_count:
@@ -3517,14 +3537,54 @@ def print_report(report: PreparedModelReport) -> None:
             else:
                 print(f"- 현재 프로젝트 루트 바로 아래에 {total_model_count}개 모델이 있습니다. 선택해주세요.")
             print("- 숫자키는 TODO 단계가 아니라 아래 모델 번호 선택입니다.")
-        for index, path in enumerate(report.model_artifact_paths, start=1):
-            marker = " <선택됨>" if path == report.selected_model_path else ""
-            print(f"  {index}. {path}{marker}")
-        if report.selected_model_path is None:
+            for index, path in enumerate(report.model_artifact_paths, start=1):
+                print(f"  {index}. {path}")
             print("- 실행 예: python .opencode/scripts/04-train-model/prepare_selected_model.py --project . --model <번호 또는 경로> --execute")
             print("- 선택 후 자동 진행: 템플릿 복사 -> runtest_2.py 생성 -> input_example.json 생성 -> 선택 모델 기준 연결부 변환")
 
     print_todo_guide(report)
+
+    if not verbose:
+        if report.required_requirements:
+            print("\nrequirements.txt 필수 항목:")
+            print("- " + ", ".join(report.required_requirements))
+        if report.prepared_paths:
+            print("\n준비 결과:")
+            if report.failures:
+                print("- 실패")
+            elif report.execute:
+                print("- 완료: 템플릿 복사, runtest_2.py 생성, requirements/input/config 갱신, 런타임 연결부 변환")
+            else:
+                print("- dry-run: --execute를 붙이면 실제 파일을 갱신합니다.")
+        if report.warnings:
+            actionable_warnings = [
+                warning
+                for warning in report.warnings
+                if not warning.startswith("numeric_model_selection_resolved:")
+            ]
+            if actionable_warnings:
+                print("\nWarnings:")
+                for warning in actionable_warnings:
+                    print(f"- {warning}")
+        if report.failures:
+            print("\nFailures:")
+            for failure in report.failures:
+                print(f"- {failure}")
+        print("\n다음 단계:")
+        if report.failures:
+            if report.next_steps:
+                for step in report.next_steps[:3]:
+                    print(f"- {step}")
+            else:
+                print("- 오류 항목을 수정한 뒤 같은 명령을 다시 실행하세요.")
+        elif report.selected_model_path:
+            print("- 4번 환경 체크: python .opencode/scripts/03-environment-check/check_environment.py --project . --entrypoint runtest_2.py")
+            print("- 5번 원격 MLflow 등록: python runtest_2.py")
+            print("- 6번 추론 테스트: python local_serving/localservingtest.py")
+        elif report.next_steps:
+            for step in report.next_steps[:3]:
+                print(f"- {step}")
+        return
 
     print("\nmodel_artifact_paths:")
     if report.model_artifact_paths:
@@ -3591,13 +3651,14 @@ def main() -> int:
     parser.add_argument("--force", action="store_true", help="kept for compatibility; runtest_2.py is refreshed for the selected model")
     parser.add_argument("--sync-runtime", action="store_true", help="reuse the selected model and transform runtime folders/files for that model")
     parser.add_argument("--json", action="store_true", help="print machine-readable JSON")
+    parser.add_argument("--verbose", action="store_true", help="print detailed model lists, prepared files, warnings, and next steps")
     args = parser.parse_args()
 
     report = build_report(args)
     if args.json:
         print(json.dumps(asdict(report), ensure_ascii=False, indent=2))
     else:
-        print_report(report)
+        print_report(report, verbose=args.verbose)
     return 1 if report.failures else 0
 
 

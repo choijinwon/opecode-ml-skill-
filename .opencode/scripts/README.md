@@ -188,7 +188,7 @@ python .opencode/scripts/04-train-model/prepare_selected_model.py --project <mod
 python .opencode/scripts/04-train-model/prepare_selected_model.py --project <model-project-folder> --sync-runtime --execute
 ```
 
-숫자 선택은 현재 출력된 `model_artifact_paths` 순서에 의존한다. 목록이 바뀔 수 있으므로 자동 준비/재실행에는 실제 모델 경로 또는 `--model selected`를 우선 사용한다.
+숫자 선택은 프로젝트 기준 상대경로 알파벳 정렬의 `model_artifact_paths` 순서를 사용한다. 같은 파일 목록이면 분석 화면과 준비 스크립트의 번호가 항상 같다. 자동 재실행에는 실제 모델 경로 또는 `--model selected`도 사용할 수 있다.
 
 출력 항목:
 

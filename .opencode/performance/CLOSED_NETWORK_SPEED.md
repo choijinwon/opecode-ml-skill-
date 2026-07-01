@@ -15,7 +15,7 @@ python .opencode/scripts/apply_index_ignore.py --project .
 
 ```text
 AIU Studio 모드:
-  1. AIU Studio Guide 출력
+  1. AI Studio TODO Guide 출력
   2. workspace 분석
   3. model_found 결과와 다음 1개 행동만 안내
 

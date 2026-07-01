@@ -1381,7 +1381,10 @@ def print_text(report: EnvironmentReport):
         for item in report.export_ready:
             print(f"- {item.name}: {item.status}")
     if report.tod_guide:
-        print(format_todo_guide(("완료", "완료", "완료", "완료", "4번 완료 후", "선택 시", "오류 시")))
+        settings_ready = not report.source_input_required
+        step4_status = "완료" if settings_ready else "입력 필요"
+        step5_status = "다음" if settings_ready else "4번 완료 후"
+        print(format_todo_guide(("완료", "완료", "완료", step4_status, step5_status, "선택 시", "오류 시")))
     if report.blocked_summary:
         print("\n차단 항목 요약:")
         for index, item in enumerate(report.blocked_summary, start=1):

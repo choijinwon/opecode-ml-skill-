@@ -107,9 +107,15 @@ def main() -> int:
 
     if evidence or model_artifact_paths:
         print("- 발견 항목:")
-        discovered = [str(x) for x in evidence if x]
-        discovered.extend(str(path) for path in model_artifact_paths[:6])
-        for item in sorted(set(discovered))[:6]:
+        if model_artifact_paths:
+            print(f"  - 모델 후보: {len(model_artifact_paths)}개")
+        model_path_set = {str(path) for path in model_artifact_paths}
+        discovered = [
+            str(x)
+            for x in evidence
+            if x and str(x) not in model_path_set and not any(str(x).endswith(suffix) for suffix in [".pkl", ".joblib", ".pt", ".pth", ".onnx", ".h5", ".keras", ".safetensors", ".bst", ".ubj"])
+        ]
+        for item in sorted(set(discovered))[:5]:
             print(f"  - {item}")
 
     if model_artifact_paths:

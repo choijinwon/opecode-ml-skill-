@@ -79,6 +79,19 @@ ARTIFACT_SUFFIXES = [
     ".safetensors",
 ]
 
+ARTIFACT_KIND_BY_SUFFIX = {
+    ".keras": "tensorflow_keras",
+    ".h5": "tensorflow_h5",
+    ".pt": "pytorch",
+    ".pth": "pytorch",
+    ".safetensors": "safetensors",
+    ".onnx": "onnx",
+    ".pkl": "sklearn_pickle",
+    ".joblib": "sklearn_joblib",
+    ".bst": "xgboost_bst",
+    ".ubj": "xgboost_ubj",
+}
+
 ARTIFACT_DIR_HINTS = [
     "saved_model",
     "saved_model.pb",
@@ -196,6 +209,22 @@ def safe_relative(path: Path, base: Path) -> str:
         return str(path.relative_to(base))
     except ValueError:
         return str(path)
+
+
+def normalize_path_text(value: str) -> str:
+    return value.replace("\\", "/").replace("＼", "/").replace("￦", "/").replace("₩", "/")
+
+
+def artifact_kind(path: Path) -> str | None:
+    return ARTIFACT_KIND_BY_SUFFIX.get(path.suffix.lower())
+
+
+def model_sort_key(path: Path, project: Path) -> str:
+    try:
+        relative = path.resolve().relative_to(project.resolve())
+    except ValueError:
+        relative = path
+    return normalize_path_text(str(relative)).lower()
 
 
 def has_project_markers(path: Path) -> bool:
@@ -318,7 +347,7 @@ def find_artifacts(path: Path, max_depth: int = 4) -> list[Path]:
             artifacts.append(file_path)
         if file_path.name in ARTIFACT_DIR_HINTS:
             artifacts.append(file_path)
-    return sorted(set(artifacts))
+    return sorted(set(artifacts), key=lambda item: model_sort_key(item, path))
 
 
 def detect_framework(project: Path, requirements_text: str, artifacts: list[Path]) -> tuple[str, list[str]]:
